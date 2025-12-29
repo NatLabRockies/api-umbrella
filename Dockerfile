@@ -1,7 +1,7 @@
 ###
 # Build
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS build
+FROM public.ecr.aws/docker/library/debian:trixie AS build
 
 ARG TARGETARCH
 
@@ -95,7 +95,7 @@ RUN make && make clean:dev
 ###
 # Test
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS test
+FROM public.ecr.aws/docker/library/debian:trixie AS test
 
 ARG TARGETARCH
 
@@ -148,7 +148,7 @@ ENV \
 ###
 # Install
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS install
+FROM public.ecr.aws/docker/library/debian:trixie AS install
 
 RUN apt-get update && \
   apt-get -y install git rsync && \
@@ -165,7 +165,7 @@ RUN DESTDIR="/build/install-destdir" PREFIX=/opt/api-umbrella ./tasks/install
 ###
 # Runtime
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS runtime
+FROM public.ecr.aws/docker/library/debian:trixie AS runtime
 
 COPY --from=install /build/install-destdir /
 COPY build/package/scripts/after-install /tmp/install/build/package/scripts/after-install
@@ -186,7 +186,7 @@ CMD ["api-umbrella", "run"]
 ###
 # Build - envoy-config-wrapper
 ###
-FROM rust:1-slim-bookworm AS envoy-config-wrapper-build
+FROM rust:1-slim-trixie AS envoy-config-wrapper-build
 
 # Use the musl target for static binaries that will work in the distroless
 # image.
