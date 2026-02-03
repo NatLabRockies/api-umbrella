@@ -35,8 +35,8 @@ QueryBuilder.define('filter-description', function() {
         buttonEl.innerHTML = '<i class="fas fa-question-circle"></i>';
 
         const ruleActionEl = rule.$el[0].querySelector(QueryBuilder.selectors.rule_actions);
-        //todo: shifted this to the right to match our other apps, but double-check w/Nick (also in the updated BS for this button, the text color is now black for this btn color, do we want to keep or customize it to be back to white? )
-        ruleActionEl.append(buttonEl);
+        //todo: double-check w/Nick (also in the updated BS for this button, the text color is now black for this btn color, do we want to keep or customize it to be back to white? )
+        ruleActionEl.prepend(buttonEl);
       } else {
         buttonEl.style.display = '';
       }
