@@ -2,15 +2,18 @@ local config = require("api-umbrella.utils.load_config")()
 local deep_merge_overwrite_arrays = require "api-umbrella.utils.deep_merge_overwrite_arrays"
 
 local api_key_prefixer = require("api-umbrella.utils.api_key_prefixer").prefix
+local db = require "lapis.db"
+local encryptor = require "api-umbrella.utils.encryptor"
+local hmac = require "api-umbrella.utils.hmac"
 local interval_lock = require "api-umbrella.utils.interval_lock"
+local pg_encode_json = require("pgmoon.json").encode_json
 local pg_utils = require "api-umbrella.utils.pg_utils"
 local random_token = require "api-umbrella.utils.random_token"
-local hmac = require "api-umbrella.utils.hmac"
-local encryptor = require "api-umbrella.utils.encryptor"
 local uuid = require "resty.uuid"
 
-local timer_at = ngx.timer.at
+local db_raw = db.raw
 local sleep = ngx.sleep
+local timer_at = ngx.timer.at
 
 local function wait_for_postgres()
   local postgres_alive = false
@@ -86,6 +89,19 @@ local function seed_api_keys()
       },
     },
   }
+
+  -- Development-only demo API user with a known API key
+  if config["app_env"] == "development" then
+    table.insert(keys, {
+      api_key = "DEMO_KEY_FOR_DEVELOPMENT_ONLY_1234567890",
+      email = "demo.developer@example.com",
+      first_name = "Demo",
+      last_name = "Developer",
+      use_description = "Demo API user for local development testing",
+      registration_source = "seed",
+      terms_and_conditions = true,
+    })
+  end
 
   for _, data in ipairs(keys) do
     pg_utils.query("START TRANSACTION")
@@ -352,6 +368,133 @@ local function seed_admin_permissions()
   end
 end
 
+local function seed_dev_api_backend()
+  if config["app_env"] ~= "development" then
+    return
+  end
+
+  local backend_name = "HTTPBin Echo API (Dev)"
+
+  pg_utils.query("START TRANSACTION")
+  set_stamping()
+
+  local result, backend_err = pg_utils.query("SELECT * FROM api_backends WHERE name = :name LIMIT 1", { name = backend_name })
+  if not result then
+    ngx.log(ngx.ERR, "failed to query api_backends: ", backend_err)
+    return
+  end
+
+  local backend_id
+  if result[1] then
+    backend_id = result[1]["id"]
+  else
+    backend_id = uuid.generate_random()
+
+    local insert_result, insert_err = pg_utils.insert("api_backends", {
+      id = backend_id,
+      name = backend_name,
+      backend_protocol = "https",
+      frontend_host = "localhost",
+      backend_host = "httpbin.org",
+      balance_algorithm = "least_conn",
+      organization_name = "Development",
+      status_description = "Development testing backend",
+    })
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in api_backends: ", insert_err)
+      return
+    end
+
+    insert_result, insert_err = pg_utils.insert("api_backend_servers", {
+      id = uuid.generate_random(),
+      api_backend_id = backend_id,
+      host = "httpbin.org",
+      port = 443,
+    })
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in api_backend_servers: ", insert_err)
+      return
+    end
+
+    insert_result, insert_err = pg_utils.insert("api_backend_url_matches", {
+      id = uuid.generate_random(),
+      api_backend_id = backend_id,
+      frontend_prefix = "/echo/",
+      backend_prefix = "/",
+    })
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in api_backend_url_matches: ", insert_err)
+      return
+    end
+  end
+
+  pg_utils.query("COMMIT")
+
+  -- Publish the backend so it's immediately active
+  pg_utils.query("START TRANSACTION")
+  set_stamping()
+
+  local published_result, published_err = pg_utils.query("SELECT * FROM published_config ORDER BY id DESC LIMIT 1")
+  if not published_result then
+    ngx.log(ngx.ERR, "failed to query published_config: ", published_err)
+    return
+  end
+
+  local current_config = {}
+  if published_result[1] and published_result[1]["config"] then
+    current_config = published_result[1]["config"]
+  end
+  if not current_config["apis"] then
+    current_config["apis"] = {}
+  end
+  if not current_config["website_backends"] then
+    current_config["website_backends"] = {}
+  end
+
+  local already_published = false
+  for _, api in ipairs(current_config["apis"]) do
+    if api["id"] == backend_id then
+      already_published = true
+      break
+    end
+  end
+
+  if not already_published then
+    table.insert(current_config["apis"], {
+      id = backend_id,
+      name = backend_name,
+      backend_protocol = "https",
+      frontend_host = "localhost",
+      backend_host = "httpbin.org",
+      balance_algorithm = "least_conn",
+      organization_name = "Development",
+      status_description = "Development testing backend",
+      servers = {
+        {
+          host = "httpbin.org",
+          port = 443,
+        },
+      },
+      url_matches = {
+        {
+          frontend_prefix = "/echo/",
+          backend_prefix = "/",
+        },
+      },
+    })
+
+    local insert_result, insert_err = pg_utils.query(
+      "INSERT INTO published_config (config) VALUES (:config)",
+      { config = db_raw(pg_encode_json(current_config)) }
+    )
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in published_config: ", insert_err)
+    end
+  end
+
+  pg_utils.query("COMMIT")
+end
+
 local function seed()
   local _, err = wait_for_postgres()
   if err then
@@ -363,6 +506,7 @@ local function seed()
   seed_api_keys()
   seed_initial_superusers()
   seed_admin_permissions()
+  seed_dev_api_backend()
 end
 
 local _M = {}
