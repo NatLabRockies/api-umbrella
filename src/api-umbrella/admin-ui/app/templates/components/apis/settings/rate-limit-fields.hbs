@@ -47,17 +47,17 @@
                     </div>
                   </td>
                   <td class="text-center">
-                    <div class="custom-control custom-radio custom-control-no-label mt-1">
+                    <div class="form-check custom-control-no-label mt-1">
                       <input
                         type="radio"
                         name={{this.uniqueSettingsId}}
                         id={{concat this.uniqueSettingsId "_" rateLimit.uniqueId}}
                         checked={{rateLimit.responseHeaders}}
                         value={{true}}
-                        class="rate-limit-response-headers custom-control-input"
+                        class="rate-limit-response-headers form-check-input"
                         onclick={{action "primaryRateLimitChange" rateLimit}}
                       />
-                      <label class="custom-control-label" for="{{this.uniqueSettingsId}}_{{rateLimit.uniqueId}}"><span class="sr-only">Use as primary rate limit</span></label>
+                      <label class="form-check-label" for="{{this.uniqueSettingsId}}_{{rateLimit.uniqueId}}"><span class="sr-only">Use as primary rate limit</span></label>
                     </div>
                   </td>
                   <td class="table-row-actions">

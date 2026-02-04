@@ -15,9 +15,9 @@
               <input type="hidden" name="config[{{this.category}}][{{record.id}}][active_version]" value={{record.active.version}}>
               <input type="hidden" name="config[{{this.category}}][{{record.id}}][pending_version]" value={{record.pending.version}}>
               <input type="hidden" name="config[{{this.category}}][{{record.id}}][publish]" value="0">
-              <div class="custom-control custom-checkbox custom-control-no-label">
-                <input type="checkbox" class="custom-control-input" name="config[{{this.category}}][{{record.id}}][publish]" value="1" id="config_{{this.category}}_{{record.id}}">
-                <label class="custom-control-label" for="config_{{this.category}}_{{record.id}}"><span class="sr-only">Publish {{record.name}} changes</span></label>
+              <div class="form-check custom-control-no-label">
+                <input type="checkbox" class="form-check-input" name="config[{{this.category}}][{{record.id}}][publish]" value="1" id="config_{{this.category}}_{{record.id}}">
+                <label class="form-check-label" for="config_{{this.category}}_{{record.id}}"><span class="sr-only">Publish {{record.name}} changes</span></label>
               </div>
             </td>
             <td>{{record.name}}<br><small><a href="#" {{action "toggleConfigDiff" record.id}}>View Config Differences</a></small></td>

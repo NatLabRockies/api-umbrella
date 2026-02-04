@@ -1,14 +1,14 @@
 <FormFields::FieldWrapper @model={{this.model}} @style={{this.style}} @fieldName={{this.fieldName}} @inputId={{this.inputId}} @label={{this.label}} @tooltip={{this.tooltip}} @hint={{this.hint}}>
   {{#each this.checkboxes as |checkbox|}}
-    <div class="custom-control custom-checkbox">
+    <div class="form-check">
       <input
         type="checkbox"
         checked={{checkbox.isChecked}}
         onclick={{action (action this.toggleCheckbox checkbox.option.id) value="target.checked"}}
         id={{checkbox.inputId}}
-        class="custom-control-input"
+        class="form-check-input"
       />
-      <label class="custom-control-label" for={{checkbox.inputId}}>{{checkbox.option.name}}</label>
+      <label class="form-check-label" for={{checkbox.inputId}}>{{checkbox.option.name}}</label>
     </div>
   {{/each}}
 </FormFields::FieldWrapper>

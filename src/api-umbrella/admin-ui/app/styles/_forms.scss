@@ -3,7 +3,6 @@ label {
   margin-bottom: 0.1rem;
 }
 
-.custom-control-label,
 .form-check-label {
   font-weight: normal;
 }
@@ -28,7 +27,7 @@ fieldset {
 fieldset.collapsible {
   margin-bottom: 12px;
 
-  .collapse.in {
+  .collapse.show {
     margin-bottom: 24px;
   }
 }
@@ -76,6 +75,7 @@ fieldset .table {
   margin-bottom: 4px;
 }
 
+
 .has-error {
   .form-control {
     @extend .is-invalid;
@@ -121,17 +121,17 @@ fieldset .table {
   margin-top: 20px;
 }
 
-.custom-control.custom-control-no-label {
+.form-check.custom-control-no-label {
   display: inline-block;
   padding-left: 1rem;
 
-  .custom-control-label {
+  .form-check-label {
     display: block;
     width: 0px;
   }
 
-  .custom-control-label::before,
-  .custom-control-label::after {
+  .form-check-label::before,
+  .form-check-label::after {
     left: -1rem;
   }
 }
@@ -140,9 +140,9 @@ fieldset .table {
   .btn-loading-label {
     display: none;
 
-    // .svg-inline--fa:first-child {
-    //   @extend .mr-2;
-    // }
+    .svg-inline--fa:first-child {
+      @extend .me-2;
+    }
   }
 
   &.btn-loading {
