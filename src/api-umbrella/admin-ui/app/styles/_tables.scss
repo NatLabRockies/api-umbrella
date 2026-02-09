@@ -1,7 +1,5 @@
 @import "node_modules/datatables.net-bs5/css/dataTables.bootstrap5";
 
-// todo: see nick's response, but need to update both pkgs for datatables to be congruent with bs5
-
 .table-nowrap th,
 .table-nowrap td {
   white-space: nowrap;
@@ -12,7 +10,7 @@ table.dataTable.table thead .sorting:after,
 table.dataTable.table thead .sorting_asc:before,
 table.dataTable.table thead .sorting_asc:after,
 table.dataTable.table thead .sorting_desc:before,
-table.dataTable.table thead .sorting_desc:after, {
+table.dataTable.table thead .sorting_desc:after {
   display: none;
 }
 
@@ -21,7 +19,7 @@ table.dataTable.table thead .sorting_asc,
 table.dataTable.table thead .sorting_desc {
   .svg-inline--fa.fa-sort,
   .svg-inline--fa.fa-sort-up,
-  .svg-inline--fa.fa-sort-down, {
+  .svg-inline--fa.fa-sort-down {
     color: $gray-500;
     position: absolute;
     right: 0.5rem;
@@ -33,7 +31,7 @@ table.dataTable.table thead .sorting_asc,
 table.dataTable.table thead .sorting_desc {
   .svg-inline--fa.fa-sort,
   .svg-inline--fa.fa-sort-up,
-  .svg-inline--fa.fa-sort-down, {
+  .svg-inline--fa.fa-sort-down {
     color: $link-color;
   }
 }
@@ -41,7 +39,7 @@ table.dataTable.table thead .sorting_desc {
 table.dataTable.table thead .sorting_disabled {
   .svg-inline--fa.fa-sort,
   .svg-inline--fa.fa-sort-up,
-  .svg-inline--fa.fa-sort-down, {
+  .svg-inline--fa.fa-sort-down {
     display: none;
   }
 }
