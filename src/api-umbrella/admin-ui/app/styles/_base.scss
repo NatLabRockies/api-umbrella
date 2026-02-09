@@ -172,6 +172,6 @@ a:hover {
   text-decoration: underline;
 }
 
-.btn-info {
+.btn-info, .btn:focus-visible {
   --bs-btn-color: white;
 }
