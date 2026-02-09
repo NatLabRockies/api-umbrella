@@ -1,5 +1,7 @@
 @import "node_modules/datatables.net-bs4/css/dataTables.bootstrap4";
 
+// todo: see nick's response, but need to update both pkgs for datatables to be congruent with bs5
+
 .table-nowrap th,
 .table-nowrap td {
   white-space: nowrap;
