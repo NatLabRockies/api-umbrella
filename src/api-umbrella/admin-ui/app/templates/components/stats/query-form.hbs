@@ -50,7 +50,9 @@
               </div>
               <div class="row">
                 <div class="col-sm-6">
-                  <div class="form-control-plaintext form-control-sm text-muted">{{! template-lint-disable no-bare-strings no-triple-curlies }}{{{t "Advanced filters use <a href=\"#query_syntax_help_content\" rel=\"popover\" class=\"text-decoration-link\">Lucene's Query Syntax</a>."}}}</div>
+                  <div class="form-control-plaintext form-control-sm text-muted">
+                    {{! template-lint-disable no-bare-strings no-triple-curlies }}{{{t "Advanced filters use <a href=\"#query_syntax_help_content\" data-bs-toggle=\"popover\" data-bs-trigger=\"focus\" class=\"text-decoration-link lucene-help-link\">Lucene's Query Syntax</a>."}}}
+                  </div>
                 </div>
                 <div class="col-sm-6 text-right">
                   <div class="form-control-plaintext form-control-sm">

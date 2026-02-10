@@ -14,6 +14,8 @@ import QueryBuilder from 'jQuery-QueryBuilder';
 import forEach from 'lodash-es/forEach';
 import { marked } from 'marked';
 import moment from 'moment-timezone';
+import Popover from 'bootstrap/js/dist/popover'
+
 
 marked.use({
   gfm: true,
@@ -35,7 +37,6 @@ QueryBuilder.define('filter-description', function() {
         buttonEl.innerHTML = '<i class="fas fa-question-circle"></i>';
 
         const ruleActionEl = rule.$el[0].querySelector(QueryBuilder.selectors.rule_actions);
-        //todo: double-check w/Nick (also in the updated BS for this button, the text color is now black for this btn color, do we want to keep or customize it to be back to white? )
         ruleActionEl.prepend(buttonEl);
       } else {
         buttonEl.style.display = '';
@@ -474,6 +475,28 @@ export default class QueryForm extends Component {
       this.send('toggleFilterType', 'builder');
     } else if(this.search) {
       this.send('toggleFilterType', 'advanced');
+    }
+
+    const helpTriggerLink = document.querySelector('.lucene-help-link');
+    const helpContent = document.getElementById('query_syntax_help_content');
+
+    if (helpTriggerLink && helpContent) {
+      helpTriggerLink.addEventListener('click', (e) => {
+        e.preventDefault();
+    });
+
+      this.popoverInstance = new Popover(helpTriggerLink, {
+        container: 'body',
+        html: true,
+        content: helpContent.innerHTML,
+        trigger: 'focus'
+    });
+  }
+}
+
+  willDestroyElement() {
+    if (this.popoverInstance) {
+      this.popoverInstance.dispose();
     }
   }
 
