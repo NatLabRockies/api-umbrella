@@ -25,7 +25,7 @@ Are you interested in working on the code behind API Umbrella? See our [developm
 
 * [api.data.gov](https://api.data.gov/)
 * [NREL Developer Network](http://developer.nrel.gov/)
-* [api.sam.gov](https://api.sam.gov)
+* [sam.gov](https://sam.gov)
 
 Are you using API Umbrella? [Edit this file](https://github.com/NREL/api-umbrella/blob/master/README.md) and let us know.
 
