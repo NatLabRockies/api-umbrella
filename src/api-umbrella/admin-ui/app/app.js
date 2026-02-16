@@ -4,6 +4,8 @@ import loadInitializers from 'ember-load-initializers';
 import config from 'api-umbrella-admin-ui/config/environment';
 import { importSync, macroCondition, isDevelopingApp, isTesting } from '@embroider/macros';
 
+//todo: making a note here to return to remove, in order to make an in-progress commit of ember upgrade
+
 if (macroCondition(isDevelopingApp() || isTesting())) {
   importSync('./deprecation-workflow');
 }
