@@ -4,7 +4,7 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const sass = require('sass');
 const autoprefixer = require('autoprefixer');
 
-module.exports = function(defaults) {
+module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
     autoImport: {
       alias: {
@@ -54,14 +54,25 @@ module.exports = function(defaults) {
       includePolyfill: true,
     },
 
+    //todo: ask Nick about this
     'ember-bootstrap': {
-      'bootstrapVersion': 4,
-      'importBootstrapFont': false,
-      'importBootstrapCSS': false,
+      bootstrapVersion: 4,
+      importBootstrapFont: false,
+      importBootstrapCSS: false,
     },
 
     'ember-simple-auth': {
       useSessionSetupMethod: true,
+    },
+
+    emberData: {
+      deprecations: {
+        // New projects can safely leave this deprecation disabled.
+        // If upgrading, to opt-into the deprecated behavior, set this to true and then follow:
+        // https://deprecations.emberjs.com/id/ember-data-deprecate-store-extends-ember-object
+        // before upgrading to Ember Data 6.0
+        DEPRECATE_STORE_EXTENDS_EMBER_OBJECT: false,
+      },
     },
   });
 

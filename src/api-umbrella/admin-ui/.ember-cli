@@ -1,5 +1,5 @@
 {
-  /**
+    /**
     Ember CLI sends analytics information by default. The data is completely
     anonymous, but there are times when you might want to disable this behavior.
 
@@ -13,7 +13,19 @@
   */
   "isTypeScriptProject": false,
 
-  // Set relative URL for livereload.js script so it loads through the HTTPS
+  /**
+    Setting `componentAuthoringFormat` to "strict" will force the blueprint generators to generate GJS
+    or GTS files for the component and the component rendering test. "loose" is the default.
+  */
+  "componentAuthoringFormat": "loose",
+
+  /**
+    Setting `routeAuthoringFormat` to "strict" will force the blueprint generators to generate GJS
+    or GTS templates for routes. "loose" is the default
+  */
+  "routeAuthoringFormat": "loose",
+
+   // Set relative URL for livereload.js script so it loads through the HTTPS
   // proxy.
   "liveReloadJsUrl": "/livereload.js"
 }
