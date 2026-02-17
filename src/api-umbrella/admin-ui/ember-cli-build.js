@@ -1,18 +1,15 @@
-'use strict';;
+'use strict';
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const { compatBuild } = require('@embroider/compat');
 const sass = require('sass');
 const autoprefixer = require('autoprefixer');
-
-const {
-  compatBuild
-} = require("@embroider/compat");
 
 module.exports = async function(defaults) {
   const {
     buildOnce
   } = await import("@embroider/vite");
 
-  const app = new EmberApp(defaults, {
+  let app = new EmberApp(defaults, {
     autoImport: {
       alias: {
         'jQuery-QueryBuilder': 'jQuery-QueryBuilder/dist/js/query-builder.standalone',

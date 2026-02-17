@@ -30,7 +30,6 @@ Make use of the many generators for code, try `npm exec ember help generate` for
 ### Running Tests
 
 - `npm run test`
-- `npm run test -- --server`
 
 ### Linting
 
@@ -48,7 +47,6 @@ Specify what it takes to deploy your app.
 
 ## Further Reading / Useful Links
 
-- [ember.js](https://emberjs.com/)
 - [Vite](https://vite.dev)
 - Development Browser Extensions
   - [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)

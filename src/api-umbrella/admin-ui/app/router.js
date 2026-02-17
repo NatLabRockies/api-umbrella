@@ -1,4 +1,4 @@
-import EmberRouter from '@ember/routing/router';
+import EmberRouter from '@embroider/router';
 import config from 'api-umbrella-admin-ui/config/environment';
 
 export default class Router extends EmberRouter {
