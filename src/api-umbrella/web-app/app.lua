@@ -10,16 +10,11 @@ local http_headers = require "api-umbrella.utils.http_headers"
 local is_empty = require "api-umbrella.utils.is_empty"
 local lapis = require "lapis"
 local lapis_config = require("lapis.config").get()
+local pg_utils = require "api-umbrella.utils.pg_utils"
 local refresh_local_active_config_cache = require("api-umbrella.web-app.stores.active_config_store").refresh_local_cache
 local resty_session = require "resty.session"
 local t = require("api-umbrella.web-app.utils.gettext").gettext
 local table_keys = require("pl.tablex").keys
-
-require "resty.session.ciphers.api_umbrella"
-require "resty.session.hmac.api_umbrella"
-require "resty.session.identifiers.api_umbrella"
-require "resty.session.storage.api_umbrella_db"
-require "resty.session.serializers.api_umbrella"
 
 local supported_languages = table_keys(LOCALE_DATA)
 
@@ -77,24 +72,26 @@ end
 -- server-side control on expiring sessions, and it can't be spoofed even with
 -- knowledge of the encryption secret key.
 local session_db_options = {
-  storage = "api_umbrella_db",
-  cipher = "api_umbrella",
-  hmac = "api_umbrella",
-  serializer = "api_umbrella",
-  identifier = "api_umbrella",
-  name = "_api_umbrella_session",
+  storage = "postgres",
+  postgres = {
+    host = pg_utils.db_config.host,
+    port = pg_utils.db_config.port,
+    database = pg_utils.db_config.database,
+    username = pg_utils.db_config.user,
+    password = pg_utils.db_config.password,
+    ssl = pg_utils.db_config.ssl,
+    ssl_verify = pg_utils.db_config.ssl_verify,
+    ssl_required = pg_utils.db_config.ssl_required,
+    table = "api_umbrella.sessions",
+  },
   secret = assert(config["secret_key"]),
-  random = {
-    length = 40,
-  },
-  cookie = {
-    samesite = "Lax",
-    secure = true,
-    httponly = true,
-    idletime = 30 * 60, -- 30 minutes
-    lifetime = 12 * 60 * 60, -- 12 hours
-    renew = -1, -- Disable renew
-  },
+  cookie_name = "_api_umbrella_session",
+  cookie_same_site = "Lax",
+  cookie_secure = true,
+  cookie_http_only = true,
+  idling_timeout = 30 * 60, -- 30 minutes
+  rolling_timeout = 0, -- disabled, matches v3 renew=-1
+  absolute_timeout = 12 * 60 * 60, -- 12 hours
 }
 local function init_session_db(self)
   if not self.session_db then
@@ -112,22 +109,14 @@ end
 -- session records in the database for the CSRF token).
 local session_cookie_options = {
   storage = "cookie",
-  cipher = "api_umbrella",
-  hmac = "api_umbrella",
-  serializer = "api_umbrella",
-  identifier = "api_umbrella",
-  name = "_api_umbrella_session_client",
   secret = assert(config["secret_key"]),
-  random = {
-    length = 40,
-  },
-  cookie = {
-    samesite = "Lax",
-    secure = true,
-    httponly = true,
-    lifetime = 48 * 60 * 60, -- 48 hours
-    renew = 1 * 60 * 60, -- 1 hour
-  },
+  cookie_name = "_api_umbrella_session_client",
+  cookie_same_site = "Lax",
+  cookie_secure = true,
+  cookie_http_only = true,
+  idling_timeout = 0, -- disabled for cookie-only sessions
+  rolling_timeout = 1 * 60 * 60, -- 1 hour
+  absolute_timeout = 48 * 60 * 60, -- 48 hours
 }
 local function init_session_cookie(self)
   if not self.session_cookie then
@@ -138,17 +127,19 @@ end
 local function current_admin_from_session(self)
   local current_admin
   self:init_session_db()
-  local _, _, open_err = self.session_db:start()
-  if open_err then
-    if open_err == "session cookie idle time has passed" or open_err == "session cookie has expired" then
-      flash.session(self, "info", t("Your session expired. Please sign in again to continue."))
-    else
-      ngx.log(ngx.ERR, "session open error: ", open_err)
+  local ok, open_err = self.session_db:open()
+  if not ok then
+    if open_err and open_err ~= "missing session cookie" then
+      if open_err == "session idling timeout exceeded" or open_err == "session absolute timeout exceeded" then
+        flash.session(self, "info", t("Your session expired. Please sign in again to continue."))
+      else
+        ngx.log(ngx.ERR, "session open error: ", open_err)
+      end
     end
   end
 
-  if self.session_db and self.session_db.data and self.session_db.data["admin_id"] then
-    local admin_id = self.session_db.data["admin_id"]
+  local admin_id = self.session_db:get("admin_id")
+  if admin_id then
     local admin = Admin:find({ id = admin_id })
     if admin and not admin:is_access_locked() then
       current_admin = admin

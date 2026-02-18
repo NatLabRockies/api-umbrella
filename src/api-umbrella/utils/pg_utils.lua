@@ -207,7 +207,11 @@ function _M.connect()
     return nil, err
   end
 
-  _M.setup_connection(pg, "api-umbrella")
+  -- Always force session variable setup on every connection, even for reused
+  -- keepalive sockets. Other libraries (e.g., lua-resty-session's postgres
+  -- storage) may share the same connection pool and return connections without
+  -- the expected search_path set.
+  _M.setup_connection(pg, "api-umbrella", true)
 
   return pg
 end

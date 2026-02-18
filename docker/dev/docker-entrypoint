@@ -15,6 +15,7 @@ mkdir -p /etc/api-umbrella
   echo "    password: dev_password"
 } > /etc/api-umbrella/api-umbrella.yml
 
+/app/configure
 mkdir -p /build/.task
 ln -snf /build/.task /app/.task
 

@@ -14,11 +14,13 @@ function _M.session(self, flash_type, message, options)
   data["message"] = message
 
   self:init_session_cookie()
-  self.session_cookie:start()
-  if not self.session_cookie.data["flash"] then
-    self.session_cookie.data["flash"] = {}
+  self.session_cookie:open()
+  local flash_data = self.session_cookie:get("flash")
+  if not flash_data then
+    flash_data = {}
   end
-  self.session_cookie.data["flash"][flash_type] = data
+  flash_data[flash_type] = data
+  self.session_cookie:set("flash", flash_data)
   self.session_cookie:save()
 end
 
@@ -27,17 +29,18 @@ function _M.setup(self)
 
   self.restore_flashes = function()
     self:init_session_cookie()
-    local _, _, open_err = self.session_cookie:start()
-    if open_err then
+    local ok, open_err = self.session_cookie:open()
+    if not ok and open_err and open_err ~= "missing session cookie" then
       ngx.log(ngx.ERR, "session open error: ", open_err)
     end
 
-    if self.session_cookie.data and not is_empty(self.session_cookie.data["flash"]) then
-      for flash_type, data in pairs(self.session_cookie.data["flash"]) do
+    local flash_data = self.session_cookie:get("flash")
+    if not is_empty(flash_data) then
+      for flash_type, data in pairs(flash_data) do
         _M.now(self, flash_type, data["message"], data)
       end
 
-      self.session_cookie.data["flash"] = nil
+      self.session_cookie:set("flash", nil)
       self.session_cookie:save()
     end
 

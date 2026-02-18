@@ -1271,12 +1271,10 @@ ALTER SEQUENCE api_umbrella.published_config_id_seq OWNED BY api_umbrella.publis
 --
 
 CREATE TABLE api_umbrella.sessions (
-    id_hash character varying(64) NOT NULL,
-    data_encrypted bytea NOT NULL,
-    data_encrypted_iv character varying(12) NOT NULL,
-    expires_at timestamp with time zone NOT NULL,
-    created_at timestamp with time zone DEFAULT transaction_timestamp() NOT NULL,
-    updated_at timestamp with time zone DEFAULT transaction_timestamp() NOT NULL
+    sid text NOT NULL,
+    name text,
+    data text,
+    exp timestamp with time zone
 );
 
 
@@ -1842,7 +1840,7 @@ ALTER TABLE ONLY api_umbrella.rate_limits
 --
 
 ALTER TABLE ONLY api_umbrella.sessions
-    ADD CONSTRAINT sessions_pkey PRIMARY KEY (id_hash);
+    ADD CONSTRAINT sessions_pkey PRIMARY KEY (sid);
 
 
 --
@@ -2034,7 +2032,7 @@ CREATE UNIQUE INDEX distributed_rate_limit_counters_version_idx ON api_umbrella.
 -- Name: sessions_expires_at_idx; Type: INDEX; Schema: api_umbrella; Owner: -
 --
 
-CREATE INDEX sessions_expires_at_idx ON api_umbrella.sessions USING btree (expires_at);
+CREATE INDEX sessions_exp_idx ON api_umbrella.sessions USING btree (exp);
 
 
 --
@@ -2616,13 +2614,6 @@ CREATE TRIGGER published_config_stamp_record BEFORE INSERT OR DELETE OR UPDATE O
 --
 
 CREATE TRIGGER rate_limits_stamp_record BEFORE INSERT OR DELETE OR UPDATE ON api_umbrella.rate_limits FOR EACH ROW EXECUTE FUNCTION api_umbrella.stamp_record('[{"table_name":"api_backend_settings","primary_key":"id","foreign_key":"api_backend_settings_id"},{"table_name":"api_user_settings","primary_key":"id","foreign_key":"api_user_settings_id"}]');
-
-
---
--- Name: sessions sessions_stamp_record; Type: TRIGGER; Schema: api_umbrella; Owner: -
---
-
-CREATE TRIGGER sessions_stamp_record BEFORE UPDATE ON api_umbrella.sessions FOR EACH ROW EXECUTE FUNCTION api_umbrella.update_timestamp();
 
 
 --

@@ -139,12 +139,12 @@ end
 
 function _M.destroy(self)
   self:init_session_db()
-  local _, _, open_err = self.session_db:start()
-  if open_err then
+  local ok, open_err = self.session_db:open()
+  if not ok and open_err and open_err ~= "missing session cookie" then
     ngx.log(ngx.ERR, "session open error: ", open_err)
   end
 
-  local sign_in_provider = self.session_db.data["sign_in_provider"]
+  local sign_in_provider = self.session_db:get("sign_in_provider")
   self.session_db:destroy()
 
   flash.session(self, "info", t("Signed out successfully."))
@@ -173,8 +173,11 @@ function _M.logout_callback(self)
   local state = ngx.var.arg_state
   if state then
     self:init_session_cookie()
-    self.session_cookie:start()
-    local session_state = self.session_cookie.data["openid_connect_state"]
+    local ok, open_err = self.session_cookie:open()
+    if not ok and open_err and open_err ~= "missing session cookie" then
+      ngx.log(ngx.ERR, "session open error: ", open_err)
+    end
+    local session_state = self.session_cookie:get("openid_connect_state")
     if state ~= session_state then
       ngx.log(ngx.WARN, "state from argument: " .. (state or "nil") .. " does not match state restored from session: " .. (session_state or "nil"))
 

@@ -17,9 +17,9 @@ return function(self, admin, provider)
   db.query("COMMIT")
 
   self:init_session_db()
-  self.session_db:start()
-  self.session_db.data["admin_id"] = admin_id
-  self.session_db.data["sign_in_provider"] = provider
+  self.session_db:open()
+  self.session_db:set("admin_id", admin_id)
+  self.session_db:set("sign_in_provider", provider)
   self.session_db:save()
 
   return build_url("/admin/#/login")

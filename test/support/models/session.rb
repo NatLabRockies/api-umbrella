@@ -1,3 +1,3 @@
 class Session < ApplicationRecord
-  self.primary_key = "id_hash"
+  self.primary_key = "sid"
 end
