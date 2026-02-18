@@ -563,7 +563,7 @@ function _M:aggregate_by_drilldown(prefix, size)
   end
 end
 
-function _M:aggregate_by_drilldown_over_time()
+function _M:aggregate_by_drilldown_over_time(hits_over_time_max_buckets)
   if not is_empty(self.errors) then
     return false
   end
@@ -573,9 +573,21 @@ function _M:aggregate_by_drilldown_over_time()
   assert(self.drilldown_prefix)
   assert(self.drilldown_depth)
 
+  local ok = validation_ext.optional.tonumber.number(hits_over_time_max_buckets)
+  if not ok then
+    add_error(self.errors, "hits_over_time_max_buckets", "hits_over_time_max_buckets", t("is not a number"))
+    return false
+  end
+
+  local size = tonumber(hits_over_time_max_buckets) or 10
+  if size < 1 or size > 100 then
+    add_error(self.errors, "hits_over_time_max_buckets", "hits_over_time_max_buckets", t("must be between 1 and 100"))
+    return false
+  end
+
   self.body["aggregations"]["top_path_hits_over_time"] = {
     terms = {
-      size = 10,
+      size = size,
     },
     aggregations = {
       drilldown_over_time = {
