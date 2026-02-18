@@ -60,7 +60,7 @@ module.exports = async function(defaults) {
 
     //todo: ask Nick about this
     'ember-bootstrap': {
-      bootstrapVersion: 4,
+      bootstrapVersion: 5,
       importBootstrapFont: false,
       importBootstrapCSS: false,
     },

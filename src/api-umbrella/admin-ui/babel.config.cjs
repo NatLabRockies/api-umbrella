@@ -4,6 +4,10 @@ const {
 } = require('@embroider/compat/babel');
 
 module.exports = {
+  ignore: [
+    /node_modules\/ember-inflector/,
+  ],
+  
   plugins: [
     [
       'babel-plugin-ember-template-compilation',

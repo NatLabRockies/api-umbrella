@@ -1,0 +1,2428 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@babel/eslint-parser": {
+      "name": "@babel/eslint-parser",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "eslint"
+      ],
+      "effects": [
+        "ember-eslint-parser",
+        "ember-simple-auth"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@babel/eslint-parser"
+      ],
+      "fixAvailable": {
+        "name": "ember-simple-auth",
+        "version": "8.3.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@babel/runtime": {
+      "name": "@babel/runtime",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1104000,
+          "name": "@babel/runtime",
+          "dependency": "@babel/runtime",
+          "title": "Babel has inefficient RegExp complexity in generated code with .replace when transpiling named capturing groups",
+          "url": "https://github.com/advisories/GHSA-968p-4wvh-cqc8",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 6.2,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<7.26.10"
+        }
+      ],
+      "effects": [
+        "ember-cli-babel"
+      ],
+      "range": "<7.26.10",
+      "nodes": [
+        "node_modules/@ember-decorators/component/node_modules/@babel/runtime",
+        "node_modules/@ember-decorators/object/node_modules/@babel/runtime",
+        "node_modules/@ember-decorators/utils/node_modules/@babel/runtime",
+        "node_modules/@embroider/util/node_modules/@babel/runtime",
+        "node_modules/@fortawesome/ember-fontawesome/node_modules/@babel/runtime",
+        "node_modules/ember-ajax/node_modules/@babel/runtime",
+        "node_modules/ember-buffered-proxy/node_modules/@babel/runtime",
+        "node_modules/ember-cache-primitive-polyfill/node_modules/@babel/runtime",
+        "node_modules/ember-classic-decorator/node_modules/@babel/runtime",
+        "node_modules/ember-cli-babel/node_modules/@babel/runtime",
+        "node_modules/ember-cli-postcss/node_modules/@babel/runtime",
+        "node_modules/ember-cp-validations/node_modules/@babel/runtime",
+        "node_modules/ember-decorators/node_modules/@babel/runtime",
+        "node_modules/ember-functions-as-helper-polyfill/node_modules/@babel/runtime",
+        "node_modules/ember-get-config/node_modules/@babel/runtime",
+        "node_modules/ember-modifier-manager-polyfill/node_modules/@babel/runtime",
+        "node_modules/ember-on-helper/node_modules/@babel/runtime",
+        "node_modules/ember-onbeforeunload/node_modules/@babel/runtime",
+        "node_modules/ember-ref-bucket/node_modules/@babel/runtime",
+        "node_modules/ember-simple-auth/node_modules/@babel/runtime",
+        "node_modules/ember-tracked-storage-polyfill/node_modules/@babel/runtime",
+        "node_modules/ember-validators/node_modules/@babel/runtime"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember-data/adapter": {
+      "name": "@ember-data/adapter",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/legacy",
+        "@warp-drive/utilities"
+      ],
+      "effects": [
+        "ember-data"
+      ],
+      "range": ">=4.8.0-alpha.0",
+      "nodes": [
+        "node_modules/@ember-data/adapter"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember-data/debug": {
+      "name": "@ember-data/debug",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ember-data/model",
+        "@ember-data/request-utils",
+        "@ember-data/store",
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/core-types"
+      ],
+      "effects": [],
+      "range": ">=4.8.0-alpha.0",
+      "nodes": [
+        "node_modules/@ember-data/debug"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-data/graph": {
+      "name": "@ember-data/graph",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [
+        "ember-data"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ember-data/graph"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember-data/json-api": {
+      "name": "@ember-data/json-api",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/json-api",
+        "@warp-drive/utilities"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ember-data/json-api"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-data/legacy-compat": {
+      "name": "@ember-data/legacy-compat",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/legacy",
+        "@warp-drive/utilities"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ember-data/legacy-compat"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-data/model": {
+      "name": "@ember-data/model",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/legacy",
+        "@warp-drive/utilities"
+      ],
+      "effects": [
+        "ember-data"
+      ],
+      "range": ">=4.5.0-alpha.0",
+      "nodes": [
+        "node_modules/@ember-data/model"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember-data/request": {
+      "name": "@ember-data/request",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ember-data/request"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-data/request-utils": {
+      "name": "@ember-data/request-utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/utilities"
+      ],
+      "effects": [
+        "@ember-data/debug",
+        "ember-data"
+      ],
+      "range": "4.13.0-alpha.1 - 4.13.0-alpha.9 || >=5.3.4",
+      "nodes": [
+        "node_modules/@ember-data/request-utils"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember-data/serializer": {
+      "name": "@ember-data/serializer",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/legacy",
+        "@warp-drive/utilities"
+      ],
+      "effects": [],
+      "range": ">=4.8.0-alpha.0",
+      "nodes": [
+        "node_modules/@ember-data/serializer"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-data/store": {
+      "name": "@ember-data/store",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ember-data/tracking",
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [
+        "@ember-data/debug"
+      ],
+      "range": "4.4.0-alpha.0 - 4.4.0-beta.1 || >=4.5.0-alpha.0",
+      "nodes": [
+        "node_modules/@ember-data/store"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-data/tracking": {
+      "name": "@ember-data/tracking",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [
+        "@ember-data/store",
+        "ember-data"
+      ],
+      "range": "4.12.2 - 4.13.0-alpha.9 || >=5.3.0-alpha.0",
+      "nodes": [
+        "node_modules/@ember-data/tracking"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember-tooling/blueprint-model": {
+      "name": "@ember-tooling/blueprint-model",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "diff"
+      ],
+      "effects": [
+        "@ember-tooling/classic-build-addon-blueprint",
+        "@ember-tooling/classic-build-app-blueprint",
+        "ember-cli"
+      ],
+      "range": ">=0.0.2",
+      "nodes": [
+        "node_modules/@ember-tooling/blueprint-model"
+      ],
+      "fixAvailable": {
+        "name": "ember-cli",
+        "version": "6.11.0",
+        "isSemVerMajor": false
+      }
+    },
+    "@ember-tooling/classic-build-addon-blueprint": {
+      "name": "@ember-tooling/classic-build-addon-blueprint",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ember-tooling/blueprint-model"
+      ],
+      "effects": [],
+      "range": ">=6.7.0-alpha.3",
+      "nodes": [
+        "node_modules/@ember-tooling/classic-build-addon-blueprint"
+      ],
+      "fixAvailable": true
+    },
+    "@ember-tooling/classic-build-app-blueprint": {
+      "name": "@ember-tooling/classic-build-app-blueprint",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ember-tooling/blueprint-model"
+      ],
+      "effects": [],
+      "range": ">=6.7.0-alpha.3",
+      "nodes": [
+        "node_modules/@ember-tooling/classic-build-app-blueprint"
+      ],
+      "fixAvailable": true
+    },
+    "@ember/optional-features": {
+      "name": "@ember/optional-features",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        "inquirer"
+      ],
+      "effects": [],
+      "range": "<=2.3.0",
+      "nodes": [
+        "node_modules/@ember/optional-features"
+      ],
+      "fixAvailable": {
+        "name": "@ember/optional-features",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember/render-modifiers": {
+      "name": "@ember/render-modifiers",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "ember-cli-babel"
+      ],
+      "effects": [
+        "ember-bootstrap"
+      ],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/@ember/render-modifiers"
+      ],
+      "fixAvailable": {
+        "name": "ember-bootstrap",
+        "version": "4.6.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember/test-helpers": {
+      "name": "@ember/test-helpers",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/macros"
+      ],
+      "effects": [
+        "ember-qunit"
+      ],
+      "range": ">=2.8.0",
+      "nodes": [
+        "node_modules/@ember/test-helpers"
+      ],
+      "fixAvailable": {
+        "name": "@ember/test-helpers",
+        "version": "2.7.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@ember/test-waiters": {
+      "name": "@ember/test-waiters",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/macros",
+        "ember-cli-babel"
+      ],
+      "effects": [
+        "ember-simple-auth"
+      ],
+      "range": ">=2.4.3",
+      "nodes": [
+        "node_modules/@ember/test-waiters",
+        "node_modules/ember-simple-auth/node_modules/@ember/test-waiters"
+      ],
+      "fixAvailable": {
+        "name": "@ember/test-waiters",
+        "version": "2.4.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@embroider/compat": {
+      "name": "@embroider/compat",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/core",
+        "@embroider/macros",
+        "broccoli",
+        "broccoli-merge-trees"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@embroider/compat"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@embroider/core": {
+      "name": "@embroider/core",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/macros"
+      ],
+      "effects": [
+        "@embroider/router",
+        "@embroider/vite"
+      ],
+      "range": ">=0.42.0",
+      "nodes": [
+        "node_modules/@embroider/core"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/core",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@embroider/macros": {
+      "name": "@embroider/macros",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-cli-babel"
+      ],
+      "effects": [
+        "@ember-data/adapter",
+        "@ember-data/debug",
+        "@ember-data/graph",
+        "@ember-data/json-api",
+        "@ember-data/legacy-compat",
+        "@ember-data/model",
+        "@ember-data/request",
+        "@ember-data/request-utils",
+        "@ember-data/serializer",
+        "@ember-data/store",
+        "@ember-data/tracking",
+        "@ember/render-modifiers",
+        "@ember/test-helpers",
+        "@ember/test-waiters",
+        "@embroider/compat",
+        "@embroider/core",
+        "@embroider/util",
+        "@warp-drive/build-config",
+        "@warp-drive/core",
+        "@warp-drive/core-types",
+        "@warp-drive/ember",
+        "@warp-drive/json-api",
+        "@warp-drive/legacy",
+        "@warp-drive/utilities",
+        "ember-auto-import",
+        "ember-data",
+        "ember-get-config",
+        "ember-qunit",
+        "ember-simple-auth",
+        "ember-validators"
+      ],
+      "range": ">=0.42.0",
+      "nodes": [
+        "node_modules/@embroider/macros"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@embroider/router": {
+      "name": "@embroider/router",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/core"
+      ],
+      "effects": [],
+      "range": ">=0.42.0",
+      "nodes": [
+        "node_modules/@embroider/router"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/router",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@embroider/util": {
+      "name": "@embroider/util",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=0.42.0",
+      "nodes": [
+        "node_modules/@embroider/util"
+      ],
+      "fixAvailable": true
+    },
+    "@embroider/vite": {
+      "name": "@embroider/vite",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/core",
+        "@embroider/macros",
+        "send"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@embroider/vite"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/vite",
+        "version": "0.2.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@eslint-community/eslint-utils": {
+      "name": "@eslint-community/eslint-utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "eslint"
+      ],
+      "effects": [
+        "eslint",
+        "eslint-plugin-es-x",
+        "eslint-plugin-n"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@eslint-community/eslint-utils"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@eslint/eslintrc": {
+      "name": "@eslint/eslintrc",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ajv"
+      ],
+      "effects": [
+        "eslint"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@eslint/eslintrc"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@fortawesome/ember-fontawesome": {
+      "name": "@fortawesome/ember-fontawesome",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "broccoli-merge-trees",
+        "ember-auto-import",
+        "ember-cli-babel",
+        "ember-get-config"
+      ],
+      "effects": [],
+      "range": "0.1.0-1 - 0.1.0-3 || 0.2.0 - 2.0.0",
+      "nodes": [
+        "node_modules/@fortawesome/ember-fontawesome"
+      ],
+      "fixAvailable": {
+        "name": "@fortawesome/ember-fontawesome",
+        "version": "3.1.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@warp-drive/build-config": {
+      "name": "@warp-drive/build-config",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/build-config"
+      ],
+      "fixAvailable": true
+    },
+    "@warp-drive/core": {
+      "name": "@warp-drive/core",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/build-config"
+      ],
+      "effects": [
+        "@ember-data/adapter",
+        "@ember-data/debug",
+        "@ember-data/graph",
+        "@ember-data/json-api",
+        "@ember-data/legacy-compat",
+        "@ember-data/model",
+        "@ember-data/request",
+        "@ember-data/request-utils",
+        "@ember-data/serializer",
+        "@ember-data/store",
+        "@ember-data/tracking",
+        "@warp-drive/core-types",
+        "@warp-drive/ember",
+        "ember-data"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/core"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@warp-drive/core-types": {
+      "name": "@warp-drive/core-types",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/core-types"
+      ],
+      "fixAvailable": true
+    },
+    "@warp-drive/ember": {
+      "name": "@warp-drive/ember",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [
+        "ember-data"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/ember"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "@warp-drive/json-api": {
+      "name": "@warp-drive/json-api",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/json-api"
+      ],
+      "fixAvailable": true
+    },
+    "@warp-drive/legacy": {
+      "name": "@warp-drive/legacy",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/utilities"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/legacy"
+      ],
+      "fixAvailable": true
+    },
+    "@warp-drive/utilities": {
+      "name": "@warp-drive/utilities",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "@warp-drive/core"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@warp-drive/utilities"
+      ],
+      "fixAvailable": true
+    },
+    "ajv": {
+      "name": "ajv",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1113214,
+          "name": "ajv",
+          "dependency": "ajv",
+          "title": "ajv has ReDoS when using `$data` option",
+          "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-400"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<8.18.0"
+        }
+      ],
+      "effects": [
+        "@eslint/eslintrc",
+        "ajv-keywords",
+        "eslint",
+        "schema-utils"
+      ],
+      "range": "<8.18.0",
+      "nodes": [
+        "node_modules/ajv"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ajv-keywords": {
+      "name": "ajv-keywords",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ajv"
+      ],
+      "effects": [
+        "schema-utils"
+      ],
+      "range": "2.1.1 - 4.0.1",
+      "nodes": [
+        "node_modules/ajv-keywords"
+      ],
+      "fixAvailable": {
+        "name": "ember-auto-import",
+        "version": "2.2.4",
+        "isSemVerMajor": true
+      }
+    },
+    "ansi-html": {
+      "name": "ansi-html",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1102319,
+          "name": "ansi-html",
+          "dependency": "ansi-html",
+          "title": "Uncontrolled Resource Consumption in ansi-html",
+          "url": "https://github.com/advisories/GHSA-whgm-jr23-g3j9",
+          "severity": "high",
+          "cwe": [
+            "CWE-400"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<0.0.8"
+        }
+      ],
+      "effects": [
+        "broccoli",
+        "broccoli-middleware"
+      ],
+      "range": "<0.0.8",
+      "nodes": [
+        "node_modules/broccoli-middleware/node_modules/ansi-html",
+        "node_modules/ember-cli/node_modules/ansi-html"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "anymatch": {
+      "name": "anymatch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "micromatch"
+      ],
+      "effects": [
+        "sane"
+      ],
+      "range": "1.2.0 - 2.0.0",
+      "nodes": [
+        "node_modules/ember-cli/node_modules/anymatch"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "babel-loader": {
+      "name": "babel-loader",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "schema-utils"
+      ],
+      "effects": [],
+      "range": "8.1.0 - 8.4.1",
+      "nodes": [
+        "node_modules/babel-loader"
+      ],
+      "fixAvailable": true
+    },
+    "braces": {
+      "name": "braces",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1098094,
+          "name": "braces",
+          "dependency": "braces",
+          "title": "Uncontrolled resource consumption in braces",
+          "url": "https://github.com/advisories/GHSA-grv7-fg5c-xmjg",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-1050"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<3.0.3"
+        }
+      ],
+      "effects": [
+        "micromatch"
+      ],
+      "range": "<3.0.3",
+      "nodes": [
+        "node_modules/ember-cli/node_modules/braces"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "broccoli": {
+      "name": "broccoli",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "ansi-html",
+        "console-ui",
+        "sane",
+        "tmp",
+        "watch-detector"
+      ],
+      "effects": [
+        "@embroider/compat",
+        "ember-cli"
+      ],
+      "range": ">=1.0.0-beta.1",
+      "nodes": [
+        "node_modules/broccoli",
+        "node_modules/ember-cli/node_modules/broccoli"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "broccoli-babel-transpiler": {
+      "name": "broccoli-babel-transpiler",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "broccoli-merge-trees"
+      ],
+      "effects": [
+        "ember-cli-babel"
+      ],
+      "range": "7.0.0-alpha.1 - 7.8.1",
+      "nodes": [
+        "node_modules/@ember-decorators/component/node_modules/broccoli-babel-transpiler",
+        "node_modules/@ember-decorators/object/node_modules/broccoli-babel-transpiler",
+        "node_modules/@ember-decorators/utils/node_modules/broccoli-babel-transpiler",
+        "node_modules/@embroider/util/node_modules/broccoli-babel-transpiler",
+        "node_modules/@fortawesome/ember-fontawesome/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-ajax/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-buffered-proxy/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-cache-primitive-polyfill/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-classic-decorator/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-cli-postcss/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-cp-validations/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-decorators/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-functions-as-helper-polyfill/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-get-config/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-modifier-manager-polyfill/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-on-helper/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-onbeforeunload/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-ref-bucket/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-simple-auth/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-tracked-storage-polyfill/node_modules/broccoli-babel-transpiler",
+        "node_modules/ember-validators/node_modules/broccoli-babel-transpiler"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "broccoli-merge-trees": {
+      "name": "broccoli-merge-trees",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "merge-trees"
+      ],
+      "effects": [
+        "@embroider/compat",
+        "@fortawesome/ember-fontawesome",
+        "broccoli-babel-transpiler",
+        "broccoli-stew",
+        "ember-auto-import",
+        "ember-bootstrap",
+        "ember-cli",
+        "ember-cli-postcss",
+        "ember-cli-sass",
+        "ember-source"
+      ],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/@ember-decorators/component/node_modules/broccoli-merge-trees",
+        "node_modules/@ember-decorators/object/node_modules/broccoli-merge-trees",
+        "node_modules/@ember-decorators/utils/node_modules/broccoli-merge-trees",
+        "node_modules/@embroider/util/node_modules/broccoli-merge-trees",
+        "node_modules/@fortawesome/ember-fontawesome/node_modules/broccoli-babel-transpiler/node_modules/broccoli-merge-trees",
+        "node_modules/broccoli-merge-trees",
+        "node_modules/broccoli-stew/node_modules/broccoli-merge-trees",
+        "node_modules/ember-ajax/node_modules/broccoli-merge-trees",
+        "node_modules/ember-buffered-proxy/node_modules/broccoli-merge-trees",
+        "node_modules/ember-cache-primitive-polyfill/node_modules/broccoli-merge-trees",
+        "node_modules/ember-classic-decorator/node_modules/broccoli-merge-trees",
+        "node_modules/ember-cli-postcss/node_modules/broccoli-babel-transpiler/node_modules/broccoli-merge-trees",
+        "node_modules/ember-cli-sass/node_modules/broccoli-merge-trees",
+        "node_modules/ember-cp-validations/node_modules/broccoli-merge-trees",
+        "node_modules/ember-decorators/node_modules/broccoli-merge-trees",
+        "node_modules/ember-functions-as-helper-polyfill/node_modules/broccoli-merge-trees",
+        "node_modules/ember-get-config/node_modules/broccoli-merge-trees",
+        "node_modules/ember-modifier-manager-polyfill/node_modules/broccoli-merge-trees",
+        "node_modules/ember-on-helper/node_modules/broccoli-merge-trees",
+        "node_modules/ember-onbeforeunload/node_modules/broccoli-merge-trees",
+        "node_modules/ember-ref-bucket/node_modules/broccoli-merge-trees",
+        "node_modules/ember-simple-auth/node_modules/broccoli-merge-trees",
+        "node_modules/ember-tracked-storage-polyfill/node_modules/broccoli-merge-trees",
+        "node_modules/ember-validators/node_modules/broccoli-merge-trees"
+      ],
+      "fixAvailable": {
+        "name": "@fortawesome/ember-fontawesome",
+        "version": "3.1.0",
+        "isSemVerMajor": true
+      }
+    },
+    "broccoli-middleware": {
+      "name": "broccoli-middleware",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "ansi-html"
+      ],
+      "effects": [],
+      "range": ">=2.1.0",
+      "nodes": [
+        "node_modules/broccoli-middleware"
+      ],
+      "fixAvailable": true
+    },
+    "broccoli-stew": {
+      "name": "broccoli-stew",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "broccoli-merge-trees"
+      ],
+      "effects": [
+        "ember-cli-typescript"
+      ],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/broccoli-stew"
+      ],
+      "fixAvailable": true
+    },
+    "can-symlink": {
+      "name": "can-symlink",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "fs-updater"
+      ],
+      "range": ">=1.0.0",
+      "nodes": [
+        "node_modules/can-symlink"
+      ],
+      "fixAvailable": {
+        "name": "@fortawesome/ember-fontawesome",
+        "version": "3.1.0",
+        "isSemVerMajor": true
+      }
+    },
+    "console-ui": {
+      "name": "console-ui",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "inquirer"
+      ],
+      "effects": [
+        "broccoli",
+        "ember-cli"
+      ],
+      "range": "2.0.0 || 2.2.0 - 2.2.1 || >=3.0.0",
+      "nodes": [
+        "node_modules/console-ui"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "css-loader": {
+      "name": "css-loader",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "schema-utils"
+      ],
+      "effects": [],
+      "range": "2.0.0 - 5.2.7",
+      "nodes": [
+        "node_modules/css-loader"
+      ],
+      "fixAvailable": true
+    },
+    "diff": {
+      "name": "diff",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1112706,
+          "name": "diff",
+          "dependency": "diff",
+          "title": "jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch",
+          "url": "https://github.com/advisories/GHSA-73rr-hh4g-fpgx",
+          "severity": "low",
+          "cwe": [
+            "CWE-400",
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=6.0.0 <8.0.3"
+        }
+      ],
+      "effects": [
+        "@ember-tooling/blueprint-model",
+        "ember-cli"
+      ],
+      "range": "6.0.0 - 8.0.2",
+      "nodes": [
+        "node_modules/@ember-tooling/blueprint-model/node_modules/diff",
+        "node_modules/ember-cli/node_modules/diff"
+      ],
+      "fixAvailable": {
+        "name": "ember-cli",
+        "version": "6.11.0",
+        "isSemVerMajor": false
+      }
+    },
+    "ember-auto-import": {
+      "name": "ember-auto-import",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/macros",
+        "broccoli-merge-trees",
+        "css-loader",
+        "style-loader"
+      ],
+      "effects": [
+        "@fortawesome/ember-fontawesome",
+        "ember-ref-bucket"
+      ],
+      "range": "<=1.1.0 || 1.2.7 - 1.2.10 || >=2.0.0-alpha.0",
+      "nodes": [
+        "node_modules/ember-auto-import"
+      ],
+      "fixAvailable": {
+        "name": "ember-auto-import",
+        "version": "2.2.4",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-bootstrap": {
+      "name": "ember-bootstrap",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@ember/render-modifiers",
+        "@embroider/macros",
+        "broccoli-merge-trees",
+        "ember-auto-import",
+        "ember-cli-babel",
+        "ember-ref-bucket",
+        "ember-source"
+      ],
+      "effects": [],
+      "range": ">=2.1.0",
+      "nodes": [
+        "node_modules/ember-bootstrap"
+      ],
+      "fixAvailable": {
+        "name": "ember-bootstrap",
+        "version": "4.6.3",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-buffered-proxy": {
+      "name": "ember-buffered-proxy",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=2.0.0-beta.0",
+      "nodes": [
+        "node_modules/ember-buffered-proxy"
+      ],
+      "fixAvailable": {
+        "name": "ember-buffered-proxy",
+        "version": "1.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-classic-decorator": {
+      "name": "ember-classic-decorator",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@embroider/macros",
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/ember-classic-decorator"
+      ],
+      "fixAvailable": {
+        "name": "ember-classic-decorator",
+        "version": "2.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-cli": {
+      "name": "ember-cli",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@ember-tooling/blueprint-model",
+        "@ember-tooling/classic-build-addon-blueprint",
+        "@ember-tooling/classic-build-app-blueprint",
+        "broccoli",
+        "broccoli-merge-trees",
+        "broccoli-middleware",
+        "broccoli-stew",
+        "console-ui",
+        "diff",
+        "fixturify-project",
+        "testem",
+        "watch-detector"
+      ],
+      "effects": [],
+      "range": "<=0.0.21 || >=3.4.0-beta.1",
+      "nodes": [
+        "node_modules/ember-cli"
+      ],
+      "fixAvailable": {
+        "name": "ember-cli",
+        "version": "6.11.0",
+        "isSemVerMajor": false
+      }
+    },
+    "ember-cli-babel": {
+      "name": "ember-cli-babel",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@babel/runtime",
+        "broccoli-babel-transpiler",
+        "fixturify-project"
+      ],
+      "effects": [
+        "@ember/render-modifiers",
+        "@ember/test-waiters",
+        "@embroider/macros",
+        "@embroider/util",
+        "@fortawesome/ember-fontawesome",
+        "ember-bootstrap",
+        "ember-buffered-proxy",
+        "ember-classic-decorator",
+        "ember-cli-deprecation-workflow",
+        "ember-cli-postcss",
+        "ember-cp-validations",
+        "ember-functions-as-helper-polyfill",
+        "ember-get-config",
+        "ember-popper-modifier",
+        "ember-ref-bucket",
+        "ember-source",
+        "ember-tracked-storage-polyfill",
+        "ember-validators"
+      ],
+      "range": "5.1.4 || >=7.0.0-alpha.1",
+      "nodes": [
+        "node_modules/@ember-decorators/component/node_modules/ember-cli-babel",
+        "node_modules/@ember-decorators/object/node_modules/ember-cli-babel",
+        "node_modules/@ember-decorators/utils/node_modules/ember-cli-babel",
+        "node_modules/@embroider/util/node_modules/ember-cli-babel",
+        "node_modules/@fortawesome/ember-fontawesome/node_modules/ember-cli-babel",
+        "node_modules/ember-ajax/node_modules/ember-cli-babel",
+        "node_modules/ember-buffered-proxy/node_modules/ember-cli-babel",
+        "node_modules/ember-cache-primitive-polyfill/node_modules/ember-cli-babel",
+        "node_modules/ember-classic-decorator/node_modules/ember-cli-babel",
+        "node_modules/ember-cli-babel",
+        "node_modules/ember-cli-postcss/node_modules/ember-cli-babel",
+        "node_modules/ember-cp-validations/node_modules/ember-cli-babel",
+        "node_modules/ember-decorators/node_modules/ember-cli-babel",
+        "node_modules/ember-functions-as-helper-polyfill/node_modules/ember-cli-babel",
+        "node_modules/ember-get-config/node_modules/ember-cli-babel",
+        "node_modules/ember-modifier-manager-polyfill/node_modules/ember-cli-babel",
+        "node_modules/ember-on-helper/node_modules/ember-cli-babel",
+        "node_modules/ember-onbeforeunload/node_modules/ember-cli-babel",
+        "node_modules/ember-ref-bucket/node_modules/ember-cli-babel",
+        "node_modules/ember-simple-auth/node_modules/ember-cli-babel",
+        "node_modules/ember-tracked-storage-polyfill/node_modules/ember-cli-babel",
+        "node_modules/ember-validators/node_modules/ember-cli-babel"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-cli-deprecation-workflow": {
+      "name": "ember-cli-deprecation-workflow",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": "3.0.0 - 3.4.0",
+      "nodes": [
+        "node_modules/ember-cli-deprecation-workflow"
+      ],
+      "fixAvailable": {
+        "name": "ember-cli-deprecation-workflow",
+        "version": "4.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-cli-postcss": {
+      "name": "ember-cli-postcss",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "broccoli-merge-trees",
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/ember-cli-postcss"
+      ],
+      "fixAvailable": {
+        "name": "ember-cli-postcss",
+        "version": "7.2.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-cli-sass": {
+      "name": "ember-cli-sass",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        "broccoli-merge-trees"
+      ],
+      "effects": [],
+      "range": ">=9.0.1",
+      "nodes": [
+        "node_modules/ember-cli-sass"
+      ],
+      "fixAvailable": {
+        "name": "ember-cli-sass",
+        "version": "8.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-cli-typescript": {
+      "name": "ember-cli-typescript",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "broccoli-stew"
+      ],
+      "effects": [],
+      "range": ">=3.1.3",
+      "nodes": [
+        "node_modules/ember-cli-typescript"
+      ],
+      "fixAvailable": true
+    },
+    "ember-cp-validations": {
+      "name": "ember-cp-validations",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-cli-babel",
+        "ember-validators"
+      ],
+      "effects": [],
+      "range": ">=4.0.0-beta.0",
+      "nodes": [
+        "node_modules/ember-cp-validations"
+      ],
+      "fixAvailable": {
+        "name": "ember-cp-validations",
+        "version": "3.5.6",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-data": {
+      "name": "ember-data",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@ember-data/adapter",
+        "@ember-data/debug",
+        "@ember-data/graph",
+        "@ember-data/json-api",
+        "@ember-data/legacy-compat",
+        "@ember-data/model",
+        "@ember-data/request",
+        "@ember-data/request-utils",
+        "@ember-data/serializer",
+        "@ember-data/store",
+        "@ember-data/tracking",
+        "@ember/test-helpers",
+        "@embroider/macros",
+        "@warp-drive/core",
+        "@warp-drive/core-types",
+        "@warp-drive/ember",
+        "@warp-drive/json-api",
+        "@warp-drive/legacy",
+        "@warp-drive/utilities"
+      ],
+      "effects": [],
+      "range": "4.4.0-alpha.0 - 4.4.0-beta.1 || >=4.5.0-alpha.0",
+      "nodes": [
+        "node_modules/ember-data"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-eslint-parser": {
+      "name": "ember-eslint-parser",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@babel/eslint-parser"
+      ],
+      "effects": [
+        "eslint-plugin-ember"
+      ],
+      "range": ">=0.1.0",
+      "nodes": [
+        "node_modules/ember-eslint-parser"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-functions-as-helper-polyfill": {
+      "name": "ember-functions-as-helper-polyfill",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ember-cli-babel",
+        "ember-cli-typescript"
+      ],
+      "effects": [
+        "ember-truth-helpers"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/ember-functions-as-helper-polyfill"
+      ],
+      "fixAvailable": {
+        "name": "ember-truth-helpers",
+        "version": "5.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-get-config": {
+      "name": "ember-get-config",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=0.5.0",
+      "nodes": [
+        "node_modules/ember-get-config"
+      ],
+      "fixAvailable": true
+    },
+    "ember-load-initializers": {
+      "name": "ember-load-initializers",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-source"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/ember-load-initializers"
+      ],
+      "fixAvailable": {
+        "name": "ember-load-initializers",
+        "version": "2.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-popper-modifier": {
+      "name": "ember-popper-modifier",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ember-auto-import",
+        "ember-cli-babel",
+        "ember-source"
+      ],
+      "effects": [],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/ember-popper-modifier"
+      ],
+      "fixAvailable": true
+    },
+    "ember-qunit": {
+      "name": "ember-qunit",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@ember/test-helpers",
+        "@embroider/macros"
+      ],
+      "effects": [],
+      "range": ">=6.2.0",
+      "nodes": [
+        "node_modules/ember-qunit"
+      ],
+      "fixAvailable": {
+        "name": "ember-qunit",
+        "version": "7.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-ref-bucket": {
+      "name": "ember-ref-bucket",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ember-auto-import",
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/ember-ref-bucket"
+      ],
+      "fixAvailable": true
+    },
+    "ember-simple-auth": {
+      "name": "ember-simple-auth",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@babel/eslint-parser",
+        "@ember/test-helpers",
+        "@ember/test-waiters",
+        "@embroider/macros"
+      ],
+      "effects": [],
+      "range": ">=6.0.0-rc.1",
+      "nodes": [
+        "node_modules/ember-simple-auth"
+      ],
+      "fixAvailable": {
+        "name": "ember-simple-auth",
+        "version": "8.3.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-source": {
+      "name": "ember-source",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "broccoli-merge-trees",
+        "ember-cli-babel"
+      ],
+      "effects": [
+        "ember-bootstrap",
+        "ember-load-initializers",
+        "ember-popper-modifier"
+      ],
+      "range": ">=3.7.0-beta.1",
+      "nodes": [
+        "node_modules/ember-source"
+      ],
+      "fixAvailable": {
+        "name": "ember-source",
+        "version": "4.3.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-tracked-storage-polyfill": {
+      "name": "ember-tracked-storage-polyfill",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ember-cli-babel"
+      ],
+      "effects": [
+        "tracked-built-ins"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/ember-tracked-storage-polyfill"
+      ],
+      "fixAvailable": {
+        "name": "tracked-built-ins",
+        "version": "1.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-truth-helpers": {
+      "name": "ember-truth-helpers",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-functions-as-helper-polyfill"
+      ],
+      "effects": [],
+      "range": "4.0.0-beta.0 - 4.0.3",
+      "nodes": [
+        "node_modules/ember-truth-helpers"
+      ],
+      "fixAvailable": {
+        "name": "ember-truth-helpers",
+        "version": "5.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "ember-validators": {
+      "name": "ember-validators",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@embroider/macros",
+        "ember-cli-babel"
+      ],
+      "effects": [],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/ember-validators"
+      ],
+      "fixAvailable": true
+    },
+    "eslint": {
+      "name": "eslint",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@eslint-community/eslint-utils",
+        "@eslint/eslintrc",
+        "ajv"
+      ],
+      "effects": [
+        "@babel/eslint-parser",
+        "@eslint-community/eslint-utils",
+        "eslint-compat-utils",
+        "eslint-config-prettier",
+        "eslint-plugin-ember",
+        "eslint-plugin-es-x",
+        "eslint-plugin-n",
+        "eslint-plugin-qunit",
+        "eslint-plugin-simple-import-sort",
+        "eslint-utils"
+      ],
+      "range": ">=4.2.0",
+      "nodes": [
+        "node_modules/eslint"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-compat-utils": {
+      "name": "eslint-compat-utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "eslint"
+      ],
+      "effects": [
+        "eslint-plugin-es-x"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/eslint-compat-utils"
+      ],
+      "fixAvailable": true
+    },
+    "eslint-config-prettier": {
+      "name": "eslint-config-prettier",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "eslint"
+      ],
+      "effects": [],
+      "range": ">=7.0.0",
+      "nodes": [
+        "node_modules/eslint-config-prettier"
+      ],
+      "fixAvailable": {
+        "name": "eslint-config-prettier",
+        "version": "6.15.0",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-plugin-ember": {
+      "name": "eslint-plugin-ember",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-eslint-parser",
+        "eslint",
+        "eslint-utils"
+      ],
+      "effects": [],
+      "range": ">=9.0.0",
+      "nodes": [
+        "node_modules/eslint-plugin-ember"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "eslint-plugin-es-x": {
+      "name": "eslint-plugin-es-x",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@eslint-community/eslint-utils",
+        "eslint",
+        "eslint-compat-utils"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/eslint-plugin-es-x"
+      ],
+      "fixAvailable": true
+    },
+    "eslint-plugin-n": {
+      "name": "eslint-plugin-n",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@eslint-community/eslint-utils",
+        "eslint",
+        "eslint-plugin-es-x"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/eslint-plugin-n"
+      ],
+      "fixAvailable": false
+    },
+    "eslint-plugin-qunit": {
+      "name": "eslint-plugin-qunit",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@eslint-community/eslint-utils",
+        "eslint"
+      ],
+      "effects": [],
+      "range": ">=8.2.6",
+      "nodes": [
+        "node_modules/eslint-plugin-qunit"
+      ],
+      "fixAvailable": true
+    },
+    "eslint-plugin-simple-import-sort": {
+      "name": "eslint-plugin-simple-import-sort",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "eslint"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/eslint-plugin-simple-import-sort"
+      ],
+      "fixAvailable": false
+    },
+    "eslint-utils": {
+      "name": "eslint-utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "eslint"
+      ],
+      "effects": [
+        "eslint-plugin-ember"
+      ],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/eslint-utils"
+      ],
+      "fixAvailable": {
+        "name": "eslint-plugin-ember",
+        "version": "8.14.0",
+        "isSemVerMajor": true
+      }
+    },
+    "external-editor": {
+      "name": "external-editor",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "inquirer"
+      ],
+      "range": ">=1.1.1",
+      "nodes": [
+        "node_modules/external-editor"
+      ],
+      "fixAvailable": {
+        "name": "@ember/optional-features",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "fixturify-project": {
+      "name": "fixturify-project",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "ember-cli",
+        "ember-cli-babel"
+      ],
+      "range": ">=1.2.0",
+      "nodes": [
+        "node_modules/@ember-decorators/component/node_modules/fixturify-project",
+        "node_modules/@ember-decorators/object/node_modules/fixturify-project",
+        "node_modules/@ember-decorators/utils/node_modules/fixturify-project",
+        "node_modules/@embroider/util/node_modules/fixturify-project",
+        "node_modules/@fortawesome/ember-fontawesome/node_modules/fixturify-project",
+        "node_modules/ember-ajax/node_modules/fixturify-project",
+        "node_modules/ember-buffered-proxy/node_modules/fixturify-project",
+        "node_modules/ember-cache-primitive-polyfill/node_modules/fixturify-project",
+        "node_modules/ember-classic-decorator/node_modules/fixturify-project",
+        "node_modules/ember-cli-postcss/node_modules/fixturify-project",
+        "node_modules/ember-cp-validations/node_modules/fixturify-project",
+        "node_modules/ember-decorators/node_modules/fixturify-project",
+        "node_modules/ember-functions-as-helper-polyfill/node_modules/fixturify-project",
+        "node_modules/ember-get-config/node_modules/fixturify-project",
+        "node_modules/ember-modifier-manager-polyfill/node_modules/fixturify-project",
+        "node_modules/ember-on-helper/node_modules/fixturify-project",
+        "node_modules/ember-onbeforeunload/node_modules/fixturify-project",
+        "node_modules/ember-ref-bucket/node_modules/fixturify-project",
+        "node_modules/ember-simple-auth/node_modules/fixturify-project",
+        "node_modules/ember-tracked-storage-polyfill/node_modules/fixturify-project",
+        "node_modules/ember-validators/node_modules/fixturify-project",
+        "node_modules/fixturify-project"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "fs-updater": {
+      "name": "fs-updater",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "can-symlink"
+      ],
+      "effects": [
+        "merge-trees"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/fs-updater"
+      ],
+      "fixAvailable": {
+        "name": "@fortawesome/ember-fontawesome",
+        "version": "3.1.0",
+        "isSemVerMajor": true
+      }
+    },
+    "inquirer": {
+      "name": "inquirer",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "external-editor"
+      ],
+      "effects": [
+        "@ember/optional-features",
+        "console-ui"
+      ],
+      "range": "3.0.0 - 8.2.6 || 9.0.0 - 9.3.7",
+      "nodes": [
+        "node_modules/console-ui/node_modules/inquirer",
+        "node_modules/inquirer"
+      ],
+      "fixAvailable": {
+        "name": "@ember/optional-features",
+        "version": "3.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "merge-trees": {
+      "name": "merge-trees",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "fs-updater"
+      ],
+      "effects": [
+        "broccoli-merge-trees"
+      ],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/merge-trees"
+      ],
+      "fixAvailable": {
+        "name": "@fortawesome/ember-fontawesome",
+        "version": "3.1.0",
+        "isSemVerMajor": true
+      }
+    },
+    "micromatch": {
+      "name": "micromatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1098681,
+          "name": "micromatch",
+          "dependency": "micromatch",
+          "title": "Regular Expression Denial of Service (ReDoS) in micromatch",
+          "url": "https://github.com/advisories/GHSA-952p-6rrq-rcjv",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<4.0.8"
+        },
+        "braces"
+      ],
+      "effects": [
+        "anymatch",
+        "sane"
+      ],
+      "range": "<=4.0.7",
+      "nodes": [
+        "node_modules/ember-cli/node_modules/anymatch/node_modules/micromatch",
+        "node_modules/ember-cli/node_modules/broccoli/node_modules/micromatch"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "minimist": {
+      "name": "minimist",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1096466,
+          "name": "minimist",
+          "dependency": "minimist",
+          "title": "Prototype Pollution in minimist",
+          "url": "https://github.com/advisories/GHSA-vh95-rmgr-6w4m",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 5.6,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L"
+          },
+          "range": "<0.2.1"
+        },
+        {
+          "source": 1097677,
+          "name": "minimist",
+          "dependency": "minimist",
+          "title": "Prototype Pollution in minimist",
+          "url": "https://github.com/advisories/GHSA-xvch-5gv4-984h",
+          "severity": "critical",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 9.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": "<0.2.4"
+        }
+      ],
+      "effects": [
+        "optimist"
+      ],
+      "range": "<=0.2.3",
+      "nodes": [
+        "node_modules/optimist/node_modules/minimist"
+      ],
+      "fixAvailable": false
+    },
+    "nomnom": {
+      "name": "nomnom",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "underscore"
+      ],
+      "effects": [
+        "po2json"
+      ],
+      "range": ">=1.6.0",
+      "nodes": [
+        "node_modules/nomnom"
+      ],
+      "fixAvailable": {
+        "name": "po2json",
+        "version": "0.3.0",
+        "isSemVerMajor": true
+      }
+    },
+    "optimist": {
+      "name": "optimist",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "minimist"
+      ],
+      "effects": [
+        "sifter"
+      ],
+      "range": ">=0.6.0",
+      "nodes": [
+        "node_modules/optimist"
+      ],
+      "fixAvailable": false
+    },
+    "po2json": {
+      "name": "po2json",
+      "severity": "critical",
+      "isDirect": true,
+      "via": [
+        "nomnom"
+      ],
+      "effects": [],
+      "range": "0.3.1 - 0.4.5",
+      "nodes": [
+        "node_modules/po2json"
+      ],
+      "fixAvailable": {
+        "name": "po2json",
+        "version": "0.3.0",
+        "isSemVerMajor": true
+      }
+    },
+    "sane": {
+      "name": "sane",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "anymatch",
+        "micromatch"
+      ],
+      "effects": [
+        "broccoli"
+      ],
+      "range": "1.5.0 - 4.1.0",
+      "nodes": [
+        "node_modules/ember-cli/node_modules/broccoli/node_modules/sane"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    },
+    "schema-utils": {
+      "name": "schema-utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "ajv",
+        "ajv-keywords"
+      ],
+      "effects": [
+        "babel-loader",
+        "css-loader",
+        "style-loader"
+      ],
+      "range": "<=3.3.0",
+      "nodes": [
+        "node_modules/css-loader/node_modules/schema-utils",
+        "node_modules/schema-utils",
+        "node_modules/style-loader/node_modules/schema-utils"
+      ],
+      "fixAvailable": {
+        "name": "ember-auto-import",
+        "version": "2.2.4",
+        "isSemVerMajor": true
+      }
+    },
+    "selectize": {
+      "name": "selectize",
+      "severity": "critical",
+      "isDirect": true,
+      "via": [
+        "sifter"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/selectize"
+      ],
+      "fixAvailable": false
+    },
+    "send": {
+      "name": "send",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109556,
+          "name": "send",
+          "dependency": "send",
+          "title": "send vulnerable to template injection that can lead to XSS",
+          "url": "https://github.com/advisories/GHSA-m6fv-jmcg-4jfg",
+          "severity": "low",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:L"
+          },
+          "range": "<0.19.0"
+        }
+      ],
+      "effects": [
+        "@embroider/vite"
+      ],
+      "range": "<0.19.0",
+      "nodes": [
+        "node_modules/send"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/vite",
+        "version": "0.2.1",
+        "isSemVerMajor": true
+      }
+    },
+    "sifter": {
+      "name": "sifter",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "optimist"
+      ],
+      "effects": [
+        "selectize"
+      ],
+      "range": ">=0.1.0",
+      "nodes": [
+        "node_modules/sifter"
+      ],
+      "fixAvailable": false
+    },
+    "style-loader": {
+      "name": "style-loader",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "schema-utils"
+      ],
+      "effects": [
+        "ember-auto-import"
+      ],
+      "range": "0.18.0 - 2.0.0",
+      "nodes": [
+        "node_modules/style-loader"
+      ],
+      "fixAvailable": {
+        "name": "ember-auto-import",
+        "version": "2.2.4",
+        "isSemVerMajor": true
+      }
+    },
+    "testem": {
+      "name": "testem",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "ember-cli"
+      ],
+      "range": ">=2.13.0",
+      "nodes": [
+        "node_modules/testem"
+      ],
+      "fixAvailable": {
+        "name": "testem",
+        "version": "2.12.0",
+        "isSemVerMajor": true
+      }
+    },
+    "tmp": {
+      "name": "tmp",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109537,
+          "name": "tmp",
+          "dependency": "tmp",
+          "title": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter",
+          "url": "https://github.com/advisories/GHSA-52f5-9888-hmc6",
+          "severity": "low",
+          "cwe": [
+            "CWE-59"
+          ],
+          "cvss": {
+            "score": 2.5,
+            "vectorString": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<=0.2.3"
+        }
+      ],
+      "effects": [
+        "broccoli",
+        "can-symlink",
+        "external-editor",
+        "fixturify-project",
+        "testem",
+        "watch-detector"
+      ],
+      "range": "<=0.2.3",
+      "nodes": [
+        "node_modules/@ember-decorators/component/node_modules/tmp",
+        "node_modules/@ember-decorators/object/node_modules/tmp",
+        "node_modules/@ember-decorators/utils/node_modules/tmp",
+        "node_modules/@embroider/util/node_modules/tmp",
+        "node_modules/@fortawesome/ember-fontawesome/node_modules/tmp",
+        "node_modules/can-symlink/node_modules/tmp",
+        "node_modules/ember-ajax/node_modules/tmp",
+        "node_modules/ember-buffered-proxy/node_modules/tmp",
+        "node_modules/ember-cache-primitive-polyfill/node_modules/tmp",
+        "node_modules/ember-classic-decorator/node_modules/tmp",
+        "node_modules/ember-cli-postcss/node_modules/tmp",
+        "node_modules/ember-cli/node_modules/tmp",
+        "node_modules/ember-cp-validations/node_modules/tmp",
+        "node_modules/ember-decorators/node_modules/tmp",
+        "node_modules/ember-functions-as-helper-polyfill/node_modules/tmp",
+        "node_modules/ember-get-config/node_modules/tmp",
+        "node_modules/ember-modifier-manager-polyfill/node_modules/tmp",
+        "node_modules/ember-on-helper/node_modules/tmp",
+        "node_modules/ember-onbeforeunload/node_modules/tmp",
+        "node_modules/ember-ref-bucket/node_modules/tmp",
+        "node_modules/ember-simple-auth/node_modules/tmp",
+        "node_modules/ember-tracked-storage-polyfill/node_modules/tmp",
+        "node_modules/ember-validators/node_modules/tmp",
+        "node_modules/external-editor/node_modules/tmp",
+        "node_modules/fixturify-project/node_modules/tmp",
+        "node_modules/testem/node_modules/tmp",
+        "node_modules/watch-detector/node_modules/tmp"
+      ],
+      "fixAvailable": {
+        "name": "ember-data",
+        "version": "4.4.3",
+        "isSemVerMajor": true
+      }
+    },
+    "tracked-built-ins": {
+      "name": "tracked-built-ins",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "ember-tracked-storage-polyfill"
+      ],
+      "effects": [],
+      "range": ">=2.0.0",
+      "nodes": [
+        "node_modules/tracked-built-ins"
+      ],
+      "fixAvailable": {
+        "name": "tracked-built-ins",
+        "version": "1.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "underscore": {
+      "name": "underscore",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109570,
+          "name": "underscore",
+          "dependency": "underscore",
+          "title": "Arbitrary Code Execution in underscore",
+          "url": "https://github.com/advisories/GHSA-cf4h-3jhx-xvhq",
+          "severity": "critical",
+          "cwe": [
+            "CWE-94"
+          ],
+          "cvss": {
+            "score": 9.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": ">=1.3.2 <1.12.1"
+        }
+      ],
+      "effects": [
+        "nomnom"
+      ],
+      "range": "1.3.2 - 1.12.0",
+      "nodes": [
+        "node_modules/underscore"
+      ],
+      "fixAvailable": {
+        "name": "po2json",
+        "version": "0.3.0",
+        "isSemVerMajor": true
+      }
+    },
+    "watch-detector": {
+      "name": "watch-detector",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "tmp"
+      ],
+      "effects": [
+        "broccoli",
+        "ember-cli"
+      ],
+      "range": ">=1.0.0",
+      "nodes": [
+        "node_modules/watch-detector"
+      ],
+      "fixAvailable": {
+        "name": "@embroider/compat",
+        "version": "0.41.0",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 21,
+      "moderate": 71,
+      "high": 6,
+      "critical": 7,
+      "total": 105
+    },
+    "dependencies": {
+      "prod": 114,
+      "dev": 2875,
+      "optional": 70,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 2989
+    }
+  }
+}

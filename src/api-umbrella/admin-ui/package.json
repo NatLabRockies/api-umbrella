@@ -31,20 +31,20 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.4",
-    "@babel/runtime": "^7.28.4",
-    "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/eslint-parser": "^7.28.4",
+    "@babel/plugin-transform-runtime": "^7.28.3",
+    "@babel/runtime": "^7.28.4",
     "@ember/optional-features": "^2.2.0",
     "@ember/string": "^4.0.1",
     "@ember/test-helpers": "^5.3.0",
     "@ember/test-waiters": "^4.1.1",
-    "@embroider/macros": "^1.19.1",
-    "@embroider/core": "^4.2.4",
-    "@embroider/vite": "^1.3.2",
     "@embroider/compat": "^4.1.7",
-    "@embroider/router": "^3.0.4",
     "@embroider/config-meta-loader": "^1.0.0",
+    "@embroider/core": "^4.2.4",
     "@embroider/legacy-inspector-support": "^0.1.3",
+    "@embroider/macros": "^1.19.1",
+    "@embroider/router": "^3.0.4",
+    "@embroider/vite": "^1.3.2",
     "@eslint/js": "^9.37.0",
     "@fortawesome/ember-fontawesome": "^1.0.3",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -73,7 +73,7 @@
     "echarts": "^5.6.0",
     "ember-ajax": "^5.1.2",
     "ember-auto-import": "~2.11.1",
-    "ember-bootstrap": "^5.1.1",
+    "ember-bootstrap": "^6.7.0",
     "ember-buffered-proxy": "~2.1.1",
     "ember-classic-decorator": "^3.0.1",
     "ember-cli": "~6.8.0",
@@ -105,8 +105,8 @@
     "globals": "^16.4.0",
     "html5sortable": "^0.13.3",
     "inflection": "^2.0.1",
-    "jQuery-QueryBuilder": "~3.0.0",
     "jed": "~1.1.1",
+    "jQuery-QueryBuilder": "~3.0.0",
     "jquery.scrollto": "~2.1.3",
     "lodash-es": "~4.17.22",
     "marked": "^8.0.1",
@@ -140,5 +140,8 @@
     "paths": [
       "lib/inject-live-reload-config"
     ]
+  },
+  "dependencies": {
+    "ember-inflector": "^6.0.0"
   }
 }

@@ -6,10 +6,22 @@ export default defineConfig({
   plugins: [
     classicEmberSupport(),
     ember(),
-    // extra plugins here
     babel({
       babelHelpers: 'runtime',
       extensions,
     }),
   ],
+  build: {
+    rollupOptions: {
+      external: ['jquery'],
+    },
+  },
+  resolve: {
+    alias: {
+      jquery: 'jquery',
+    },
+  },
+  optimizeDeps: {
+    exclude: ['jquery'],
+  },
 });
