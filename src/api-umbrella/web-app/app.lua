@@ -10,6 +10,7 @@ local http_headers = require "api-umbrella.utils.http_headers"
 local is_empty = require "api-umbrella.utils.is_empty"
 local lapis = require "lapis"
 local lapis_config = require("lapis.config").get()
+local pg_utils = require "api-umbrella.utils.pg_utils"
 local refresh_local_active_config_cache = require("api-umbrella.web-app.stores.active_config_store").refresh_local_cache
 local resty_session = require "resty.session"
 local t = require("api-umbrella.web-app.utils.gettext").gettext
@@ -82,7 +83,6 @@ local session_db_options = {
     ssl_verify = pg_utils.db_config.ssl_verify,
     ssl_required = pg_utils.db_config.ssl_required,
     table = "api_umbrella.sessions",
-    pool = "session_db",
   },
   secret = assert(config["secret_key"]),
   cookie_name = "_api_umbrella_session",
