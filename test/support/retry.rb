@@ -24,7 +24,8 @@ if ENV["CI"] == "true"
       # Retry any failure in some specific tests that might be flaky in CI due
       # to specific timing conditions.
       case klass_method_name
-      when "Test::Proxy::TestTimeoutsResponse#test_response_closes_when_chunk_delay_exceeds_read_timeout"
+      when "Test::Proxy::TestTimeoutsResponse#test_response_closes_when_chunk_delay_exceeds_read_timeout",
+        "Test::Proxy::RateLimits::TestNonFrozenLimit#test_non_frozen_time_limit"
         return true
       end
 

@@ -14,6 +14,7 @@ local respond_to = require "api-umbrella.web-app.utils.respond_to"
 local stable_object_hash = require "api-umbrella.utils.stable_object_hash"
 local t = require("api-umbrella.web-app.utils.gettext").gettext
 local time = require "api-umbrella.utils.time"
+local timer_at = require "api-umbrella.web-app.utils.timer_at"
 
 local db_statement_timeout_ms = config["web"]["analytics_v0_summary_db_timeout"] * 1000
 
@@ -325,7 +326,7 @@ function _M.summary(self)
     -- users don't get a super slow response and we don't overwhelm the server
     -- when it's uncached).
     if cache:updated_at_timestamp() < ngx.now() - 60 * 60 * 6 then
-      ngx.timer.at(0, function()
+      timer_at(0, function()
         -- Ensure only one pre-seed is happening at a time (at least per
         -- server).
         interval_lock.mutex_exec("preseed_analytics_summary_cache", generate_summary)
@@ -337,7 +338,7 @@ function _M.summary(self)
 
     -- Trigger analytics generation in background so if it takes longer than
     -- this request, it can still populate.
-    ngx.timer.at(0, function()
+    timer_at(0, function()
       -- Ensure only one pre-seed is happening at a time (at least per
       -- server).
       interval_lock.mutex_exec("initial_analytics_summary_cache", generate_summary)

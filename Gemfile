@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby "~> 3.1"
 
 # Task runner
-gem "thor", "~> 1.4.0"
+gem "thor", "~> 1.5.0"
 
 # Tests
 gem "minitest", "~> 5.26.2"
@@ -79,7 +79,7 @@ gem "concurrent-ruby", "~> 1.3.3"
 gem "zonebie", "~> 0.6.1"
 
 # Encrypting admin passwords.
-gem "bcrypt", "~> 3.1.12"
+gem "bcrypt", "~> 3.1.21"
 
 # Encrypting/decrypting database values.
 gem "encryptor", "~> 3.0.0"
