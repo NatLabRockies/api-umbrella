@@ -387,7 +387,7 @@ module ApiUmbrellaTestHelpers
     def decrypt_session_client_cookie(cookie_value)
       # The cookie value is base64url(header) + base64url(ciphertext).
       # The header is always V4_HEADER_SIZE bytes raw.
-      header_b64_len = (((V4_HEADER_SIZE * 4) + 2) / 3.0).ceil
+      header_b64_len = session_base64_encode("\x00" * V4_HEADER_SIZE).length
       header_b64 = cookie_value[0, header_b64_len]
       ciphertext_b64 = cookie_value[header_b64_len..]
 
