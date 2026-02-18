@@ -81,11 +81,13 @@ export default {
     }
   },
 
-  renderTime(value, type) {
-    if(type === 'display' && value && value !== '-') {
-      return moment(value).format('YYYY-MM-DD HH:mm:ss');
-    }
+  renderTime(timezone) {
+    return function(value, type) {
+      if(type === 'display' && value && value !== '-') {
+        return moment(value).tz(timezone).format('YYYY-MM-DD LTS z');
+      }
 
-    return value;
+      return value;
+    }
   },
 };

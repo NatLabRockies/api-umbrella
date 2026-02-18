@@ -5,7 +5,7 @@
     "prettier:check": "prettier --check ."
   },
   "dependencies": {
-    "a11y-dialog": "^8.1.4",
+    "a11y-dialog": "^8.1.5",
     "bootstrap": "^5.3.8",
     "escape-html": "^1.0.3",
     "form-serialize": "^0.7.2",
@@ -17,7 +17,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-import": "^2.32.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "prettier-plugin-go-template": "^0.0.15"
   }
 }

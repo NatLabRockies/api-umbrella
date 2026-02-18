@@ -1,7 +1,7 @@
 local Admin = require "api-umbrella.web-app.models.admin"
 local config = require("api-umbrella.utils.load_config")()
 local csrf = require "api-umbrella.web-app.utils.csrf"
-local db = require "lapis.db"
+local db_init = require "api-umbrella.web-app.utils.db_init"
 local error_messages_by_field = require "api-umbrella.web-app.utils.error_messages_by_field"
 local escape_html = require("lapis.html").escape
 local flash = require "api-umbrella.web-app.utils.flash"
@@ -10,7 +10,6 @@ local http_headers = require "api-umbrella.utils.http_headers"
 local is_empty = require "api-umbrella.utils.is_empty"
 local lapis = require "lapis"
 local lapis_config = require("lapis.config").get()
-local pg_utils = require "api-umbrella.utils.pg_utils"
 local refresh_local_active_config_cache = require("api-umbrella.web-app.stores.active_config_store").refresh_local_cache
 local resty_session = require "resty.session"
 local t = require("api-umbrella.web-app.utils.gettext").gettext
@@ -160,6 +159,8 @@ local function current_admin_from_session(self)
 end
 
 local function before_filter(self)
+  db_init()
+
   -- Refresh cache per request if background polling is disabled.
   if config["router"]["active_config"]["refresh_local_cache_interval"] == 0 then
     refresh_local_active_config_cache()
@@ -180,23 +181,6 @@ local function before_filter(self)
 
   self.res.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate, no-store"
   self.res.headers["Pragma"] = "no-cache"
-
-  -- Note that ngx.ctx.pgmoon will only be set after running the db.query, so
-  -- that's why we execute a dummy query once. If this issue gets addressed
-  -- there might be a better way to access the underlying pgmoon object from
-  -- Lapis: https://github.com/leafo/lapis/issues/565
-  db.query("SELECT 1")
-  pg_utils.setup_type_casting(ngx.ctx.pgmoon)
-
-  -- Set session variables for the database connection (always use UTC and set
-  -- an app name for auditing).
-  --
-  -- Ideally we would only set these once per connection (and not set it when
-  -- the socket is reused), but Lapi's "db" instance doesn't have a way to get
-  -- the underlying pgmoon connection before executing a query (the connection
-  -- is lazily established after the first query).
-  pg_utils.setup_socket_timeouts(ngx.ctx.pgmoon)
-  pg_utils.setup_session_vars(ngx.ctx.pgmoon, "api-umbrella-web-app")
 
   ngx.ctx.locale = http_headers.preferred_accept_language(ngx.var.http_accept_language, supported_languages)
   self.t = function(_, message)
