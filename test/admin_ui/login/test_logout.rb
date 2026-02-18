@@ -32,7 +32,7 @@ class Test::AdminUi::Login::TestLogout < Minitest::Capybara::Test
     assert_response_code(302, response)
     assert_equal("https://127.0.0.1:9081/admin/#/after-logout", response.headers.fetch("Location"))
     set_cookies = Array(response.headers["Set-Cookie"]).join("; ")
-    assert_match("_api_umbrella_session=; Expires=Thu, 01 Jan 1970 00:00:01 GMT", set_cookies)
+    assert_match(/_api_umbrella_session=;.*Expires=Thu, 01 Jan 1970 00:00:01 GMT/, set_cookies)
     data = parse_admin_session_client_cookie(response.headers["Set-Cookie"])
     assert_equal("Signed out successfully.", data["flash"]["info"]["message"])
 

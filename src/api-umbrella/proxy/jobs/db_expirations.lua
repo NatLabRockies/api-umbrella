@@ -10,7 +10,7 @@ local function do_run()
     "DELETE FROM analytics_cache WHERE expires_at IS NOT NULL AND expires_at < now()",
     "DELETE FROM cache WHERE expires_at IS NOT NULL AND expires_at < now()",
     "DELETE FROM distributed_rate_limit_counters WHERE expires_at < now()",
-    "DELETE FROM sessions WHERE expires_at < now()",
+    "DELETE FROM sessions WHERE exp < now()",
   }
   for _, query in ipairs(queries) do
     local result, err = pg_utils.query(query, nil, { quiet = true })

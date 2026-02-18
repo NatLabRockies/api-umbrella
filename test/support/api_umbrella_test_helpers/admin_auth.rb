@@ -231,125 +231,183 @@ module ApiUmbrellaTestHelpers
       Base64.urlsafe_decode64(value)
     end
 
-    def encrypt_session_cookie(data)
-      id = SecureRandom.hex(20)
-      id_encoded = session_base64_encode(id)
-      iv = id[0, 12]
-      expires = Time.now.to_i + 3600
-      data_serialized = MultiJson.dump(data)
-      hmac_data_key = OpenSSL::HMAC.digest("sha256", $config["secret_key"], [
-        id,
-        expires,
-      ].join(""))
-      hmac_data = OpenSSL::HMAC.digest("sha256", hmac_data_key, [
-        id,
-        expires,
-        data_serialized,
-        STATIC_USER_AGENT,
-        "http",
-      ].join(""))
-      auth_data = [
-        STATIC_USER_AGENT,
-        "http",
+    # Build a lua-resty-session v4 cookie header and encrypt data using v4's
+    # binary cookie format. Returns [header_binary, ciphertext_binary].
+    #
+    # The 82-byte header structure:
+    #   [1B type][2B flags][32B sid][5B creation_time][4B rolling_offset]
+    #   [3B data_size][16B tag][3B idling_offset][16B mac]
+    #
+    # The encryption uses HKDF-derived AES-256-GCM keys.
+    def build_v4_session(data, flags: 0)
+      ikm = Digest::SHA256.digest($config.fetch("secret_key"))
+      cookie_type = 1
+      sid = SecureRandom.bytes(32)
+      creation_time = Time.now.to_i
+      rolling_offset = 0
+      idling_offset = 0
+
+      # Derive AES-256-GCM key and IV from the SID using HKDF
+      sid_key = OpenSSL::KDF.hkdf(ikm, salt: "", info: "encryption:#{sid}", length: 44, hash: "SHA256")
+      aes_key = sid_key[0, 32]
+      iv = sid_key[32, 12]
+
+      # Compute data_size as the base64url-encoded length of the ciphertext.
+      # We need to encrypt first to know the exact size, but since AES-GCM
+      # output length equals input length for the ciphertext portion, we can
+      # predict it: base64url length of data.length bytes.
+      # Actually, we need to encrypt to get the tag, so we build the header
+      # in two passes: first without tag/mac, encrypt, then fill in tag/mac.
+
+      # Build partial header (up to and including data_size, before tag)
+      # This is the AAD for AES-GCM encryption.
+      data_size = session_base64_encode(data).length
+      partial_header = [
+        [cookie_type].pack("C"),           # 1 byte
+        [flags].pack("v"),                 # 2 bytes little-endian uint16
+        sid,                               # 32 bytes
+        [creation_time].pack("Q<")[0, 5],  # 5 bytes LE
+        [rolling_offset].pack("V"),        # 4 bytes LE
+        [data_size].pack("V")[0, 3],       # 3 bytes LE
       ].join("")
 
-      data_encrypted = Encryptor.encrypt({
-        :value => data_serialized,
-        :iv => iv,
-        :key => Digest::SHA256.digest($config["secret_key"]),
-        :auth_data => auth_data,
-      })
+      # Encrypt session data with AES-256-GCM
+      cipher = OpenSSL::Cipher.new("aes-256-gcm")
+      cipher.encrypt
+      cipher.key = aes_key
+      cipher.iv = iv
+      cipher.auth_data = partial_header
+      ciphertext = cipher.update(data)
+      ciphertext << cipher.final
+      tag = cipher.auth_tag
+
+      # Complete header: partial_header + tag + idling_offset
+      header_for_mac = partial_header + tag + [idling_offset].pack("V")[0, 3]
+
+      # Compute HMAC-SHA256 MAC over the header (truncated to 16 bytes)
+      mac_key = OpenSSL::KDF.hkdf(ikm, salt: "", info: "authentication:#{sid}", length: 32, hash: "SHA256")
+      mac = OpenSSL::HMAC.digest("sha256", mac_key, header_for_mac)[0, 16]
+
+      full_header = header_for_mac + mac
+
+      {
+        header: full_header,
+        ciphertext: ciphertext,
+        sid: sid,
+        creation_time: creation_time,
+      }
+    end
+
+    # Serialize session data the way lua-resty-session v4 stores it internally:
+    # [[data_dict, audience]] where audience defaults to "default"
+    def v4_session_data(data)
+      MultiJson.dump([[data, "default"]])
+    end
+
+    def encrypt_session_cookie(data)
+      data_serialized = v4_session_data(data)
+      # FLAG_STORAGE = 0x0001 indicates server-side storage is used
+      result = build_v4_session(data_serialized, flags: 0x0001)
+
+      # For DB-backed sessions, cookie contains only the header
+      cookie_header = session_base64_encode(result[:header])
+
+      # Store encrypted data in database
+      sid_encoded = session_base64_encode(result[:sid])
+      ciphertext_encoded = session_base64_encode(result[:ciphertext])
+      db_data = MultiJson.dump([ciphertext_encoded])
+      ttl = 12 * 60 * 60 # 12 hours, matches absolute_timeout
+      exp = Time.at(result[:creation_time] + ttl).utc
 
       Session.create!({
-        :id_hash => id_encoded,
-        :expires_at => Time.at(expires).utc,
-        :data_encrypted => data_encrypted,
-        :data_encrypted_iv => iv,
+        :sid => sid_encoded,
+        :name => "_api_umbrella_session",
+        :data => db_data,
+        :exp => exp,
       })
 
-      [
-        id_encoded,
-        expires,
-        session_base64_encode(hmac_data),
-      ].join("|")
+      cookie_header
     end
 
     def decrypt_session_cookie(cookie_value)
-      parts = cookie_value.split("|")
-      id_encoded = parts[0]
-      auth_data = [
-        STATIC_USER_AGENT,
-        "http",
-      ].join("")
+      # In v4, the DB-backed cookie is just the base64url-encoded header.
+      # Extract the SID from the header to look up the DB record.
+      header = session_base64_decode(cookie_value)
+      sid = header[3, 32]
+      sid_encoded = session_base64_encode(sid)
 
-      session = Session.find_by(:id_hash => id_encoded)
+      session = Session.find_by(:sid => sid_encoded)
 
-      data_serialized = Encryptor.decrypt({
-        :value => session.data_encrypted,
-        :iv => session.data_encrypted_iv,
-        :key => Digest::SHA256.digest($config["secret_key"]),
-        :auth_data => auth_data,
-      })
+      # DB data is a JSON array: ["<base64url_ciphertext>"]
+      db_data = MultiJson.load(session.data)
+      ciphertext = session_base64_decode(db_data[0])
 
-      MultiJson.load(data_serialized)
+      # Derive the decryption key from the SID
+      ikm = Digest::SHA256.digest($config["secret_key"])
+      sid_key = OpenSSL::KDF.hkdf(ikm, salt: "", info: "encryption:#{sid}", length: 44, hash: "SHA256")
+      aes_key = sid_key[0, 32]
+      iv = sid_key[32, 12]
+
+      # The AAD is the first 47 bytes of the header (before the tag)
+      aad = header[0, 47]
+      tag = header[47, 16]
+
+      decipher = OpenSSL::Cipher.new("aes-256-gcm")
+      decipher.decrypt
+      decipher.key = aes_key
+      decipher.iv = iv
+      decipher.auth_data = aad
+      decipher.auth_tag = tag
+      plaintext = decipher.update(ciphertext)
+      plaintext << decipher.final
+
+      # v4 data format: [[data_dict, audience]]
+      parsed = MultiJson.load(plaintext)
+      parsed[0][0]
     end
 
     def encrypt_session_client_cookie(data)
-      id = SecureRandom.hex(20)
-      iv = id[0, 12]
-      id_encoded = session_base64_encode(id)
-      expires = Time.now.to_i + 3600
-      data_serialized = MultiJson.dump(data)
-      hmac_data_key = OpenSSL::HMAC.digest("sha256", $config["secret_key"], [
-        id,
-        expires,
-      ].join(""))
-      hmac_data = OpenSSL::HMAC.digest("sha256", hmac_data_key, [
-        id,
-        expires,
-        data_serialized,
-        STATIC_USER_AGENT,
-        "http",
-      ].join(""))
-      auth_data = [
-        STATIC_USER_AGENT,
-        "http",
-      ].join("")
+      data_serialized = v4_session_data(data)
+      # No FLAG_STORAGE for cookie-only sessions
+      result = build_v4_session(data_serialized, flags: 0)
 
-      data_encrypted = Encryptor.encrypt({
-        :value => data_serialized,
-        :iv => iv,
-        :key => Digest::SHA256.digest($config["secret_key"]),
-        :auth_data => auth_data,
-      })
-
-      [
-        id_encoded,
-        expires,
-        session_base64_encode(data_encrypted),
-        session_base64_encode(hmac_data),
-      ].join("|")
+      # For cookie-only sessions, cookie contains header + ciphertext
+      session_base64_encode(result[:header]) + session_base64_encode(result[:ciphertext])
     end
 
     def decrypt_session_client_cookie(cookie_value)
-      parts = cookie_value.split("|")
-      id_encoded = parts[0]
-      id = session_base64_decode(id_encoded)
-      iv = id[0, 12]
-      data = session_base64_decode(parts[2])
-      auth_data = [
-        STATIC_USER_AGENT,
-        "http",
-      ].join("")
+      # The cookie value is base64url(header) + base64url(ciphertext).
+      # The header is always 82 bytes raw = 110 base64url chars (ceil(82*4/3) with no padding).
+      header_b64_len = ((82 * 4 + 2) / 3.0).ceil
+      header_b64 = cookie_value[0, header_b64_len]
+      ciphertext_b64 = cookie_value[header_b64_len..]
 
-      data_serialized = Encryptor.decrypt({
-        :value => data,
-        :iv => iv,
-        :key => Digest::SHA256.digest($config["secret_key"]),
-        :auth_data => auth_data,
-      })
+      header = session_base64_decode(header_b64)
+      ciphertext = session_base64_decode(ciphertext_b64)
+      sid = header[3, 32]
 
-      MultiJson.load(data_serialized)
+      # Derive the decryption key from the SID
+      ikm = Digest::SHA256.digest($config["secret_key"])
+      sid_key = OpenSSL::KDF.hkdf(ikm, salt: "", info: "encryption:#{sid}", length: 44, hash: "SHA256")
+      aes_key = sid_key[0, 32]
+      iv = sid_key[32, 12]
+
+      # The AAD is the first 47 bytes of the header (before the tag)
+      aad = header[0, 47]
+      tag = header[47, 16]
+
+      decipher = OpenSSL::Cipher.new("aes-256-gcm")
+      decipher.decrypt
+      decipher.key = aes_key
+      decipher.iv = iv
+      decipher.auth_data = aad
+      decipher.auth_tag = tag
+      plaintext = decipher.update(ciphertext)
+      plaintext << decipher.final
+
+      # v4 data format: [[data_dict, audience]]
+      parsed = MultiJson.load(plaintext)
+      parsed[0][0]
     end
   end
 end

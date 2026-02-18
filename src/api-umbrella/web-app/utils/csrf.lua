@@ -17,18 +17,18 @@ local _M = {}
 
 function _M.generate_token(self)
   self:init_session_cookie()
-  self.session_cookie:start()
-  local csrf_token_key = self.session_cookie.data["csrf_token_key"]
-  local csrf_token_iv = self.session_cookie.data["csrf_token_iv"]
+  self.session_cookie:open()
+  local csrf_token_key = self.session_cookie:get("csrf_token_key")
+  local csrf_token_iv = self.session_cookie:get("csrf_token_iv")
   if not csrf_token_key or not csrf_token_iv then
     if not csrf_token_key then
       csrf_token_key = random_token(40)
-      self.session_cookie.data["csrf_token_key"] = csrf_token_key
+      self.session_cookie:set("csrf_token_key", csrf_token_key)
     end
 
     if not csrf_token_iv then
       csrf_token_iv = random_token(12)
-      self.session_cookie.data["csrf_token_iv"] = csrf_token_iv
+      self.session_cookie:set("csrf_token_iv", csrf_token_iv)
     end
 
     self.session_cookie:save()
@@ -41,12 +41,12 @@ end
 
 local function validate_token(self)
   self:init_session_cookie()
-  local _, _, open_err = self.session_cookie:start()
-  if open_err then
+  local ok, open_err = self.session_cookie:open()
+  if not ok and open_err and open_err ~= "missing session cookie" then
     ngx.log(ngx.ERR, "session open error: ", open_err)
   end
 
-  local key = self.session_cookie.data["csrf_token_key"]
+  local key = self.session_cookie:get("csrf_token_key")
   if not key then
     return false, "Missing CSRF token key"
   end

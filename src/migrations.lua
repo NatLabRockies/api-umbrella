@@ -1586,4 +1586,25 @@ return {
     db.query(grants_sql)
     db.query("COMMIT")
   end,
+
+  [1771350000] = function()
+    db.query("BEGIN")
+
+    -- Drop old v3 sessions table and create new v4-compatible table.
+    -- lua-resty-session v4 uses a completely different schema.
+    db.query("DROP TRIGGER IF EXISTS sessions_stamp_record ON sessions")
+    db.query("DROP TABLE sessions")
+    db.query([[
+      CREATE TABLE sessions(
+        sid TEXT PRIMARY KEY,
+        name TEXT,
+        data TEXT,
+        exp TIMESTAMP WITH TIME ZONE
+      )
+    ]])
+    db.query("CREATE INDEX ON sessions(exp)")
+
+    db.query(grants_sql)
+    db.query("COMMIT")
+  end,
 }

@@ -198,12 +198,12 @@ function _M.connect()
 
   _M.setup_type_casting(pg)
 
-  -- The first time this socket is used (but not when reusing keepalive
-  -- sockets), setup any session variables on the connection.
-  if pg.sock:getreusedtimes() == 0 then
-    _M.setup_socket_timeouts(pg)
-    _M.setup_session_vars(pg, "api-umbrella")
-  end
+  -- Always setup session variables on the connection, even for reused
+  -- keepalive sockets. Other libraries (e.g., lua-resty-session's postgres
+  -- storage) may share the same connection pool and return connections without
+  -- the expected search_path set.
+  _M.setup_socket_timeouts(pg)
+  _M.setup_session_vars(pg, "api-umbrella")
 
   return pg
 end
