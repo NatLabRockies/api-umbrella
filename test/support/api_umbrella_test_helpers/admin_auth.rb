@@ -14,7 +14,7 @@ module ApiUmbrellaTestHelpers
     V4_HEADER_SIZE = 82
     V4_HEADER_SID_OFFSET = 3
     V4_HEADER_SID_SIZE = 32
-    V4_HEADER_PRE_TAG_SIZE = 47  # bytes before AES-GCM tag
+    V4_HEADER_PRE_TAG_SIZE = 47 # bytes before AES-GCM tag
     V4_HEADER_TAG_SIZE = 16
 
     include ApiUmbrellaTestHelpers::Selenium
@@ -387,7 +387,7 @@ module ApiUmbrellaTestHelpers
     def decrypt_session_client_cookie(cookie_value)
       # The cookie value is base64url(header) + base64url(ciphertext).
       # The header is always V4_HEADER_SIZE bytes raw.
-      header_b64_len = ((V4_HEADER_SIZE * 4 + 2) / 3.0).ceil
+      header_b64_len = (((V4_HEADER_SIZE * 4) + 2) / 3.0).ceil
       header_b64 = cookie_value[0, header_b64_len]
       ciphertext_b64 = cookie_value[header_b64_len..]
 
