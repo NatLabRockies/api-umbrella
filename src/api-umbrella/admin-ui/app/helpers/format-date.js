@@ -1,20 +1,23 @@
-import { helper } from '@ember/component/helper';
+import Helper from '@ember/component/helper';
+import { inject } from '@ember/service';
 import isString from 'lodash-es/isString';
 import moment from 'moment-timezone';
 
-export function formatDate(params) {
-  let date = params[0];
-  let format = params[1];
+export default class FormatDate extends Helper {
+  @inject session;
 
-  if(!format || !isString(format)) {
-    format = 'YYYY-MM-DD HH:mm Z';
-  }
+  compute(positional) {
+    let date = positional[0];
+    let format = positional[1];
 
-  if(date) {
-    return moment(date).format(format);
-  } else {
-    return '';
+    if(!format || !isString(format)) {
+      format = 'YYYY-MM-DD LT z';
+    }
+
+    if(date) {
+      return moment(date).tz(this.session.data.authenticated.analytics_timezone).format(format);
+    } else {
+      return '';
+    }
   }
 }
-
-export default helper(formatDate);

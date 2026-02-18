@@ -124,9 +124,17 @@ module ApiUmbrellaTestHelpers
       if ip
         http_opts[:headers]["X-Forwarded-For"] = ip
       end
+
+      # When testing rate limits, unless specifically disabled (by passing in
+      # `false`), freeze the time used during each test to prevent race
+      # conditions in the testing environment and ensure better consistency.
+      if time.nil?
+        time = rate_limit_frozen_time
+      end
       if time
         http_opts[:headers]["X-Fake-Time"] = time.strftime("%s.%L")
       end
+
       if http_options
         http_opts.deep_merge!(http_options)
       end
@@ -141,6 +149,25 @@ module ApiUmbrellaTestHelpers
 
       assert_equal(count, requests.length)
       requests.map { |r| r.response }
+    end
+
+    # Provide a frozen time that is static across all requests within a
+    # specific test. This is used for a couple reasons:
+    #
+    # - The rate limiting algorithm is estimated for performance reasons, so
+    #   there can be situations where the user is allowed to exceed the true
+    #   rate limit by a couple requests briefly. While this shouldn't be super
+    #   common, it can crop up randomly in tests. This can happen due to the
+    #   time "buckets" that are used internally, so if the requests happen to
+    #   span multiple buckets inside a single test scenario, it could cause the
+    #   technical limit to be exceeded briefly.
+    # - When testing distributed limits, then similarly, `make_requests` could
+    #   populate a different time bucket than `set_distributed_count` sets, so
+    #   it's important that we use a static time so both methods can ensure
+    #   they're updating the same bucket (even if technically the requests may
+    #   span a minute boundary).
+    def rate_limit_frozen_time
+      @rate_limit_frozen_time ||= Time.now.utc
     end
   end
 end

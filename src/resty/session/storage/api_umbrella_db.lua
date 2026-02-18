@@ -1,4 +1,5 @@
 local db = require "lapis.db"
+local encode_bytea = require("pgmoon").Postgres.encode_bytea
 
 local _M = {}
 _M.__index = _M
@@ -30,7 +31,7 @@ function _M:save(id_encoded, ttl, data)
   local id = self.decode(id_encoded)
   local iv = string.sub(id, 1, 12)
 
-  db.query("INSERT INTO sessions(id_hash, expires_at, data_encrypted, data_encrypted_iv) VALUES(?, now() + interval ?, ?, ?) ON CONFLICT (id_hash) DO UPDATE SET expires_at = EXCLUDED.expires_at, data_encrypted = EXCLUDED.data_encrypted, data_encrypted_iv = EXCLUDED.data_encrypted_iv", id_encoded, ttl .. " seconds", db.raw(ngx.ctx.pgmoon:encode_bytea(data)), iv)
+  db.query("INSERT INTO sessions(id_hash, expires_at, data_encrypted, data_encrypted_iv) VALUES(?, now() + interval ?, ?, ?) ON CONFLICT (id_hash) DO UPDATE SET expires_at = EXCLUDED.expires_at, data_encrypted = EXCLUDED.data_encrypted, data_encrypted_iv = EXCLUDED.data_encrypted_iv", id_encoded, ttl .. " seconds", db.raw(encode_bytea(nil, data)), iv)
   return true
 end
 

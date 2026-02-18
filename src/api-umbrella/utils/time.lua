@@ -7,7 +7,6 @@ local null = ngx.null
 local date = icu_date.new()
 local format_iso8601 = icu_date.formats.pattern("yyyy-MM-dd'T'HH:mm:ssZZZZZ")
 local format_iso8601_ms = icu_date.formats.pattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")
-local format_csv = icu_date.formats.pattern("yyyy-MM-dd HH:mm:ss")
 local format_postgres = icu_date.formats.pattern("yyyy-MM-dd HH:mm:ss.SSSSxxx")
 local format_postgres_no_millis = icu_date.formats.pattern("yyyy-MM-dd HH:mm:ssxxx")
 
@@ -80,7 +79,7 @@ function _M.timestamp_ms_to_csv(timestamp)
   end
 
   date:set_millis(timestamp)
-  return date:format(format_csv)
+  return date:format(format_iso8601_ms)
 end
 
 function _M.iso8601_to_timestamp(string)
@@ -116,7 +115,7 @@ function _M.iso8601_to_csv(string)
   end
 
   date:parse(format_iso8601, string)
-  return date:format(format_csv)
+  return date:format(format_iso8601)
 end
 
 function _M.iso8601_ms_to_csv(string)
@@ -125,7 +124,7 @@ function _M.iso8601_ms_to_csv(string)
   end
 
   date:parse(format_iso8601_ms, string)
-  return date:format(format_csv)
+  return date:format(format_iso8601_ms)
 end
 
 function _M.opensearch_to_csv(value)

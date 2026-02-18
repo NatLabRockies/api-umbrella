@@ -118,7 +118,7 @@ class Test::Proxy::RateLimits::TestDistributedRateLimits < Minitest::Test
       api_user: FactoryBot.create(:api_user),
       duration: 50 * 60 * 1000, # 50 minutes
       limit_to: 1001,
-      time: frozen_time,
+      time: rate_limit_frozen_time,
     }
 
     set_distributed_count(143, **extract_set_distributed_count_options(options))
@@ -130,7 +130,7 @@ class Test::Proxy::RateLimits::TestDistributedRateLimits < Minitest::Test
       api_user: FactoryBot.create(:api_user),
       duration: 50 * 60 * 1000, # 50 minutes
       limit_to: 1001,
-      time: frozen_time,
+      time: rate_limit_frozen_time,
     }
 
     responses = make_requests("/api/hello", 75, **extract_make_requests_options(options))
@@ -145,7 +145,7 @@ class Test::Proxy::RateLimits::TestDistributedRateLimits < Minitest::Test
       api_user: FactoryBot.create(:api_user),
       duration: 50 * 60 * 1000, # 50 minutes
       limit_to: 1001,
-      time: frozen_time,
+      time: rate_limit_frozen_time,
     }
 
     responses = make_requests("/api/hello", 80, **extract_make_requests_options(options))
@@ -300,7 +300,7 @@ class Test::Proxy::RateLimits::TestDistributedRateLimits < Minitest::Test
       api_user: FactoryBot.create(:api_user),
       duration: 50 * 60 * 1000, # 50 minutes
       limit_to: 1001,
-      time: frozen_time,
+      time: rate_limit_frozen_time,
     }
 
     responses = make_requests("/api/hello", 10, **extract_make_requests_options(options))
@@ -336,7 +336,7 @@ class Test::Proxy::RateLimits::TestDistributedRateLimits < Minitest::Test
         api_user: FactoryBot.create(:api_user),
         duration: 50 * 60 * 1000, # 50 minutes
         limit_to: 1001,
-        time: frozen_time,
+        time: rate_limit_frozen_time,
       }
 
       begin
@@ -403,14 +403,6 @@ class Test::Proxy::RateLimits::TestDistributedRateLimits < Minitest::Test
   end
 
   private
-
-  def frozen_time
-    # Freeze the time to ensure that the make_requests and
-    # set_distributed_count calls both affect the same bucket (otherwise,
-    # make_requests could end up populating two buckets if these tests happen
-    # to run across a minute boundary).
-    Time.now.utc
-  end
 
   def extract_assert_response_headers_options(options)
     options.slice(:limit_to)
