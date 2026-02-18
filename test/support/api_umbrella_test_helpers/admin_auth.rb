@@ -8,6 +8,15 @@ module ApiUmbrellaTestHelpers
     # a hard-coded user agent when we're pre-seeding the session cookie value.
     STATIC_USER_AGENT = "TestStaticUserAgent".freeze
 
+    # lua-resty-session v4 binary header layout constants.
+    # Header is 82 bytes: [1B type][2B flags][32B sid][5B creation_time]
+    #   [4B rolling_offset][3B data_size][16B tag][3B idling_offset][16B mac]
+    V4_HEADER_SIZE = 82
+    V4_HEADER_SID_OFFSET = 3
+    V4_HEADER_SID_SIZE = 32
+    V4_HEADER_PRE_TAG_SIZE = 47  # bytes before AES-GCM tag
+    V4_HEADER_TAG_SIZE = 16
+
     include ApiUmbrellaTestHelpers::Selenium
 
     def admin_login(admin = nil)
@@ -333,7 +342,7 @@ module ApiUmbrellaTestHelpers
       # In v4, the DB-backed cookie is just the base64url-encoded header.
       # Extract the SID from the header to look up the DB record.
       header = session_base64_decode(cookie_value)
-      sid = header[3, 32]
+      sid = header[V4_HEADER_SID_OFFSET, V4_HEADER_SID_SIZE]
       sid_encoded = session_base64_encode(sid)
 
       session = Session.find_by(:sid => sid_encoded)
@@ -348,9 +357,9 @@ module ApiUmbrellaTestHelpers
       aes_key = sid_key[0, 32]
       iv = sid_key[32, 12]
 
-      # The AAD is the first 47 bytes of the header (before the tag)
-      aad = header[0, 47]
-      tag = header[47, 16]
+      # The AAD is the bytes before the AES-GCM tag
+      aad = header[0, V4_HEADER_PRE_TAG_SIZE]
+      tag = header[V4_HEADER_PRE_TAG_SIZE, V4_HEADER_TAG_SIZE]
 
       decipher = OpenSSL::Cipher.new("aes-256-gcm")
       decipher.decrypt
@@ -377,14 +386,14 @@ module ApiUmbrellaTestHelpers
 
     def decrypt_session_client_cookie(cookie_value)
       # The cookie value is base64url(header) + base64url(ciphertext).
-      # The header is always 82 bytes raw = 110 base64url chars (ceil(82*4/3) with no padding).
-      header_b64_len = ((82 * 4 + 2) / 3.0).ceil
+      # The header is always V4_HEADER_SIZE bytes raw.
+      header_b64_len = ((V4_HEADER_SIZE * 4 + 2) / 3.0).ceil
       header_b64 = cookie_value[0, header_b64_len]
       ciphertext_b64 = cookie_value[header_b64_len..]
 
       header = session_base64_decode(header_b64)
       ciphertext = session_base64_decode(ciphertext_b64)
-      sid = header[3, 32]
+      sid = header[V4_HEADER_SID_OFFSET, V4_HEADER_SID_SIZE]
 
       # Derive the decryption key from the SID
       ikm = Digest::SHA256.digest($config["secret_key"])
@@ -392,9 +401,9 @@ module ApiUmbrellaTestHelpers
       aes_key = sid_key[0, 32]
       iv = sid_key[32, 12]
 
-      # The AAD is the first 47 bytes of the header (before the tag)
-      aad = header[0, 47]
-      tag = header[47, 16]
+      # The AAD is the bytes before the AES-GCM tag
+      aad = header[0, V4_HEADER_PRE_TAG_SIZE]
+      tag = header[V4_HEADER_PRE_TAG_SIZE, V4_HEADER_TAG_SIZE]
 
       decipher = OpenSSL::Cipher.new("aes-256-gcm")
       decipher.decrypt

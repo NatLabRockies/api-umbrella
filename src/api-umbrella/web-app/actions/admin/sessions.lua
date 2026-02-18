@@ -173,7 +173,10 @@ function _M.logout_callback(self)
   local state = ngx.var.arg_state
   if state then
     self:init_session_cookie()
-    self.session_cookie:open()
+    local ok, open_err = self.session_cookie:open()
+    if not ok and open_err and open_err ~= "missing session cookie" then
+      ngx.log(ngx.ERR, "session open error: ", open_err)
+    end
     local session_state = self.session_cookie:get("openid_connect_state")
     if state ~= session_state then
       ngx.log(ngx.WARN, "state from argument: " .. (state or "nil") .. " does not match state restored from session: " .. (session_state or "nil"))
