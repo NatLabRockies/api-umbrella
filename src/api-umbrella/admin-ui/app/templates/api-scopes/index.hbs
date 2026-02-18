@@ -5,7 +5,7 @@
     <LinkTo @route="api_scopes.new" class="btn btn-primary"><FaIcon @icon="plus" /> Add New API Scope</LinkTo>
   </div>
 {{else}}
-  <div class="alert alert-primary"><a href="{{this.session.data.authenticated.admin_contact_url}}">Contact us</a> to make adminstrator changes.</div>
+  <div class="alert alert-primary" role="alert"><a href="{{this.session.data.authenticated.admin_contact_url}}">Contact us</a> to make adminstrator changes.</div>
 {{/if}}
 
 <ApiScopes::IndexTable />

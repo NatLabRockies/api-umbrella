@@ -1,12 +1,12 @@
 <FormFields::FieldWrapper @model={{this.model}} @style={{this.style}} @fieldName={{this.fieldName}} @inputId={{this.inputId}}>
-  <div class="custom-control custom-checkbox">
+  <div class="form-check">
     <input
       type="checkbox"
       checked={{get this.model this.fieldName}}
       onclick={{action (mut (get this.model this.fieldName)) value="target.checked"}}
       id={{this.inputId}}
-      class="custom-control-input"
+      class="form-check-input"
     />
-    <label class="custom-control-label" for={{this.inputId}}>{{this.label}}</label>
+    <label class="form-check-label" for={{this.inputId}}>{{this.label}}</label>
   </div>
 </FormFields::FieldWrapper>

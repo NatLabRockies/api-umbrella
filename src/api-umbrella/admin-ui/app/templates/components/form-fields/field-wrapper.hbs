@@ -1,6 +1,6 @@
 {{#if (eq this.style "horizontal")}}
   <div class="form-horizontal">
-    <div class="form-group row {{this.wrapperErrorClass}}">
+    <div class="mb-3 row {{this.wrapperErrorClass}}">
       <div class="col-sm-2 col-form-label">
         {{#if this.label}}
           <label for={{this.labelFor}}>{{this.label}}</label>
@@ -16,7 +16,7 @@
   </div>
 {{else if (eq this.style "horizontal-wide-labels")}}
   <div class="form-horizontal">
-    <div class="form-group row {{this.wrapperErrorClass}}">
+    <div class="mb-3 row {{this.wrapperErrorClass}}">
       <div class="col-sm-3 col-form-label">
         {{#if this.label}}
           <label for={{this.labelFor}}>{{this.label}}</label>
@@ -31,7 +31,7 @@
     </div>
   </div>
 {{else}}
-  <div class="form-group {{this.wrapperErrorClass}}">
+  <div class="mb-3 {{this.wrapperErrorClass}}">
     {{#if this.label}}
       <label for={{this.labelFor}}>{{this.label}}</label>
     {{/if}}

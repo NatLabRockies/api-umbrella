@@ -1,5 +1,5 @@
 import 'datatables.net';
-import 'datatables.net-bs4';
+import 'datatables.net-bs5';
 
 import $ from 'jquery';
 import merge from 'lodash-es/merge';
@@ -55,7 +55,7 @@ export function initialize(appInstance) {
 
   merge($.fn.DataTable.ext.classes, {
     sFilterInput: 'form-control',
-    sLengthSelect: 'custom-select form-control',
+    sLengthSelect: 'form-select form-control',
   });
 }
 

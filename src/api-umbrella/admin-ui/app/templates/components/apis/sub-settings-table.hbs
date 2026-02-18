@@ -32,7 +32,7 @@
     <div class="col-6">
       <button type="button" class="btn btn-light btn-sm" {{action "add"}}><FaIcon @icon="plus-circle" /> Add URL Settings</button>
     </div>
-    <div class="col-6 text-right">
+    <div class="col-6 text-end">
       {{#if this.sortable.isReorderable}}
         <button type="button" id="sub_settings_reorder" class="btn btn-light btn-sm" {{on "click" (fn this.sortable.reorderCollection "sub_settings")}}><FaIcon @icon="bars" /> <span class="reorder-button-text">Reorder</span></button>
       {{/if}}

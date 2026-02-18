@@ -2,7 +2,7 @@
 
 .query-builder {
   .pull-right {
-    float: right !important;
+    @extend .float-end;
   }
 
   .rules-group-container {
@@ -43,9 +43,9 @@
       }
     }
 
-    select.form-control {
-      @extend .custom-select;
-      @extend .custom-select-sm;
+    select.form-select {
+      @extend .form-select;
+      @extend .form-select-sm;
     }
 
     input[type='number'].form-control,

@@ -38,7 +38,7 @@
     </fieldset>
 
     <fieldset class="collapsible">
-      <legend><button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#global_settings" aria-controls="global_settings" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Global Request Settings"}}</button></legend>
+      <legend><button type="button" class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#global_settings" aria-controls="global_settings" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Global Request Settings"}}</button></legend>
       <div id="global_settings" class="collapse form-horizontal">
         <FieldsFor @model={{this.model.settings}} @style="horizontal-wide-labels" as |f|>
           {{f.text-field "appendQueryString" label="Append Query String Parameters" placeholder="param1=value&param2=value"}}
@@ -51,7 +51,7 @@
     </fieldset>
 
     <fieldset class="collapsible">
-      <legend><button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#sub_settings" aria-controls="sub_settings" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Sub-URL Request Settings"}}</button></legend>
+      <legend><button type="button" class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#sub_settings" aria-controls="sub_settings" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Sub-URL Request Settings"}}</button></legend>
       <div id="sub_settings" class="collapse">
         <p class="fieldset-note">{{t "Change settings for specific sub-URLs within this API."}}</p>
         <Apis::SubSettingsTable @model={{this.model}} @roleOptions={{this.roleOptions}} />
@@ -59,7 +59,7 @@
     </fieldset>
 
     <fieldset class="collapsible">
-      <legend><button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#rewrites" aria-controls="rewrites" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Advanced Requests Rewriting"}}</button></legend>
+      <legend><button type="button" class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#rewrites" aria-controls="rewrites" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Advanced Requests Rewriting"}}</button></legend>
       <div id="rewrites" class="collapse">
         <p class="fieldset-note">{{t "Modify the incoming request's URL or headers before passing it to the backend."}}</p>
         <Apis::RewriteTable @model={{this.model}} />
@@ -67,7 +67,7 @@
     </fieldset>
 
     <fieldset class="collapsible">
-      <legend><button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#advanced_settings" aria-controls="advanced_settings" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Advanced Settings"}}</button></legend>
+      <legend><button type="button" class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#advanced_settings" aria-controls="advanced_settings" aria-expanded="false"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Advanced Settings"}}</button></legend>
       <div id="advanced_settings" class="collapse form-horizontal">
         <FieldsFor @model={{this.model}} @style="horizontal-wide-labels" as |f|>
           {{f.select-field "balanceAlgorithm" label="Balance Algorithm" options=this.balanceAlgorithmOptions}}

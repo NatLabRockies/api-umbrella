@@ -14,12 +14,12 @@
               <th class="text-center">
                 Primary
                 <button type="button" class="btn btn-link btn-tooltip tooltip-trigger" data-tippy-content="<p>Controls which rate limit will return its status in the HTTP response headers. This informs the end-users of this limit and how many remaining requests they have. For example:</p>
-  <pre class='code-block'>
-  X-RateLimit-Limit: 1000
-  X-RateLimit-Remaining: 840
-  </pre>
-  <p>Only one rate limit may return this status information, so it will likely be your primary, publicized rate limit (for example, hourly), and not more granular rate limits you may have assigned (for example, per-second limits).</p>">
-                  <FaIcon @icon="question-circle" /><span class="sr-only">Help</span>
+                <pre class='code-block'>
+                  X-RateLimit-Limit: 1000
+                  X-RateLimit-Remaining: 840
+                  </pre>
+                  <p>Only one rate limit may return this status information, so it will likely be your primary, publicized rate limit (for example, hourly), and not more granular rate limits you may have assigned (for example, per-second limits).</p>">
+                  <FaIcon @icon="question-circle" /><span class="visually-hidden">Help</span>
                 </button>
               </th>
               <th></th>
@@ -33,31 +33,29 @@
                     <Input @type="text" @value={{rateLimit.durationInUnits}} class="form-control form-control-sm rate-limit-duration-in-units" aria-label="Duration" />
                   </td>
                   <td style="text-align: left;">
-                    <SelectMenu @value={{rateLimit.durationUnits}} @action={{action (mut rateLimit.durationUnits)}} @options={{this.rateLimitDurationUnitOptions}} @inputClass="custom-select custom-select-sm rate-limit-duration-units" />
+                    <SelectMenu @value={{rateLimit.durationUnits}} @action={{action (mut rateLimit.durationUnits)}} @options={{this.rateLimitDurationUnitOptions}} @inputClass="form-select form-select-sm rate-limit-duration-units" />
                   </td>
                   <td>
-                    <SelectMenu @value={{rateLimit.limitBy}} @action={{action (mut rateLimit.limitBy)}} @options={{this.rateLimitLimitByOptions}} @inputClass="custom-select custom-select-sm rate-limit-limit-by" />
+                    <SelectMenu @value={{rateLimit.limitBy}} @action={{action (mut rateLimit.limitBy)}} @options={{this.rateLimitLimitByOptions}} @inputClass="form-select form-select-sm rate-limit-limit-by" />
                   </td>
                   <td>
                     <div class="input-group input-group-sm">
                       <Input @type="text" @value={{rateLimit.limit}} class="form-control rate-limit-limit" aria-label="Limit" />
-                      <div class="input-group-append">
                         <span class="input-group-text">requests</span>
-                      </div>
                     </div>
                   </td>
                   <td class="text-center">
-                    <div class="custom-control custom-radio custom-control-no-label mt-1">
+                    <div class="form-check custom-control-no-label mt-1">
                       <input
                         type="radio"
                         name={{this.uniqueSettingsId}}
                         id={{concat this.uniqueSettingsId "_" rateLimit.uniqueId}}
                         checked={{rateLimit.responseHeaders}}
                         value={{true}}
-                        class="rate-limit-response-headers custom-control-input"
+                        class="rate-limit-response-headers form-check-input"
                         onclick={{action "primaryRateLimitChange" rateLimit}}
                       />
-                      <label class="custom-control-label" for="{{this.uniqueSettingsId}}_{{rateLimit.uniqueId}}"><span class="sr-only">Use as primary rate limit</span></label>
+                      <label class="form-check-label" for="{{this.uniqueSettingsId}}_{{rateLimit.uniqueId}}"><span class="visually-hidden">Use as primary rate limit</span></label>
                     </div>
                   </td>
                   <td class="table-row-actions">

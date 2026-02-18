@@ -13,10 +13,10 @@
     </div>
     <div class="row">
       <div class="col-6">
-        <div class="form-group custom-control custom-checkbox">
+        <div class="form-group form-check">
           <input value="0" type="hidden" name="admin[remember_me]" />
-          <input class="custom-control-input" type="checkbox" value="1" name="admin[remember_me]" id="admin_remember_me" />
-          <label class="custom-control-label" for="admin_remember_me"><%= t("Remember me") %></label>
+          <input class="form-check-input" type="checkbox" value="1" name="admin[remember_me]" id="admin_remember_me" />
+          <label class="form-check-label" for="admin_remember_me"><%= t("Remember me") %></label>
         </div>
       </div>
       <div class="col-6 text-right">

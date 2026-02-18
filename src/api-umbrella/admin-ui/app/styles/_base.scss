@@ -155,3 +155,23 @@ a:hover {
 .alert a {
   text-decoration: underline;
 }
+
+.text-decoration-link {
+  text-decoration: none;
+}
+
+.text-decoration-link:hover {
+  text-decoration: underline;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.btn-info, .btn:focus-visible {
+  --bs-btn-color: white;
+}

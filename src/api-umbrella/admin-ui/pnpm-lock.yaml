@@ -52,7 +52,7 @@ importers:
         version: 1.1.2
       '@pnotify/bootstrap4':
         specifier: ^5.2.0
-        version: 5.2.0(bootstrap@4.6.2(popper.js@1.16.1))
+        version: 5.2.0(bootstrap@5.3.8(@popperjs/core@2.11.8))
       '@pnotify/core':
         specifier: ^5.2.0
         version: 5.2.0
@@ -70,10 +70,10 @@ importers:
         version: 10.4.24(postcss@8.5.6)
       bootbox:
         specifier: ^6.0.4
-        version: 6.0.4(@popperjs/core@2.11.8)(bootstrap@4.6.2(popper.js@1.16.1))
+        version: 6.0.4(@popperjs/core@2.11.8)(bootstrap@5.3.8(@popperjs/core@2.11.8))
       bootstrap:
-        specifier: ^4.6.2
-        version: 4.6.2(popper.js@1.16.1)
+        specifier: ^5.3.8
+        version: 5.3.8(@popperjs/core@2.11.8)
       broccoli-asset-rev:
         specifier: ^3.0.0
         version: 3.0.0
@@ -86,7 +86,7 @@ importers:
       datatables.net:
         specifier: ^1.13.11
         version: 1.13.11
-      datatables.net-bs4:
+      datatables.net-bs5:
         specifier: ^1.13.11
         version: 1.13.11
       daterangepicker:
@@ -216,8 +216,8 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
       jQuery-QueryBuilder:
-        specifier: ~2.7.0
-        version: 2.7.0
+        specifier: ~3.0.0
+        version: 3.0.0
       jed:
         specifier: ~1.1.1
         version: 1.1.1
@@ -244,7 +244,7 @@ importers:
         version: 2.0.6
       pnotify:
         specifier: ~5.2.0
-        version: 5.2.0(@fortawesome/free-solid-svg-icons@6.7.2)(animate.css@3.7.2)(bootstrap@4.6.2(popper.js@1.16.1))(font-awesome@4.7.0)
+        version: 5.2.0(@fortawesome/free-solid-svg-icons@6.7.2)(animate.css@3.7.2)(bootstrap@5.3.8(@popperjs/core@2.11.8))(font-awesome@4.7.0)
       po2json:
         specifier: ~0.4.5
         version: 0.4.5
@@ -1989,17 +1989,13 @@ packages:
       bootstrap: ^4.4.0 || ^5.0.0
       jquery: ^3.5.1
 
-  bootstrap@3.4.1:
-    resolution: {integrity: sha512-yN5oZVmRCwe5aKwzRj6736nSmKDX7pLYwsXiCj/EYmo16hODaBiT4En5btW/jhBF/seV+XMx3aYwukYC3A49DA==}
-    engines: {node: '>=6'}
-    deprecated: This version of Bootstrap is no longer supported. Please upgrade to the latest version.
+  bootstrap-icons@1.13.1:
+    resolution: {integrity: sha512-ijombt4v6bv5CLeXvRWKy7CuM3TRTuPEuGaGKvTV5cz65rQSY8RQ2JcHt6b90cBBAC7s8fsf2EkQDldzCoXUjw==}
 
-  bootstrap@4.6.2:
-    resolution: {integrity: sha512-51Bbp/Uxr9aTuy6ca/8FbFloBUJZLHwnhTcnjIeRn2suQWsWzcuJhGjKDB5eppVte/8oCdOL3VuwxvZDUggwGQ==}
-    deprecated: This version of Bootstrap is no longer supported. Please upgrade to the latest version.
+  bootstrap@5.3.8:
+    resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
     peerDependencies:
-      jquery: 1.9.1 - 3
-      popper.js: ^1.16.1
+      '@popperjs/core': ^2.11.8
 
   bower-config@1.4.3:
     resolution: {integrity: sha512-MVyyUk3d1S7d2cl6YISViwJBc2VXCkxF5AUFykvN0PQj5FsUiMNSgAYTso18oRFfyZ6XEtjrgg9MAaufHbOwNw==}
@@ -2739,8 +2735,8 @@ packages:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
 
-  datatables.net-bs4@1.13.11:
-    resolution: {integrity: sha512-1LnxzQDFKpwvBETc8wtUtQ+pUXhs6NJomNST5pRzzHAccckkj9rZeOp3mevKDnDJKuNhBM1Y0rIeZGylJnqh9A==}
+  datatables.net-bs5@1.13.11:
+    resolution: {integrity: sha512-NQO15TjXo4xvZ0jReC4Uf86ezbQzPQPdaN2YncrCPhzQ6fx+2WD7DUq4ur0HbAcYHo94/M+MtD5Ch29To7Rj3Q==}
 
   datatables.net@1.13.11:
     resolution: {integrity: sha512-AE6RkMXziRaqzPcu/pl3SJXeRa6fmXQG/fVjuRESujvkzqDCYEeKTTpPMuVJSGYJpPi32WGSphVNNY1G4nSN/g==}
@@ -4432,8 +4428,8 @@ packages:
     resolution: {integrity: sha512-+XRlFseT8B3L9KyjxxLjfXSLMuErKDsd8DBNrsaxoViABMEZlOSCstwmw0qpoFX3+U6yWU1yhLudAe6/lETGGA==}
     engines: {node: '>=0.12'}
 
-  jQuery-QueryBuilder@2.7.0:
-    resolution: {integrity: sha512-lwS/QXU+OQ2KYBw+py33Us6S0t5OpLeEE1ZBIVu1r5QxRjPOgDUoXCUeZCX2rPXpRc6Vb7QrOr0409cyf3dQCw==}
+  jQuery-QueryBuilder@3.0.0:
+    resolution: {integrity: sha512-ZzDMZVdO8UzQBVWrr2gtIx+N6zLmjpvYCOTH3osKbhPLKNlZynDktxb3JNFJrb9Fdr5/EPmBo80XvNF3OBBx3Q==}
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
@@ -8194,15 +8190,15 @@ snapshots:
       '@pnotify/core': 5.2.0
       animate.css: 3.7.2
 
-  '@pnotify/bootstrap3@5.2.0(bootstrap@4.6.2(popper.js@1.16.1))':
+  '@pnotify/bootstrap3@5.2.0(bootstrap@5.3.8(@popperjs/core@2.11.8))':
     dependencies:
       '@pnotify/core': 5.2.0
-      bootstrap: 4.6.2(popper.js@1.16.1)
+      bootstrap: 5.3.8(@popperjs/core@2.11.8)
 
-  '@pnotify/bootstrap4@5.2.0(bootstrap@4.6.2(popper.js@1.16.1))':
+  '@pnotify/bootstrap4@5.2.0(bootstrap@5.3.8(@popperjs/core@2.11.8))':
     dependencies:
       '@pnotify/core': 5.2.0
-      bootstrap: 4.6.2(popper.js@1.16.1)
+      bootstrap: 5.3.8(@popperjs/core@2.11.8)
 
   '@pnotify/confirm@5.2.0':
     dependencies:
@@ -8893,16 +8889,16 @@ snapshots:
       raw-body: 1.1.7
       safe-json-parse: 1.0.1
 
-  bootbox@6.0.4(@popperjs/core@2.11.8)(bootstrap@4.6.2(popper.js@1.16.1)):
+  bootbox@6.0.4(@popperjs/core@2.11.8)(bootstrap@5.3.8(@popperjs/core@2.11.8)):
     dependencies:
       '@popperjs/core': 2.11.8
-      bootstrap: 4.6.2(popper.js@1.16.1)
+      bootstrap: 5.3.8(@popperjs/core@2.11.8)
 
-  bootstrap@3.4.1: {}
+  bootstrap-icons@1.13.1: {}
 
-  bootstrap@4.6.2(popper.js@1.16.1):
+  bootstrap@5.3.8(@popperjs/core@2.11.8):
     dependencies:
-      popper.js: 1.16.1
+      '@popperjs/core': 2.11.8
 
   bower-config@1.4.3:
     dependencies:
@@ -9825,7 +9821,7 @@ snapshots:
       es-errors: 1.3.0
       is-data-view: 1.0.2
 
-  datatables.net-bs4@1.13.11:
+  datatables.net-bs5@1.13.11:
     dependencies:
       datatables.net: 1.13.11
       jquery: 4.0.0
@@ -12429,9 +12425,11 @@ snapshots:
       editions: 2.3.1
       textextensions: 2.6.0
 
-  jQuery-QueryBuilder@2.7.0:
+  jQuery-QueryBuilder@3.0.0:
     dependencies:
-      bootstrap: 3.4.1
+      '@popperjs/core': 2.11.8
+      bootstrap: 5.3.8(@popperjs/core@2.11.8)
+      bootstrap-icons: 1.13.1
       jquery: 3.7.1
       jquery-extendext: 1.0.0
       moment: 2.30.1
@@ -13355,11 +13353,11 @@ snapshots:
     dependencies:
       find-up: 3.0.0
 
-  pnotify@5.2.0(@fortawesome/free-solid-svg-icons@6.7.2)(animate.css@3.7.2)(bootstrap@4.6.2(popper.js@1.16.1))(font-awesome@4.7.0):
+  pnotify@5.2.0(@fortawesome/free-solid-svg-icons@6.7.2)(animate.css@3.7.2)(bootstrap@5.3.8(@popperjs/core@2.11.8))(font-awesome@4.7.0):
     dependencies:
       '@pnotify/animate': 5.2.0(animate.css@3.7.2)
-      '@pnotify/bootstrap3': 5.2.0(bootstrap@4.6.2(popper.js@1.16.1))
-      '@pnotify/bootstrap4': 5.2.0(bootstrap@4.6.2(popper.js@1.16.1))
+      '@pnotify/bootstrap3': 5.2.0(bootstrap@5.3.8(@popperjs/core@2.11.8))
+      '@pnotify/bootstrap4': 5.2.0(bootstrap@5.3.8(@popperjs/core@2.11.8))
       '@pnotify/confirm': 5.2.0
       '@pnotify/core': 5.2.0
       '@pnotify/countdown': 5.2.0

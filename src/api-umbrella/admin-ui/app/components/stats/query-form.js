@@ -8,6 +8,7 @@ import { tagName } from '@ember-decorators/component';
 import { observes } from '@ember-decorators/object';
 import Logs from 'api-umbrella-admin-ui/models/stats/logs';
 import { t } from 'api-umbrella-admin-ui/utils/i18n';
+import Popover from 'bootstrap/js/dist/popover'
 import classic from 'ember-classic-decorator';
 import $ from 'jquery';
 import QueryBuilder from 'jQuery-QueryBuilder';
@@ -474,7 +475,30 @@ export default class QueryForm extends Component {
     } else if(this.search) {
       this.send('toggleFilterType', 'advanced');
     }
+
+    const helpTriggerLink = document.querySelector('.lucene-help-link');
+    const helpContent = document.getElementById('query_syntax_help_content');
+
+    if(helpTriggerLink && helpContent) {
+      helpTriggerLink.addEventListener('click', (e) => {
+        e.preventDefault();
+    });
+
+      this.popoverInstance = new Popover(helpTriggerLink, {
+        container: 'body',
+        html: true,
+        content: helpContent.innerHTML,
+        trigger: 'focus',
+    });
   }
+}
+
+willDestroy() {
+  if(this.popoverInstance) {
+    this.popoverInstance.dispose();
+  }
+  super.willDestroy(...arguments);
+}
 
   // eslint-disable-next-line ember/no-observers
   @observes('query')

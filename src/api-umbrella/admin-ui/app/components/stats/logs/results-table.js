@@ -330,7 +330,7 @@ export default class ResultsTable extends Component {
               const tooltipButtonEl = document.createElement('button');
               tooltipButtonEl.className = 'btn btn-link btn-tooltip';
               tooltipButtonEl.type = 'button';
-              tooltipButtonEl.innerHTML = '<i class="fas fa-question-circle"></i><span class="sr-only">Help</span>';
+              tooltipButtonEl.innerHTML = '<i class="fas fa-question-circle"></i><span class="visually-hidden">Help</span>';
 
               tippy(tooltipButtonEl, {
                 trigger: 'click',
