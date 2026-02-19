@@ -15,7 +15,7 @@
               <input type="hidden" name="config[{{this.category}}][{{record.id}}][active_version]" value={{record.active.version}}>
               <input type="hidden" name="config[{{this.category}}][{{record.id}}][pending_version]" value={{record.pending.version}}>
               <input type="hidden" name="config[{{this.category}}][{{record.id}}][publish]" value="0">
-              <div class="form-check custom-control-no-label">
+              <div class="form-check d-inline-block">
                 <input type="checkbox" class="form-check-input" name="config[{{this.category}}][{{record.id}}][publish]" value="1" id="config_{{this.category}}_{{record.id}}">
                 <label class="form-check-label" for="config_{{this.category}}_{{record.id}}"><span class="visually-hidden">Publish {{record.name}} changes</span></label>
               </div>

@@ -3,4 +3,10 @@ $enable-shadows: true;
 // Make placeholder text lighter, or else it's hard to distinguish it between
 // text that's filled in: https://github.com/twbs/bootstrap/issues/21624 This
 // new color is based on the browser defaults.
-$input-placeholder-color: #a9a9a9;
+// $input-placeholder-color: #a9a9a9;
+$input-placeholder-color: #86898b;
+$border-color: #adb5bd;
+
+$table-border-color: #ced4da;
+
+$light: #dee2e6;

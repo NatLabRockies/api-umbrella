@@ -1,5 +1,5 @@
 {{#if this.session.isAuthenticated}}
-  <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark px-3">
+  <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-dark px-3">
     <span class="navbar-brand">API Umbrella</span>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -61,7 +61,7 @@
     </div>
   </nav>
 
-  <div id="content" class="container-fluid">
+  <div id="content" class="container-fluid mt-2">
     {{outlet}}
   </div>
 

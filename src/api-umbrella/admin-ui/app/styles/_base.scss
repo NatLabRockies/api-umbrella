@@ -1,10 +1,6 @@
-body {
-  padding-top: 66px;
-}
-
 .code-block,
 .tippy-box pre {
-  background-color: $light;
+  background-color: $gray-100;
   border: $card-border-width solid $card-border-color;
   @include border-radius($card-border-radius);
   padding: 0.5rem;
@@ -14,12 +10,8 @@ body {
   font-weight: bold;
 }
 
-.button-actions {
+.table-button-actions {
   text-align: right;
-  margin-bottom: 16px;
-}
-
-.button-actions-down {
   position: relative;
   height: 0px;
   margin: 0px;
@@ -27,11 +19,11 @@ body {
 }
 
 .arrow {
-  margin-top: 24px;
+  margin-top: 1.5rem;
   text-align: center;
   color: $gray-600;
-  font-size: 12px;
-  line-height: 12px;
+  font-size: 0.75rem;
+  line-height: 1em;
 
   .svg-inline--fa {
     color: lighten($gray-600, 16%);
@@ -48,13 +40,8 @@ body {
 }
 
 a.remove-action {
-  font-size: 12px;
-  vertical-align: middle;
+  font-size: 0.75rem;
   color: $danger;
-}
-
-a:hover {
-  cursor: pointer;
 }
 
 .api-key {
@@ -63,18 +50,9 @@ a:hover {
 
 .record-details {
   text-align: right;
-  font-size: 11px;
-  line-height: 13px;
+  font-size: 0.75rem;
+  line-height: 1.2em;
   color: $text-muted;
-}
-
-.query-syntax-help .example {
-  text-align: right;
-}
-
-.query-syntax-help td.example {
-  font-style: italic;
-  font-size: 11px;
 }
 
 .diff {
@@ -89,19 +67,11 @@ a:hover {
   }
 }
 
-.dropdown-menu {
-  .fa {
-    /* Make the icons a consistent width so the menu text lines up */
-    width: 16px;
-    text-align: center;
-  }
-}
-
 .publish-toggle-checkboxes {
-  margin: -28px 0px 32px 17px;
+  margin: -1rem 0px 2rem 0px;
   text-align: center;
-  width: 80px;
-  font-size: 85%;
+  width: 5rem;
+  font-size: 0.75rem;
 }
 
 .control-group-negative-top {
@@ -114,7 +84,7 @@ a:hover {
   margin-top: 3em;
   margin-bottom: 1em;
   padding-top: 1em;
-  font-size: 11px;
+  font-size: 0.75rem;
   color: $text-muted;
 }
 
@@ -133,12 +103,7 @@ a:hover {
 }
 
 .btn-light {
-  @include button-variant($gray-300, $gray-300);
-}
-
-.btn-link:not(:disabled):not(.disabled):active,
-.btn-link:not(:disabled):not(.disabled).active {
-  box-shadow: none;
+  @include button-variant($gray-300, $gray-400);
 }
 
 // Workaround for ember-bootstrap 4.9.0 flashing modal backgrounds as solid
@@ -148,30 +113,6 @@ a:hover {
   opacity: $modal-backdrop-opacity;
 }
 
-.ui-pnotify-text p:last-of-type {
+.pnotify-text p:last-of-type {
   margin-bottom: 0px;
-}
-
-.alert a {
-  text-decoration: underline;
-}
-
-.text-decoration-link {
-  text-decoration: none;
-}
-
-.text-decoration-link:hover {
-  text-decoration: underline;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-.btn-info, .btn:focus-visible {
-  --bs-btn-color: white;
 }

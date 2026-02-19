@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-sm-4">
         <div class="form-control-plaintext form-control-sm">
-          <button id="filter_toggle" type="button" data-bs-toggle="collapse" data-bs-target="#filters_ui" aria-controls="filters_ui" aria-expanded="true" class="btn btn-link text-decoration-link p-0 m-0"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Filter Results"}}</button>
+          <button id="filter_toggle" type="button" data-bs-toggle="collapse" data-bs-target="#filters_ui" aria-controls="filters_ui" aria-expanded="true" class="btn btn-link p-0 m-0"><FaIcon @icon="caret-down" @fixedWidth={{true}} />{{t "Filter Results"}}</button>
         </div>
       </div>
       <div class="col-sm-8 filter-times">
@@ -35,7 +35,7 @@
               </div>
               <div class="col-sm-6 text-end">
                 <div class="form-control-plaintext form-control-sm">
-                  <a href="#" {{action "toggleFilterType" "advanced"}} class="filter-type-toggle text-decoration-link">{{t "Switch to advanced filters"}}</a>
+                  <a href="#" {{action "toggleFilterType" "advanced"}} class="filter-type-toggle">{{t "Switch to advanced filters"}}</a>
                 </div>
               </div>
             </div>
@@ -49,119 +49,119 @@
               <div class="row">
                 <div class="col-sm-6">
                   <div class="form-control-plaintext form-control-sm text-muted">
-                    {{! template-lint-disable no-bare-strings no-triple-curlies }}{{{t "Advanced filters use <a href=\"#query_syntax_help_content\" data-bs-toggle=\"popover\" data-bs-trigger=\"focus\" class=\"text-decoration-link lucene-help-link\">Lucene's Query Syntax</a>."}}}
+                    {{! template-lint-disable no-bare-strings no-triple-curlies }}{{{t "Advanced filters use <a tabindex=\"0\" role=\"button\" class=\"lucene-help-link\">Lucene's Query Syntax</button>."}}}
                   </div>
                 </div>
                 <div class="col-sm-6 text-end">
                   <div class="form-control-plaintext form-control-sm">
-                    <a href="#" {{action "toggleFilterType" "builder"}} class="filter-type-toggle text-decoration-link">{{t "Switch to simple filters"}}</a>
+                    <a href="#" {{action "toggleFilterType" "builder"}} class="filter-type-toggle">{{t "Switch to simple filters"}}</a>
                   </div>
                 </div>
               </div>
               <div id="query_syntax_help_content" style="display: none;">
-                <p>{{! template-lint-disable no-bare-strings no-triple-curlies }}{{{t "Use <a href=\"https://lucene.apache.org/core/2_9_4/queryparsersyntax.html#Terms\" target=\"_blank\" class=\"text-decoration-link\">Lucene's query syntax</a> to perform complex queries."}}}</p>
+                <p>{{! template-lint-disable no-bare-strings no-triple-curlies }}{{{t "Use <a href=\"https://lucene.apache.org/core/2_9_4/queryparsersyntax.html#Terms\" target=\"_blank\">Lucene's query syntax</a> to perform complex queries."}}}</p>
                 <p>{{t "Example"}}:</p>
                 <pre class="code-block">request_method:"POST" AND response_status:[400 TO *]</pre>
                 <p>{{t "Available Fields"}}:</p>
-                <table class="table table-sm query-syntax-help">
+                <table class="table table-sm mb-0">
                   <thead>
                     <tr>
                       <th>{{t "Field"}}</th>
-                      <th class="example">{{t "Example"}}</th>
+                      <th>{{t "Example"}}</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>request_at</td>
-                      <td class="example">2013-11-06T20:02:53.752Z</td>
+                      <td><code>request_at</code></td>
+                      <td><em>2013-11-06T20:02:53.752Z</em></td>
                     </tr>
                     <tr>
-                      <td>request_method</td>
-                      <td class="example">GET</td>
+                      <td><code>request_method</code></td>
+                      <td><em>GET</em></td>
                     </tr>
                     <tr>
-                      <td>request_url</td>
-                      <td class="example">http://api.data.gov/nrel/alt-fuel-stations/v1.json?limit=2</td>
+                      <td><code>request_url</code></td>
+                      <td><em>http://api.data.gov/nrel/alt-fuel-stations/v1.json?limit=2</em></td>
                     </tr>
                     <tr>
-                      <td>request_scheme</td>
-                      <td class="example">http</td>
+                      <td><code>request_scheme</code></td>
+                      <td><em>http</em></td>
                     </tr>
                     <tr>
-                      <td>request_host</td>
-                      <td class="example">api.data.gov</td>
+                      <td><code>request_host</code></td>
+                      <td><em>api.data.gov</em></td>
                     </tr>
                     <tr>
-                      <td>request_path</td>
-                      <td class="example">/nrel/alt-fuel-stations/v1.json</td>
+                      <td><code>request_path</code></td>
+                      <td><em>/nrel/alt-fuel-stations/v1.json</em></td>
                     </tr>
                     <tr>
-                      <td>request_path_hierarchy</td>
-                      <td class="example">/nrel/alt-fuel-stations/v1</td>
+                      <td><code>request_path_hierarchy</code></td>
+                      <td><em>/nrel/alt-fuel-stations/v1</em></td>
                     </tr>
                     <tr>
-                      <td>request_user_agent</td>
-                      <td class="example">curl/7.33.0</td>
+                      <td><code>request_user_agent</code></td>
+                      <td><em>curl/7.33.0</em></td>
                     </tr>
                     <tr>
-                      <td>request_user_agent_type</td>
-                      <td class="example">Library</td>
+                      <td><code>request_user_agent_type</code></td>
+                      <td><em>Library</em></td>
                     </tr>
                     <tr>
-                      <td>request_user_agent_family</td>
-                      <td class="example">cURL</td>
+                      <td><code>request_user_agent_family</code></td>
+                      <td><em>cURL</em></td>
                     </tr>
                     <tr>
-                      <td>request_accept_encoding</td>
-                      <td class="example">deflate, gzip</td>
+                      <td><code>request_accept_encoding</code></td>
+                      <td><em>deflate, gzip</em></td>
                     </tr>
                     <tr>
-                      <td>request_ip</td>
-                      <td class="example">93.184.216.119</td>
+                      <td><code>request_ip</code></td>
+                      <td><em>93.184.216.119</em></td>
                     </tr>
                     <tr>
-                      <td>request_ip_country</td>
-                      <td class="example">US</td>
+                      <td><code>request_ip_country</code></td>
+                      <td><em>US</em></td>
                     </tr>
                     <tr>
-                      <td>request_ip_region</td>
-                      <td class="example">CO</td>
+                      <td><code>request_ip_region</code></td>
+                      <td><em>CO</em></td>
                     </tr>
                     <tr>
-                      <td>request_ip_city</td>
-                      <td class="example">Golden</td>
+                      <td><code>request_ip_city</code></td>
+                      <td><em>Golden</em></td>
                     </tr>
                     <tr>
-                      <td>response_status</td>
-                      <td class="example">200</td>
+                      <td><code>response_status</code></td>
+                      <td><em>200</em></td>
                     </tr>
                     <tr>
-                      <td>response_content_type</td>
-                      <td class="example">application/json; charset=utf-8</td>
+                      <td><code>response_content_type</code></td>
+                      <td><em>application/json; charset=utf-8</em></td>
                     </tr>
                     <tr>
-                      <td>response_content_encoding</td>
-                      <td class="example">gzip</td>
+                      <td><code>response_content_encoding</code></td>
+                      <td><em>gzip</em></td>
                     </tr>
                     <tr>
-                      <td>response_transfer_encoding</td>
-                      <td class="example">chunked</td>
+                      <td><code>response_transfer_encoding</code></td>
+                      <td><em>chunked</em></td>
                     </tr>
                     <tr>
-                      <td>response_server</td>
-                      <td class="example">nginx/1.4.2</td>
+                      <td><code>response_server</code></td>
+                      <td><em>nginx/1.4.2</em></td>
                     </tr>
                     <tr>
-                      <td>api_key</td>
-                      <td class="example">DEMO_KEY</td>
+                      <td><code>api_key</code></td>
+                      <td><em>DEMO_KEY</em></td>
                     </tr>
                     <tr>
-                      <td>user_email</td>
-                      <td class="example">demo.api_keys@data.gov</td>
+                      <td><code>user_email</code></td>
+                      <td><em>demo.api_keys@data.gov</em></td>
                     </tr>
                     <tr>
-                      <td>user_id</td>
-                      <td class="example">ad2d94b6-e0f8-4e26-b1a6-1bc6b12f3d76</td>
+                      <td><code>user_id</code></td>
+                      <td><em>ad2d94b6-e0f8-4e26-b1a6-1bc6b12f3d76</em></td>
                     </tr>
                   </tbody>
                 </table>

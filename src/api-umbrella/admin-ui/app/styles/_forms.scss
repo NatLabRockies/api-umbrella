@@ -15,26 +15,29 @@ label {
   padding-top: 0px;
 }
 
-.form-horizontal.condensed .form-group,
-.form-horizontal.condensed .mb-3 {
-  margin-bottom: 5px;
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-horizontal.condensed .form-group {
+  margin-bottom: 0.25rem;
 }
 
 fieldset {
-  margin: 12px 0px 32px 0px;
-  padding: 6px 0px;
+  margin: 0.5rem 0px 2rem 0px;
+  padding: 0.25rem 0px;
 }
 
 fieldset.collapsible {
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 
   .collapse.show {
-    margin-bottom: 24px;
+    margin-bottom: 2rem;
   }
 }
 
 legend {
-  margin-bottom: 2px;
+  margin-bottom: 0.5rem;
   border-width: 0px 0px 1px 0px;
   border-style: solid;
   border-color: $gray-600;
@@ -54,28 +57,22 @@ legend a,
 legend button.btn-link {
   display: block;
   color: $link-color !important;
-}
+  text-decoration: none !important;
 
-legend a:hover,
-legend button.btn-link:hover {
-  color: $link-hover-color !important;
-  text-decoration: none;
-}
-
-legend button.btn-link:focus {
-  text-decoration: none;
+  &:hover {
+    color: $link-hover-color !important;
+  }
 }
 
 .fieldset-note {
-  font-size: 85%;
+  font-size: 0.85rem;
   color: $text-muted;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 fieldset .table {
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
-
 
 .has-error {
   .form-control {
@@ -90,7 +87,7 @@ fieldset .table {
 
 .error-messages {
   h4 {
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
   }
 
   ul {
@@ -122,21 +119,6 @@ fieldset .table {
   margin-top: 20px;
 }
 
-.form-check.custom-control-no-label {
-  display: inline-block;
-  padding-left: 1rem;
-
-  .form-check-label {
-    display: block;
-    width: 0px;
-  }
-
-  .form-check-label::before,
-  .form-check-label::after {
-    left: -1rem;
-  }
-}
-
 .btn {
   .btn-loading-label {
     display: none;
@@ -162,4 +144,8 @@ fieldset .table {
     padding-left: 1.5rem;
     margin-bottom: 0px;
   }
+}
+
+.btn-light {
+  --bs-btn-active-bg: #{$gray-500};
 }
