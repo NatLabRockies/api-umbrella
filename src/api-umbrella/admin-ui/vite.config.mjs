@@ -13,7 +13,10 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
-      external: ['jquery'],
+      external: (id) => {
+        // Externalize jquery, require, and all @ember/* packages
+        return id === 'jquery' || id === 'require' || id.startsWith('@ember/');
+      },
     },
   },
   resolve: {
@@ -23,5 +26,13 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['jquery'],
+  },
+  css: {
+    // Ensure dynamic or runtime-generated CSS files are properly handled
+    preprocessorOptions: {
+      scss: {
+        additionalData: '@import "@/styles/globals.scss";', // Example path if SCSS is used
+      },
+    },
   },
 });

@@ -4,7 +4,7 @@ import { action, computed } from '@ember/object';
 import { success } from '@pnotify/core';
 import LoadingButton from 'api-umbrella-admin-ui/utils/loading-button';
 import bootbox from 'bootbox';
-import Diff from 'diff';
+import { Diff } from 'diff';
 import classic from 'ember-classic-decorator';
 import $ from 'jquery';
 
