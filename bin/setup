@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+echo "Setting up API Umbrella development environment..."
+
+# Check for mkcert
+if command -v mkcert &> /dev/null; then
+  echo "✅ mkcert found"
+
+  mkdir -p dev/ssl
+  if [ -f dev/ssl/localhost.pem ] && [ -f dev/ssl/localhost-key.pem ]; then
+    echo "✅ Local SSL certificates already exist (dev/ssl/)"
+  else
+    echo "ℹ️  Generating locally-trusted SSL certificates..."
+    set -x
+    mkcert -install
+    mkcert -cert-file dev/ssl/localhost.pem -key-file dev/ssl/localhost-key.pem localhost 127.0.0.1 ::1
+    { set +x; } 2>/dev/null
+    echo "✅ SSL certificates generated"
+  fi
+else
+  echo "⚠️  mkcert not found — the dev environment will use a self-signed certificate."
+  echo "   Install mkcert for trusted local HTTPS: https://github.com/FiloSottile/mkcert"
+  echo "   Then re-run: ./bin/setup"
+fi
+
+echo ""
+echo "Setup complete! Run 'docker compose up' to start the development environment."

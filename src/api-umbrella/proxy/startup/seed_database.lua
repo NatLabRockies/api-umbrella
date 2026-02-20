@@ -2,15 +2,23 @@ local config = require("api-umbrella.utils.load_config")()
 local deep_merge_overwrite_arrays = require "api-umbrella.utils.deep_merge_overwrite_arrays"
 
 local api_key_prefixer = require("api-umbrella.utils.api_key_prefixer").prefix
-local interval_lock = require "api-umbrella.utils.interval_lock"
-local pg_utils = require "api-umbrella.utils.pg_utils"
-local random_token = require "api-umbrella.utils.random_token"
-local hmac = require "api-umbrella.utils.hmac"
 local encryptor = require "api-umbrella.utils.encryptor"
+local hmac = require "api-umbrella.utils.hmac"
+local interval_lock = require "api-umbrella.utils.interval_lock"
+local json_encode = require "api-umbrella.utils.json_encode"
+local opensearch = require "api-umbrella.utils.opensearch"
+local opensearch_setup = require "api-umbrella.proxy.startup.opensearch_setup"
+local pg_encode_json = require("pgmoon.json").encode_json
+local pg_utils = require "api-umbrella.utils.pg_utils"
+local random_num = require "api-umbrella.utils.random_num"
+local random_token = require "api-umbrella.utils.random_token"
 local uuid = require "resty.uuid"
 
-local timer_at = ngx.timer.at
+local opensearch_query = opensearch.query
+local pg_raw = pg_utils.raw
 local sleep = ngx.sleep
+local string_find = string.find
+local timer_at = ngx.timer.at
 
 local function wait_for_postgres()
   local postgres_alive = false
@@ -86,6 +94,18 @@ local function seed_api_keys()
       },
     },
   }
+
+  -- Development-only demo API user with a known API key
+  if config["app_env"] == "development" then
+    table.insert(keys, {
+      api_key = "DEMO_KEY_FOR_DEVELOPMENT_ONLY_1234567890",
+      email = "demo.developer@example.com",
+      first_name = "Demo",
+      last_name = "Developer",
+      use_description = "Demo API user for local development testing",
+      registration_source = "seed",
+    })
+  end
 
   for _, data in ipairs(keys) do
     pg_utils.query("START TRANSACTION")
@@ -352,6 +372,294 @@ local function seed_admin_permissions()
   end
 end
 
+local function seed_dev_api_backend()
+  if config["app_env"] ~= "development" then
+    return
+  end
+
+  local backend_name = "HTTPBin Echo API (Dev)"
+
+  pg_utils.query("START TRANSACTION")
+  set_stamping()
+
+  local result, backend_err = pg_utils.query("SELECT * FROM api_backends WHERE name = :name LIMIT 1", { name = backend_name })
+  if not result then
+    ngx.log(ngx.ERR, "failed to query api_backends: ", backend_err)
+    return
+  end
+
+  local backend_id
+  if result[1] then
+    backend_id = result[1]["id"]
+  else
+    backend_id = uuid.generate_random()
+
+    local insert_result, insert_err = pg_utils.insert("api_backends", {
+      id = backend_id,
+      name = backend_name,
+      backend_protocol = "https",
+      frontend_host = "localhost",
+      backend_host = "httpbin.org",
+      balance_algorithm = "least_conn",
+      organization_name = "Development",
+      status_description = "Development testing backend",
+    })
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in api_backends: ", insert_err)
+      return
+    end
+
+    insert_result, insert_err = pg_utils.insert("api_backend_servers", {
+      id = uuid.generate_random(),
+      api_backend_id = backend_id,
+      host = "httpbin.org",
+      port = 443,
+    })
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in api_backend_servers: ", insert_err)
+      return
+    end
+
+    insert_result, insert_err = pg_utils.insert("api_backend_url_matches", {
+      id = uuid.generate_random(),
+      api_backend_id = backend_id,
+      frontend_prefix = "/echo/",
+      backend_prefix = "/",
+    })
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in api_backend_url_matches: ", insert_err)
+      return
+    end
+  end
+
+  pg_utils.query("COMMIT")
+
+  -- Publish the backend so it's immediately active
+  pg_utils.query("START TRANSACTION")
+  set_stamping()
+
+  local published_result, published_err = pg_utils.query("SELECT * FROM published_config ORDER BY id DESC LIMIT 1")
+  if not published_result then
+    ngx.log(ngx.ERR, "failed to query published_config: ", published_err)
+    return
+  end
+
+  local current_config = {}
+  if published_result[1] and published_result[1]["config"] then
+    current_config = published_result[1]["config"]
+  end
+  if not current_config["apis"] then
+    current_config["apis"] = {}
+  end
+  if not current_config["website_backends"] then
+    current_config["website_backends"] = {}
+  end
+
+  local already_published = false
+  for _, api in ipairs(current_config["apis"]) do
+    if api["id"] == backend_id then
+      already_published = true
+      break
+    end
+  end
+
+  if not already_published then
+    table.insert(current_config["apis"], {
+      id = backend_id,
+      name = backend_name,
+      backend_protocol = "https",
+      frontend_host = "localhost",
+      backend_host = "httpbin.org",
+      balance_algorithm = "least_conn",
+      organization_name = "Development",
+      status_description = "Development testing backend",
+      servers = {
+        {
+          host = "httpbin.org",
+          port = 443,
+        },
+      },
+      url_matches = {
+        {
+          frontend_prefix = "/echo/",
+          backend_prefix = "/",
+        },
+      },
+    })
+
+    local insert_result, insert_err = pg_utils.query(
+      "INSERT INTO published_config (config) VALUES (:config)",
+      { config = pg_raw(pg_encode_json(current_config)) }
+    )
+    if not insert_result then
+      ngx.log(ngx.ERR, "failed to create record in published_config: ", insert_err)
+    end
+  end
+
+  pg_utils.query("COMMIT")
+end
+
+local function seed_dev_analytics_data()
+  if config["app_env"] ~= "development" then
+    return
+  end
+
+  local _, err = opensearch_setup.wait_for_opensearch()
+  if err then
+    ngx.log(ngx.ERR, "timed out waiting for opensearch before seeding analytics: ", err)
+    return
+  end
+
+  local index_prefix = config["opensearch"]["index_name_prefix"] .. "-logs-v" .. config["opensearch"]["template_version"]
+
+  -- Check if we already have seeded data by looking for the marker
+  local check_result, check_err = opensearch_query("/" .. index_prefix .. "-allowed/_search", {
+    method = "POST",
+    body = {
+      query = {
+        term = {
+          user_registration_source = "dev_seed",
+        },
+      },
+      size = 0,
+    },
+  })
+
+  if check_result and check_result.body_json and check_result.body_json["hits"] and check_result.body_json["hits"]["total"] and check_result.body_json["hits"]["total"]["value"] > 0 then
+    return
+  end
+
+  -- Ignore 404 errors (index doesn't exist yet) and proceed with seeding
+  if check_err and not string_find(check_err, "404", nil, true) then
+    ngx.log(ngx.NOTICE, "analytics check returned error (may be expected on first run): ", check_err)
+  end
+
+  -- Get the demo user ID from the database
+  -- Use ROLLBACK to clear any aborted transaction state from previous operations
+  pg_utils.query("ROLLBACK")
+  local result, user_err = pg_utils.query("SELECT * FROM api_users WHERE email = :email LIMIT 1", { email = "demo.developer@example.com" })
+  if not result then
+    ngx.log(ngx.NOTICE, "demo user not found, skipping analytics seed: ", user_err)
+    return
+  end
+
+  local demo_user = result[1]
+  if not demo_user then
+    ngx.log(ngx.NOTICE, "demo user not found, skipping analytics seed")
+    return
+  end
+
+  -- Sample request data for variety
+  local request_data = {
+    { path = "/echo/get", method = "GET" },
+    { path = "/echo/post", method = "POST" },
+    { path = "/echo/headers", method = "GET" },
+    { path = "/echo/ip", method = "GET" },
+    { path = "/echo/user-agent", method = "GET" },
+  }
+
+  local statuses = { 200, 200, 200, 201, 200, 200, 200, 200, 200, 400, 200, 200, 500, 200, 200 }
+  local user_agents = {
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    "curl/7.79.1",
+    "Python-urllib/3.9",
+  }
+
+  -- Create sample log entries over the past 30 days
+  local now = ngx.time() * 1000
+  local day_ms = 24 * 60 * 60 * 1000
+
+  local bulk_body = ""
+  local log_count = 0
+
+  for day_offset = 30, 0, -1 do
+    local base_time = now - (day_offset * day_ms)
+    local entries_per_day = random_num(2, 5)
+
+    for _ = 1, entries_per_day do
+      local request_id = uuid.generate_random()
+      local data = request_data[random_num(1, #request_data)]
+      local status = statuses[random_num(1, #statuses)]
+      local user_agent = user_agents[random_num(1, #user_agents)]
+      local timestamp = base_time + random_num(0, day_ms - 1)
+
+      local index_name
+      if status >= 400 then
+        index_name = index_prefix .. "-errored"
+      else
+        index_name = index_prefix .. "-allowed"
+      end
+
+      -- Build hierarchy levels from path (e.g., "/echo/get" -> "echo/", "get")
+      local path_parts = {}
+      for part in data["path"]:sub(2):gmatch("[^/]+") do
+        table.insert(path_parts, part)
+      end
+
+      local log_entry = {
+        ["@timestamp"] = timestamp,
+        request_id = request_id,
+        api_key = "DEMO_KEY_FOR_DEVELOPMENT_ONLY_1234567890",
+        user_id = demo_user["id"],
+        user_email = demo_user["email"],
+        user_registration_source = "dev_seed",
+        request_method = data["method"],
+        request_scheme = "https",
+        request_host = "localhost",
+        request_path = data["path"],
+        request_url_hierarchy_level0 = "localhost/",
+        request_ip = "127.0.0.1",
+        request_ip_country = "US",
+        request_ip_region = "CO",
+        request_ip_city = "Golden",
+        request_size = random_num(100, 500),
+        request_user_agent = user_agent,
+        request_user_agent_family = "Other",
+        request_user_agent_type = "Other",
+        response_status = status,
+        response_time = random_num(10, 500),
+        response_size = random_num(200, 2000),
+        response_content_type = "application/json",
+      }
+
+      -- Add hierarchy levels
+      for i, part in ipairs(path_parts) do
+        local level_value = part
+        if i < #path_parts then
+          level_value = level_value .. "/"
+        end
+        log_entry["request_url_hierarchy_level" .. i] = level_value
+      end
+
+      bulk_body = bulk_body .. json_encode({ create = { _index = index_name, _id = request_id } }) .. "\n"
+      bulk_body = bulk_body .. json_encode(log_entry) .. "\n"
+      log_count = log_count + 1
+    end
+  end
+
+  if log_count > 0 then
+    local bulk_result, bulk_err = opensearch_query("/_bulk", {
+      method = "POST",
+      headers = {
+        ["Content-Type"] = "application/x-ndjson",
+      },
+      body = bulk_body,
+    })
+    if not bulk_result then
+      ngx.log(ngx.ERR, "failed to seed analytics data: ", bulk_err)
+    elseif bulk_result.body_json and bulk_result.body_json["errors"] then
+      ngx.log(ngx.ERR, "bulk operation had errors: ", bulk_result.body or "")
+    else
+      ngx.log(ngx.NOTICE, "seeded ", log_count, " analytics log entries for development")
+
+      -- Refresh the indices so data is immediately searchable
+      opensearch_query("/" .. index_prefix .. "-*/_refresh", {
+        method = "POST",
+      })
+    end
+  end
+end
+
 local function seed()
   local _, err = wait_for_postgres()
   if err then
@@ -363,6 +671,8 @@ local function seed()
   seed_api_keys()
   seed_initial_superusers()
   seed_admin_permissions()
+  seed_dev_api_backend()
+  seed_dev_analytics_data()
 end
 
 local _M = {}
