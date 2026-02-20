@@ -11,14 +11,29 @@ The easiest way to get started with API Umbrella development is to use [Docker](
 
 After installing Docker, follow these steps:
 
+### Optional: Trusted local HTTPS with mkcert
+
+By default, the development environment uses a self-signed SSL certificate, which requires accepting browser warnings and using `curl -k`. To use a locally-trusted certificate instead:
+
+1. [Install mkcert](https://github.com/FiloSottile/mkcert#installation)
+2. Run the setup script:
+
+```sh
+$ ./bin/setup
+```
+
+This generates trusted certificates in `dev/ssl/` and installs mkcert's root CA in your system trust store. You only need to do this once.
+
+### Start the development environment
+
 ```sh
 # Get the code and spinup your development VM
 $ git clone https://github.com/NREL/api-umbrella.git
 $ cd api-umbrella
-$ docker-compose up
+$ docker compose up
 ```
 
-Assuming all goes smoothly, you should be able to see the homepage at [https://localhost:8201/](https://localhost:8201/). You will need to accept the self-signed SSL certificate for localhost in order to access the development environment.
+Assuming all goes smoothly, you should be able to see the homepage at [https://localhost:8201/](https://localhost:8201/). If you ran `./bin/setup` with mkcert, you can access the site directly. Otherwise, you will need to accept the self-signed SSL certificate warning in your browser.
 
 If you're having any difficulties getting the development environment setup, then open an [issue](https://github.com/NREL/api-umbrella/issues).
 
@@ -72,7 +87,7 @@ $ curl -k "https://localhost:8201/echo/post" \
     -d '{"hello": "world"}'
 ```
 
-The `-k` flag is needed to accept the self-signed SSL certificate.
+The `-k` flag is needed to accept the self-signed SSL certificate (not needed if you used mkcert via `./bin/setup`).
 
 ### Sample Analytics Data
 
