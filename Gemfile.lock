@@ -129,8 +129,12 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    nokogiri (1.18.10)
+    nokogiri (1.19.1)
       mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.19.1-aarch64-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.19.1-x86_64-linux-gnu)
       racc (~> 1.4)
     oj (3.16.15)
       bigdecimal (>= 3.0)
@@ -240,7 +244,7 @@ DEPENDENCIES
   minitest-sprint (~> 1.3.0)
   multi_json (~> 1.19.1)
   net-smtp (~> 0.5.0)
-  nokogiri (~> 1.18)
+  nokogiri (~> 1.19)
   oj (~> 3.16)
   opensearch-ruby (~> 3.4.0)
   pg (~> 1.6.2)
