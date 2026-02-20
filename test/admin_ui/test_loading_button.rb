@@ -33,7 +33,7 @@ class Test::AdminUi::TestLoadingButton < Minitest::Capybara::Test
 
       assert_loading_button("Save", "Saving...")
       assert_text("Successfully saved")
-      page.execute_script("window.PNotifyRemoveAll()")
+      find(".alert.alert-dismissible .btn-close").click
       refute_text("Successfully saved")
 
       # Verify that after the first save, the button gets reset and can be used
@@ -61,7 +61,7 @@ class Test::AdminUi::TestLoadingButton < Minitest::Capybara::Test
       visit "/admin/#/config/publish"
       assert_loading_button("Publish", "Publishing...")
       assert_text("Successfully published the configuration")
-      page.execute_script("window.PNotifyRemoveAll()")
+      find(".alert.alert-dismissible .btn-close").click
       refute_text("Successfully published the configuration")
 
       # Verify that after the first publish, the button gets reset and can be
@@ -74,7 +74,7 @@ class Test::AdminUi::TestLoadingButton < Minitest::Capybara::Test
       find("nav a", :text => /Publish Changes/).click
       assert_loading_button("Publish", "Publishing...")
       assert_text("Successfully published the configuration")
-      page.execute_script("window.PNotifyRemoveAll()")
+      find(".alert.alert-dismissible .btn-close").click
       refute_text("Successfully published the configuration")
     end
   end

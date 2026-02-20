@@ -24,7 +24,7 @@
               <a href="#" {{action "edit" rewrite}}><FaIcon @icon="pencil-alt" />{{t "Edit"}}</a>
               <a href="#" class="remove-action" {{action "remove" rewrite}}><FaIcon @icon="times" />{{t "Remove"}}</a>
             </td>
-            <td class="reorder-handle"><FaIcon @icon="bars" /></td>
+            <td class="reorder-handle"><FaIcon @icon="grip-vertical" /></td>
           </tr>
         {{/each}}
       {{else}}
@@ -38,7 +38,7 @@
     </div>
     <div class="col-6 text-end">
       {{#if this.sortable.isReorderable}}
-        <button type="button" id="rewrites_reorder" class="btn btn-light btn-sm" {{on "click" (fn this.sortable.reorderCollection "rewrites")}}><FaIcon @icon="bars" /> <span class="reorder-button-text">{{t "Reorder"}}</span></button>
+        <button type="button" id="rewrites_reorder" class="btn btn-light btn-sm" {{on "click" (fn this.sortable.reorderCollection "rewrites")}}><FaIcon @icon="grip-vertical" /> <span class="reorder-button-text">{{t "Reorder"}}</span></button>
       {{/if}}
     </div>
   </div>

@@ -218,7 +218,6 @@ class Test::AdminUi::TestApis < Minitest::Capybara::Test
 
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     api = ApiBackend.order(:created_at => :desc).first
     visit "/admin/#/apis/#{api.id}/edit"
@@ -379,10 +378,10 @@ class Test::AdminUi::TestApis < Minitest::Capybara::Test
     # Save the API.
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     # Edit again.
     click_link api.name
+    refute_text("Successfully saved")
 
     # Verify the sub-url setting in the table.
     find("legend button", :text => /Sub-URL Request Settings/).click
@@ -412,10 +411,10 @@ class Test::AdminUi::TestApis < Minitest::Capybara::Test
     # Save the API.
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     # Edit again.
     click_link api.name
+    refute_text("Successfully saved")
 
     # Verify all of the edit updates are displayed properly (we saw an issue
     # where the select menu handling didn't work properly on the second display

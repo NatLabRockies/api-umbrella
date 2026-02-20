@@ -12,24 +12,29 @@ local basename = require("posix.libgen").basename
 local config = require("api-umbrella.utils.load_config")()
 local find_cmd = require "api-umbrella.utils.find_cmd"
 local json_decode = require("cjson").decode
+local path_exists = require "api-umbrella.utils.path_exists"
 local path_join = require "api-umbrella.utils.path_join"
 local readfile = require("pl.utils").readfile
 
 local get_api_umbrella_version = require "api-umbrella.utils.get_api_umbrella_version"
 API_UMBRELLA_VERSION = get_api_umbrella_version()
 
-local login_css_paths = find_cmd(path_join(config["_embedded_root_dir"], "app/build/dist/web-assets"), { "-name", "login-*.css" })
-if login_css_paths and #login_css_paths == 1 then
-  LOGIN_CSS_FILENAME = basename(login_css_paths[1])
-else
-  ngx.log(ngx.ERR, "could not find login css file path")
-end
+local manifest_path = path_join(config["_embedded_root_dir"], "app/build/dist/web-assets/.vite/manifest.json")
+if path_exists(manifest_path) then
+  local manifest = json_decode(readfile(manifest_path))
+  if manifest and manifest["assets/login.js"] and manifest["assets/login.js"]["file"] then
+    LOGIN_JS_FILENAME = manifest["assets/login.js"]["file"]
+  else
+    ngx.log(ngx.ERR, "could not find login js file path")
+  end
 
-local login_js_paths = find_cmd(path_join(config["_embedded_root_dir"], "app/build/dist/web-assets"), { "-name", "login-*.js" })
-if login_js_paths and #login_js_paths == 1 then
-  LOGIN_JS_FILENAME = basename(login_js_paths[1])
+  if manifest and manifest["assets/login.js"] and manifest["assets/login.js"]["css"] and #manifest["assets/login.js"]["css"] == 1 then
+    LOGIN_CSS_FILENAME = manifest["assets/login.js"]["css"][1]
+  else
+    ngx.log(ngx.ERR, "could not find login css file path")
+  end
 else
-  ngx.log(ngx.ERR, "could not find login js file path")
+  ngx.log(ngx.ERR, "could not find login manifest file path")
 end
 
 LOCALE_DATA = {}

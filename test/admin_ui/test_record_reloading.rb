@@ -23,26 +23,26 @@ class Test::AdminUi::TestRecordReloading < Minitest::Capybara::Test
 
     click_button "Save"
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     user.reload
     assert_equal("foo", user.use_description)
 
     # Second edit
     click_link user.email
+    refute_text("Successfully saved")
 
     assert_field "Purpose", :with => "foo"
     fill_in "Purpose", :with => "foobar"
 
     click_button "Save"
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     user.reload
     assert_equal("foobar", user.use_description)
 
     # Third edit
     click_link user.email
+    refute_text("Successfully saved")
 
     assert_field "Purpose", :with => "foobar"
     fill_in "Purpose", :with => "foobarbaz"

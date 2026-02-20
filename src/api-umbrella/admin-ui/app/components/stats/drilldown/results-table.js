@@ -30,13 +30,13 @@ export default class ResultsTable extends Component {
           render: (name, type, data) => {
             if(type === 'display' && name && name !== '-') {
               if(data.terminal) {
-                return '<i class="far fa-file fa-fw me-1"></i>' + escape(name);
+                return '<i class="far fa-file me-1"></i>' + escape(name);
               } else {
                 let params = clone(this.presentQueryParamValues);
                 params.prefix = data.descendent_prefix;
                 let link = '#/stats/drilldown?' + $.param(params);
 
-                return '<a href="' + link + '"><i class="far fa-folder fa-fw me-1"></i>' + escape(name) + '</a>';
+                return '<a href="' + link + '"><i class="far fa-folder me-1"></i>' + escape(name) + '</a>';
               }
             }
 

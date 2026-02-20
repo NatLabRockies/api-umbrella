@@ -219,27 +219,27 @@ class Test::AdminUi::TestStatsLogs < Minitest::Capybara::Test
     admin_login
     visit "/admin/#/stats/logs?search=&start_at=2015-01-12&end_at=2015-01-13&interval=week"
     refute_selector(".busy-blocker")
-    assert_selector("button.active", :text => "Week")
+    assert_selector(".filter-times .btn-check:checked + .btn", :text => "Week")
     assert_link("Download CSV", :href => /interval=week/)
 
-    click_button "Day"
-    refute_selector("button.active", :text => "Week")
-    assert_selector("button.active", :text => "Day")
+    choose "Day"
+    refute_selector(".filter-times .btn-check:checked + .btn", :text => "Week")
+    assert_selector(".filter-times .btn-check:checked + .btn", :text => "Day")
     assert_link("Download CSV", :href => /interval=day/)
 
-    click_button "Hour"
-    refute_selector("button.active", :text => "Day")
-    assert_selector("button.active", :text => "Hour")
+    choose "Hour"
+    refute_selector(".filter-times .btn-check:checked + .btn", :text => "Day")
+    assert_selector(".filter-times .btn-check:checked + .btn", :text => "Hour")
     assert_link("Download CSV", :href => /interval=hour/)
 
-    click_button "Month"
-    refute_selector("button.active", :text => "Hour")
-    assert_selector("button.active", :text => "Month")
+    choose "Month"
+    refute_selector(".filter-times .btn-check:checked + .btn", :text => "Hour")
+    assert_selector(".filter-times .btn-check:checked + .btn", :text => "Month")
     assert_link("Download CSV", :href => /interval=month/)
 
-    click_button "Minute"
-    refute_selector("button.active", :text => "Month")
-    assert_selector("button.active", :text => "Minute")
+    choose "Minute"
+    refute_selector(".filter-times .btn-check:checked + .btn", :text => "Month")
+    assert_selector(".filter-times .btn-check:checked + .btn", :text => "Minute")
     assert_link("Download CSV", :href => /interval=minute/)
   end
 

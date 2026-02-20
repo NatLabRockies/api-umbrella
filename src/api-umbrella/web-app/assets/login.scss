@@ -1,16 +1,14 @@
-@import "~bootstrap/scss/bootstrap";
+$border-color: #adb5bd;
+
+@import "bootstrap";
 
 body {
   padding: 20px;
 }
 
-.login .btn {
-  font-size: 16px;
-}
-
 .login h1 {
   text-align: center;
-  margin: 0px 0px 15px 0px;
+  margin: 0px 0px 1rem 0px;
   font-weight: 200;
 }
 
@@ -31,7 +29,7 @@ body {
 .login .btn {
   display: block;
   width: 100%;
-  padding: 10px;
+  padding: 0.625rem;
   background-color: #07c;
   color: #fff;
   border-style: none;
@@ -51,13 +49,13 @@ body {
 .login .login-container {
   border: 1px solid #ddd;
   border-radius: 2px;
-  padding: 15px;
-  margin: 15px 0px;
+  padding: 1rem;
+  margin: 1rem 0px;
 }
 
 .external-login {
-  margin-top: 20px;
-  line-height: 24px;
+  margin-top: 1.25rem;
+  line-height: 1.5em;
 }
 
 .external-login:first-child {
@@ -66,7 +64,7 @@ body {
 
 .external-login .alert {
   margin-bottom: 2px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .external-login .btn span {
@@ -75,13 +73,13 @@ body {
 
 .external-login .btn .svg-inline--fa {
   margin-right: 3px;
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
 .external-login .btn span,
 .external-login .btn .svg-inline--fa {
   vertical-align: middle;
-  line-height: 24px;
+  line-height: 1.5em;
 }
 
 .login .checkbox {

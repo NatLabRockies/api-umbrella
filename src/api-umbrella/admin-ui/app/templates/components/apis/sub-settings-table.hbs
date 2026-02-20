@@ -20,7 +20,7 @@
               <a href="#" {{action "edit" subSettings}}><FaIcon @icon="pencil-alt" />Edit</a>
               <a href="#" class="remove-action" {{action "remove" subSettings}}><FaIcon @icon="times" />Remove</a>
             </td>
-            <td class="reorder-handle"><FaIcon @icon="bars" /></td>
+            <td class="reorder-handle"><FaIcon @icon="grip-vertical" /></td>
           </tr>
         {{/each}}
       {{else}}
@@ -33,9 +33,7 @@
       <button type="button" class="btn btn-light btn-sm" {{action "add"}}><FaIcon @icon="plus-circle" /> Add URL Settings</button>
     </div>
     <div class="col-6 text-end">
-      {{#if this.sortable.isReorderable}}
-        <button type="button" id="sub_settings_reorder" class="btn btn-light btn-sm" {{on "click" (fn this.sortable.reorderCollection "sub_settings")}}><FaIcon @icon="bars" /> <span class="reorder-button-text">Reorder</span></button>
-      {{/if}}
+      <ReorderTable @collection={{this.model.subSettings}} @tableId="sub_settings_table" />
     </div>
   </div>
 </div>

@@ -9,6 +9,9 @@ export default class ApplicationRoute extends Route {
 
   @service busy;
 
+  @service currentFlashMessages;
+  @service pendingFlashMessages;
+
   async beforeModel() {
     await this.session.setup();
   }
@@ -59,6 +62,7 @@ export default class ApplicationRoute extends Route {
   @action
   refreshCurrentRoute() {
     this.refresh();
+    window.scrollTo(0, 0);
   }
 
   @action
@@ -78,5 +82,26 @@ export default class ApplicationRoute extends Route {
       this.busy.hide();
       return this.intermediateTransitionTo('error');
     }
+  }
+
+  @action
+  didTransition() {
+    // On each route change, clear any currently visible flash messages, since
+    // we only want the flash messages to be visible on one page, but not
+    // persistent otherwise.
+    this.currentFlashMessages.empty();
+
+    // Next, copy any "pending" flash messages that were set just before this
+    // route change to the "current" messages to display. In this way, the
+    // "pending" changes can be shown just once.
+    for (const item of this.pendingFlashMessages.items) {
+      this.currentFlashMessages.add(item);
+    }
+
+    // Clear the pending messages that have now been copied for one-time
+    // display to the current area.
+    this.pendingFlashMessages.empty();
+
+    return true;
   }
 }

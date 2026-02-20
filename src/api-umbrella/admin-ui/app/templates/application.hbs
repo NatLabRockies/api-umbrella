@@ -10,10 +10,10 @@
           <li class="nav-item dropdown nav-analytics">
             <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{t "Analytics"}}</a>
             <div class="dropdown-menu">
-              <LinkTo @route="stats.drilldown" class="dropdown-item"><FaIcon @icon="sitemap" @fixedWidth={{true}} /> {{t "API Drilldown"}}</LinkTo>
-              <LinkTo @route="stats.logs" class="dropdown-item"><FaIcon @icon="signal" @fixedWidth={{true}} /> {{t "Filter Logs"}}</LinkTo>
-              <LinkTo @route="stats.users" class="dropdown-item"><FaIcon @icon="user" @fixedWidth={{true}} /> {{t "By Users"}}</LinkTo>
-              <LinkTo @route="stats.map" class="dropdown-item"><FaIcon @icon="map-marker-alt" @fixedWidth={{true}} /> {{t "By Location"}}</LinkTo>
+              <LinkTo @route="stats.drilldown" class="dropdown-item"><FaIcon @icon="sitemap" /> {{t "API Drilldown"}}</LinkTo>
+              <LinkTo @route="stats.logs" class="dropdown-item"><FaIcon @icon="signal" /> {{t "Filter Logs"}}</LinkTo>
+              <LinkTo @route="stats.users" class="dropdown-item"><FaIcon @icon="user" /> {{t "By Users"}}</LinkTo>
+              <LinkTo @route="stats.map" class="dropdown-item"><FaIcon @icon="map-marker-alt" /> {{t "By Location"}}</LinkTo>
             </div>
           </li>
         {{/if}}
@@ -22,14 +22,14 @@
             <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{t "Users"}}</a>
             <div class="dropdown-menu">
               {{#if this.currentAdmin.permissions.user_view}}
-                <LinkTo @route="api_users" class="dropdown-item"><FaIcon @icon="user" @fixedWidth={{true}} /> {{t "API Users"}}</LinkTo>
+                <LinkTo @route="api_users" class="dropdown-item"><FaIcon @icon="user" /> {{t "API Users"}}</LinkTo>
               {{/if}}
               {{#if this.currentAdmin.permissions.admin_view}}
-                <LinkTo @route="admins" class="dropdown-item"><FaIcon @icon="user" @fixedWidth={{true}} /> {{t "Admin Accounts"}}</LinkTo>
+                <LinkTo @route="admins" class="dropdown-item"><FaIcon @icon="user" /> {{t "Admin Accounts"}}</LinkTo>
                 <div class="dropdown-divider"></div>
                 <div role="presentation" class="dropdown-header">{{t "Permissions Management"}}</div>
-                <LinkTo @route="api_scopes" class="dropdown-item"><FaIcon @icon="lock" @fixedWidth={{true}} /> {{t "API Scopes"}}</LinkTo>
-                <LinkTo @route="admin_groups" class="dropdown-item"><FaIcon @icon="users" @fixedWidth={{true}} /> {{t "Admin Groups"}}</LinkTo>
+                <LinkTo @route="api_scopes" class="dropdown-item"><FaIcon @icon="lock" /> {{t "API Scopes"}}</LinkTo>
+                <LinkTo @route="admin_groups" class="dropdown-item"><FaIcon @icon="users" /> {{t "Admin Groups"}}</LinkTo>
               {{/if}}
             </div>
           </li>
@@ -39,11 +39,11 @@
             <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{t "Configuration"}}</a>
             <div class="dropdown-menu">
               {{#if this.currentAdmin.permissions.backend_manage}}
-                <LinkTo @route="apis" class="dropdown-item"><FaIcon @icon="cog" @fixedWidth={{true}} /> {{t "API Backends"}}</LinkTo>
-                <LinkTo @route="website_backends" class="dropdown-item"><FaIcon @icon="cog" @fixedWidth={{true}} /> {{t "Website Backends"}}</LinkTo>
+                <LinkTo @route="apis" class="dropdown-item"><FaIcon @icon="cog" /> {{t "API Backends"}}</LinkTo>
+                <LinkTo @route="website_backends" class="dropdown-item"><FaIcon @icon="cog" /> {{t "Website Backends"}}</LinkTo>
               {{/if}}
               {{#if this.currentAdmin.permissions.backend_publish}}
-                <LinkTo @route="config.publish" class="dropdown-item"><FaIcon @icon="upload" @fixedWidth={{true}} /> {{t "Publish Changes"}}</LinkTo>
+                <LinkTo @route="config.publish" class="dropdown-item"><FaIcon @icon="upload" /> {{t "Publish Changes"}}</LinkTo>
               {{/if}}
             </div>
           </li>
@@ -51,7 +51,7 @@
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
-          <a href="#" id="nav_gear_menu" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><FaIcon @icon="cog" @fixedWidth={{true}} role="presentation" /></a>
+          <a href="#" id="nav_gear_menu" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><FaIcon @icon="cog" role="presentation" /></a>
           <div class="dropdown-menu dropdown-menu-end">
             <LinkTo @route="admins.edit" @model={{this.session.data.authenticated.admin.id}} class="dropdown-item" id="my_account_nav_link">{{t "My Account"}}</LinkTo>
             <a href="#" class="dropdown-item" {{action "logout"}}>{{t "Sign out"}}</a>
@@ -62,6 +62,8 @@
   </nav>
 
   <div id="content" class="container-fluid mt-2">
+    <FlashMessages />
+
     {{outlet}}
   </div>
 

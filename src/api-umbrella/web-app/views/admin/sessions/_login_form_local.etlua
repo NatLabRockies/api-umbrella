@@ -3,29 +3,29 @@
   <% render("api-umbrella.web-app.views.layout.errors") %>
 
   <div class="form-inputs">
-    <div class="form-group string optional admin_username">
-      <label class="control-label string optional" for="admin_username"><%= username_label %></label>
+    <div class="mb-3 string optional admin_username">
+      <label class="form-label string optional" for="admin_username"><%= username_label %></label>
       <input class="form-control string optional" autofocus="autofocus" type="text" name="admin[username]" id="admin_username" value="<%= admin_params["username"] or "" %>" />
     </div>
-    <div class="form-group password optional admin_password">
-      <label class="control-label password optional" for="admin_password"><%= t("Password") %></label>
+    <div class="mb-3 password optional admin_password">
+      <label class="form-label password optional" for="admin_password"><%= t("Password") %></label>
       <input class="form-control password optional" type="password" name="admin[password]" id="admin_password" />
     </div>
     <div class="row">
       <div class="col-6">
-        <div class="form-group form-check">
+        <div class="mb-3 form-check">
           <input value="0" type="hidden" name="admin[remember_me]" />
           <input class="form-check-input" type="checkbox" value="1" name="admin[remember_me]" id="admin_remember_me" />
           <label class="form-check-label" for="admin_remember_me"><%= t("Remember me") %></label>
         </div>
       </div>
-      <div class="col-6 text-right">
+      <div class="col-6 text-end">
         <a href="/admins/password/new"><%= t("Forgot your password?") %></a><br />
       </div>
     </div>
   </div>
 
   <div class="form-actions">
-    <input type="submit" name="commit" value="<%= t("Sign in") %>" id="sign_in" class="btn btn-default" />
+    <input type="submit" name="commit" value="<%= t("Sign in") %>" id="sign_in" class="btn btn-primary" />
   </div>
 </form>

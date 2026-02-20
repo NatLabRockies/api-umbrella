@@ -1,4 +1,7 @@
 import { action } from '@ember/object';
+import {DragDropManager} from '@dnd-kit/dom';
+import {RestrictToVerticalAxis} from '@dnd-kit/abstract/modifiers';
+import {Sortable as DndSortable} from '@dnd-kit/dom/sortable';
 import { guidFor } from '@ember/object/internals';
 import { tracked } from '@glimmer/tracking';
 import { t } from 'api-umbrella-admin-ui/utils/i18n';
@@ -8,10 +11,12 @@ export default class Sortable {
   @tracked sortableCollection;
 
   constructor(sortableCollection) {
+    console.info('constructor!');
     this.sortableCollection = sortableCollection;
   }
 
   get isReorderable() {
+    console.info('isReorderable');
     const length = this.sortableCollection.length;
     return (length > 1);
   }
@@ -37,6 +42,21 @@ export default class Sortable {
       container.classList.add('reorder-active');
     }
 
+    const manager = new DragDropManager({
+      modifiers: (defaults) => [...defaults, RestrictToVerticalAxis],
+    });
+    const tableRowEls = container.querySelectorAll('tbody tr');
+    for (const [index, tableRowEl] of tableRowEls.entries()) {
+      console.info(tableRowEl);
+      const sortable = new DndSortable({
+        id: tableRowEl.dataset.guid,
+        index,
+        element: tableRowEl,
+        handle: tableRowEl.querySelector('.reorder-handle'),
+      }, manager);
+    }
+
+    /*
     const tbody = container.querySelector('tbody');
     sortable(tbody, {
       items: 'tr',
@@ -44,7 +64,20 @@ export default class Sortable {
       forcePlaceholderSize: true,
       placeholderClass: 'reorder-placeholder',
     });
+    tbody.addEventListener('sortstart', () => {
+      console.info('sortstart: ', arguments);
+    });
+    tbody.addEventListener('sortstop', () => {
+      console.info('sortstop: ', arguments);
+    });
+    tbody.addEventListener('sortenter', () => {
+      console.info('sortenter: ', arguments);
+    });
+    tbody.addEventListener('sortleave', () => {
+      console.info('sortleave: ', arguments);
+    });
     tbody.addEventListener('sortupdate', () => {
+      console.info('sortupdate: ', arguments);
       const indexes = {};
       const rows = tbody.querySelectorAll('tr');
       for(let i = 0; i < rows.length; i++) {
@@ -54,5 +87,6 @@ export default class Sortable {
 
       this.updateSortOrder(indexes);
     });
+    */
   }
 }

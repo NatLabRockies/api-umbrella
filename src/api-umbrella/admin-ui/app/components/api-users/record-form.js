@@ -72,20 +72,6 @@ export default class RecordForm extends Component.extend(Save) {
 
         return message;
       },
-      messageHide(model) {
-        if(isNew && model.get('apiKey')) {
-          return false;
-        } else {
-          return true;
-        }
-      },
-      messageWidth(model) {
-        if(isNew && model.get('apiKey')) {
-          return '500px';
-        } else {
-          return undefined;
-        }
-      },
     });
   }
 }

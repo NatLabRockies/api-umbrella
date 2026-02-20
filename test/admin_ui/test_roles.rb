@@ -47,14 +47,13 @@ class Test::AdminUi::TestRoles < Minitest::Capybara::Test
     click_button("Save")
 
     assert_text("Successfully saved the user")
-    page.execute_script("window.PNotifyRemoveAll()")
-    refute_text("Successfully saved the user")
 
     user = ApiUser.find_by!(:email => "#{unique_test_id}@example.com")
     assert_equal(["test-new-role"], user.roles)
 
     click_link("Add New API User")
     assert_text("Add API User")
+    refute_text("Successfully saved the user")
     find(".selectize-input").click
     assert_text("test-new-role")
   end
@@ -72,7 +71,6 @@ class Test::AdminUi::TestRoles < Minitest::Capybara::Test
     click_button("Save")
 
     assert_text("Successfully saved the user")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     user = ApiUser.find_by!(:email => "#{unique_test_id}@example.com")
     assert_equal(["test-new-user-role"], user.roles)
@@ -113,7 +111,6 @@ class Test::AdminUi::TestRoles < Minitest::Capybara::Test
 
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     user.reload
     assert_equal(["test-role2"], user.roles)
@@ -152,7 +149,6 @@ class Test::AdminUi::TestRoles < Minitest::Capybara::Test
 
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     api.reload
     assert_equal(["test-role2"], api.settings.required_roles)

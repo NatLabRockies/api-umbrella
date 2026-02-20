@@ -50,6 +50,12 @@ module.exports = function(defaults) {
       },
     },
 
+    /*
+    babel: {
+      plugins: [require.resolve('@babel/plugin-transform-class-static-block')]
+    },
+    */
+
     'ember-cli-babel': {
       includePolyfill: true,
     },

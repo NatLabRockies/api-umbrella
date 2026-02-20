@@ -1,0 +1,8 @@
+{{#each this.currentFlashMessages.items as |flash|}}
+  <BsAlert @type={{flash.type}}>
+    {{#if flash.title}}
+      <div><strong>{{flash.title}}</strong></div>
+    {{/if}}
+    {{{flash.message}}}
+  </BsAlert>
+{{/each}}

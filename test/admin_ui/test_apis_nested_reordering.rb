@@ -92,7 +92,6 @@ class Test::AdminUi::TestApisNestedReordering < Minitest::Capybara::Test
 
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     # Verify that the initial save had the expected sort order.
     api = ApiBackend.order(:created_at => :desc).first
@@ -114,7 +113,6 @@ class Test::AdminUi::TestApisNestedReordering < Minitest::Capybara::Test
     fill_in "Name", :with => "Testing API Backend Update"
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     api.reload
     api = ApiBackend.order(:created_at => :desc).first
@@ -162,7 +160,6 @@ class Test::AdminUi::TestApisNestedReordering < Minitest::Capybara::Test
 
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     api.reload
     api = ApiBackend.order(:created_at => :desc).first
