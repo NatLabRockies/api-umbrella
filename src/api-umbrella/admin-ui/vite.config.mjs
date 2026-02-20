@@ -13,26 +13,11 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
-      external: (id) => {
-        // Externalize jquery, require, and all @ember/* packages
-        return id === 'jquery' || id === 'require' || id.startsWith('@ember/');
-      },
+      external: ['require'],
     },
-  },
-  resolve: {
-    alias: {
-      jquery: 'jquery',
-    },
+    chunkSizeWarningLimit: 800,
   },
   optimizeDeps: {
-    exclude: ['jquery'],
-  },
-  css: {
-    // Ensure dynamic or runtime-generated CSS files are properly handled
-    preprocessorOptions: {
-      scss: {
-        additionalData: '@import "@/styles/globals.scss";', // Example path if SCSS is used
-      },
-    },
+    exclude: ['ember-inflector'],
   },
 });

@@ -14,11 +14,15 @@
 
     {{content-for "head-footer"}}
   </head>
+
   <body>
     <noscript>
       <p>This application requires JavaScript.</p>
-      <p>Here are <a href="http://www.enable-javascript.com/">instructions how to enable JavaScript in your web browser</a>.</p>
+      <p>
+        Here are <a href="http://www.enable-javascript.com/">instructions how to enable JavaScript in your web browser</a>.
+      </p>
     </noscript>
+
     <div id="ember_load_indicator" class="ember-load-indicator" style="display: none;">
       <div class="busy-blocker__bg"></div>
       <div class="busy-blocker__content">
@@ -26,15 +30,20 @@
         <p>Loading...</p>
       </div>
     </div>
-    <script>document.getElementById('ember_load_indicator').style.display = 'block';</script>
+    <script>
+      document.getElementById('ember_load_indicator').style.display = 'block';
+    </script>
 
     {{content-for "body"}}
 
     <script>
       CommonValidations = {};
     </script>
-    <script src="/admin/server_side_loader.js"></script>
-    <script src="/@embroider/virtual/vendor.js"></script>
+
+    <!-- below breaks vite build -->
+    <!-- <script type="module" src="/admin/server_side_loader.js"></script> -->
+    <script type="module" src="/@embroider/virtual/vendor.js"></script>
+
     <script type="module">
       import Application from './app/app';
       import environment from './app/config/environment';
@@ -45,4 +54,3 @@
     {{content-for "body-footer"}}
   </body>
 </html>
-

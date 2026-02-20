@@ -58,11 +58,12 @@ module.exports = async function(defaults) {
       includePolyfill: true,
     },
 
-    //todo: ask Nick about this
+    //todo: ask Nick about this (in bootstrap branch still @4)
     'ember-bootstrap': {
       bootstrapVersion: 5,
       importBootstrapFont: false,
       importBootstrapCSS: false,
+      insertEmberWormholeElementToDom: false,
     },
 
     'ember-simple-auth': {
