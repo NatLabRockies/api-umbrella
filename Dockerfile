@@ -74,7 +74,8 @@ COPY tasks/app/example-website/build /app/tasks/app/example-website/
 RUN make app:example-website:build && make clean:dev
 
 COPY src/api-umbrella/web-app/assets /app/src/api-umbrella/web-app/assets
-COPY src/api-umbrella/web-app/webpack.config.js /app/src/api-umbrella/web-app/webpack.config.js
+COPY src/api-umbrella/web-app/package.json /app/src/api-umbrella/web-app/package.json
+COPY src/api-umbrella/web-app/vite.config.js /app/src/api-umbrella/web-app/vite.config.js
 COPY tasks/app/web-app/precompile /app/tasks/app/web-app/
 RUN make app:web-app:precompile && make clean:dev
 

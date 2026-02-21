@@ -290,7 +290,8 @@ tasks:
     sources:
       - ./build/work/stamp/app-deps/web-app/pnpm
       - ./src/api-umbrella/web-app/assets/**/*.scss
-      - ./src/api-umbrella/web-app/webpack.config.js
+      - ./src/api-umbrella/web-app/package.json
+      - ./src/api-umbrella/web-app/vite.config.js
       - ./tasks/app/web-app/precompile
       - ./tasks/helpers.sh
     generates:
