@@ -1,68 +1,103 @@
-import Component from '@glimmer/component';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-import { tracked } from '@glimmer/tracking';
-import {DragDropManager} from '@dnd-kit/dom';
 import {RestrictToVerticalAxis} from '@dnd-kit/abstract/modifiers';
-import {Sortable} from '@dnd-kit/dom/sortable';
+import {DragDropManager} from '@dnd-kit/dom';
+import {isSortable,Sortable} from '@dnd-kit/dom/sortable';
+import { action } from '@ember/object';
+import { guidFor } from '@ember/object/internals';
+import { schedule } from '@ember/runloop';
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 
 export default class ReorderTable extends Component {
   @tracked isReordering = false;
 
-  constructor(owner, args) {
+  constructor() {
     super(...arguments);
+    this.setupDomSorting();
+  }
 
-    // this.addObserver('args.collection', this, () => {
-    //   console.info('COLLECTION CHANGES');
-    // });
+  willDestroy() {
+    super.willDestroy(...arguments);
+    this.destroyDomSorting();
   }
 
   get isReorderable() {
-    console.info('isReorderable');
     const length = this.args.collection.length;
+    this.handleCollectionChange();
     return (length > 1);
+  }
+
+  get container() {
+    const container = document.getElementById(this.args.tableId);
+    return container;
+  }
+
+  handleCollectionChange() {
+    schedule('afterRender', this, function() {
+      this.setupDomSorting();
+    });
   }
 
   @action
   toggleReordering() {
     this.isReordering = !this.isReordering;
-    console.info('toggleReordering');
-    const length = this.args.collection.length;
-    console.info('length: ', length);
-
-
-    const observer = new MutationObserver((mutationList) => {
-      console.info('MUTATION: ', mutationList);
-      console.info('MUTATION: ', mutationList[0]);
-    });
-    observer.observe(document.querySelector(`#${this.args.tableId} tbody`), {
-      childList: true,
-    });
-
-    this.makeSortable();
+    this.setupDomSorting();
   }
 
-  makeSortable() {
-    const container = document.getElementById(this.args.tableId);
+  setupDomSorting() {
+    this.destroyDomSorting();
 
-    if (this.isReordering) {
-      container.classList.add('reorder-active');
-    } else {
-      container.classList.remove('reorder-active');
+    if(!this.container) {
+      console.error('tableId doesn not exist: ', this.args.tableId);
+      return;
     }
 
-    const manager = new DragDropManager({
+    if(this.isReordering) {
+      this.container.classList.add('reorder-active');
+    } else {
+      this.container.classList.remove('reorder-active');
+    }
+
+    this.manager = new DragDropManager({
       modifiers: (defaults) => [...defaults, RestrictToVerticalAxis],
     });
-    const tableRowEls = container.querySelectorAll('tbody tr');
-    for (const [index, tableRowEl] of tableRowEls.entries()) {
-      console.info(tableRowEl);
-      const sortable = new Sortable({
+
+    this.sortables = [];
+    const tableRowEls = this.container.querySelectorAll('tbody tr');
+    for(const [index, tableRowEl] of tableRowEls.entries()) {
+      this.sortables.push(new Sortable({
         id: tableRowEl.dataset.guid,
         index,
         element: tableRowEl,
         handle: tableRowEl.querySelector('.reorder-handle'),
-      }, manager);
+      }, this.manager));
+    }
+
+    this.manager.monitor.addEventListener('dragend', this.handleDragEnd.bind(this));
+  }
+
+  destroyDomSorting() {
+    if(this.manager) {
+      this.manager.destroy();
+    }
+  }
+
+  handleDragEnd(event) {
+    if(event.canceled || !isSortable(event.operation.source)) {
+      return;
+    }
+
+    const indexes = {};
+    for(const sortable of this.sortables) {
+      indexes[sortable.id] = sortable.index;
+    }
+
+    this.updateCollectionSortOrders(indexes);
+  }
+
+  updateCollectionSortOrders(indexes) {
+    for(const record of this.args.collection) {
+      const index = indexes[guidFor(record)];
+      record.set('sortOrder', index + 1);
     }
   }
 }

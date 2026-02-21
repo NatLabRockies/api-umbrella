@@ -3,6 +3,6 @@
     {{#if flash.title}}
       <div><strong>{{flash.title}}</strong></div>
     {{/if}}
-    {{{flash.message}}}
+    {{! template-lint-disable no-triple-curlies }}{{{flash.message}}}
   </BsAlert>
 {{/each}}

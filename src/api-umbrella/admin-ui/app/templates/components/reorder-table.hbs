@@ -1,5 +1,5 @@
 {{#if this.isReorderable}}
-  <button type="button" id="sub_settings_reorder" class="btn btn-light btn-sm" {{on "click" this.toggleReordering}}>
+  <button type="button" id="{{@tableId}}_reorder" class="btn btn-light btn-sm" {{on "click" this.toggleReordering}}>
     <FaIcon @icon="grip-vertical" />
     {{#if this.isReordering}}
       Done

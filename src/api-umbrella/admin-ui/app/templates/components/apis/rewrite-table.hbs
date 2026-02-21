@@ -37,9 +37,7 @@
       <button type="button" class="btn btn-light btn-sm" {{action "add"}}><FaIcon @icon="plus-circle" /> {{t "Add Rewrite"}}</button>
     </div>
     <div class="col-6 text-end">
-      {{#if this.sortable.isReorderable}}
-        <button type="button" id="rewrites_reorder" class="btn btn-light btn-sm" {{on "click" (fn this.sortable.reorderCollection "rewrites")}}><FaIcon @icon="grip-vertical" /> <span class="reorder-button-text">{{t "Reorder"}}</span></button>
-      {{/if}}
+      <ReorderTable @collection={{this.model.rewrites}} @tableId="rewrites_table" />
     </div>
   </div>
 </div>

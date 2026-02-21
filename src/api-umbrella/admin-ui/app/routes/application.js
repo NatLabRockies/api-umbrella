@@ -94,7 +94,7 @@ export default class ApplicationRoute extends Route {
     // Next, copy any "pending" flash messages that were set just before this
     // route change to the "current" messages to display. In this way, the
     // "pending" changes can be shown just once.
-    for (const item of this.pendingFlashMessages.items) {
+    for(const item of this.pendingFlashMessages.items) {
       this.currentFlashMessages.add(item);
     }
 

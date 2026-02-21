@@ -200,9 +200,6 @@ importers:
       eslint-plugin-simple-import-sort:
         specifier: ^10.0.0
         version: 10.0.0(eslint@8.57.1)
-      html5sortable:
-        specifier: ^0.14.0
-        version: 0.14.0
       inflection:
         specifier: ^2.0.1
         version: 2.0.1
@@ -3981,9 +3978,6 @@ packages:
   html-tags@3.3.1:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
     engines: {node: '>=8'}
-
-  html5sortable@0.14.0:
-    resolution: {integrity: sha512-esbDyvvrNEAeTwMUIVPyCHeabcrHAKetFDk2TEEOSFwySK5L4byZfy4h5wBqrKer7sfznevzRobn8iqpLobUjw==}
 
   http-errors@1.6.3:
     resolution: {integrity: sha512-lks+lVC8dgGyh97jxvxeYTWQFvh4uw4yC12gVl63Cg30sjPX4wuGcdkICVXDAESr6OJGjqGA8Iz5mkeN6zlD7A==}
@@ -11935,8 +11929,6 @@ snapshots:
       lru-cache: 7.18.3
 
   html-tags@3.3.1: {}
-
-  html5sortable@0.14.0: {}
 
   http-errors@1.6.3:
     dependencies:

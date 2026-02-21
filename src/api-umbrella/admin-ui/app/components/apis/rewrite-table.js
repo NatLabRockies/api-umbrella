@@ -3,7 +3,6 @@ import Component from '@ember/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tagName } from '@ember-decorators/component';
-import Sortable from 'api-umbrella-admin-ui/utils/sortable';
 import bootbox from 'bootbox';
 import classic from 'ember-classic-decorator';
 import without from 'lodash-es/without';
@@ -14,12 +13,6 @@ export default class RewriteTable extends Component {
   @service store;
 
   openModal = false;
-
-  init() {
-    super.init(...arguments);
-
-    this.sortable = new Sortable(this.model.rewrites);
-  }
 
   @action
   add() {

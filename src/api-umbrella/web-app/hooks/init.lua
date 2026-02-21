@@ -8,7 +8,6 @@ require "api-umbrella.web-app.hooks.init_preload_modules"
 local worker_group_init = require("api-umbrella.utils.worker_group").init
 worker_group_init()
 
-local basename = require("posix.libgen").basename
 local config = require("api-umbrella.utils.load_config")()
 local find_cmd = require "api-umbrella.utils.find_cmd"
 local json_decode = require("cjson").decode

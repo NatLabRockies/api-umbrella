@@ -1,5 +1,10 @@
-import { config, dom, library } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+
+import { config, dom, library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faFile,
+  faFolder,
+} from '@fortawesome/free-regular-svg-icons';
 import {
   faArrowDown,
   faArrowRight,
@@ -26,10 +31,6 @@ import {
   faUser,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-  faFile,
-  faFolder,
-} from '@fortawesome/free-regular-svg-icons';
 
 config.autoAddCss = false;
 

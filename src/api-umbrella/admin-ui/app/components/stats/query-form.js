@@ -8,7 +8,6 @@ import { tagName } from '@ember-decorators/component';
 import { observes } from '@ember-decorators/object';
 import Logs from 'api-umbrella-admin-ui/models/stats/logs';
 import { t } from 'api-umbrella-admin-ui/utils/i18n';
-import Popover from 'bootstrap/js/dist/popover'
 import classic from 'ember-classic-decorator';
 import $ from 'jquery';
 import QueryBuilder from 'jQuery-QueryBuilder';

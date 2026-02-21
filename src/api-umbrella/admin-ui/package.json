@@ -89,7 +89,6 @@
     "eslint-plugin-prettier": "^4.2.5",
     "eslint-plugin-qunit": "^7.3.4",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "html5sortable": "^0.14.0",
     "inflection": "^2.0.1",
     "jQuery-QueryBuilder": "~3.0.0",
     "jed": "~1.1.1",
