@@ -79,7 +79,7 @@ gem "concurrent-ruby", "~> 1.3.3"
 gem "zonebie", "~> 0.6.1"
 
 # Encrypting admin passwords.
-gem "bcrypt", "~> 3.1.21"
+gem "bcrypt", "~> 3.1.22"
 
 # Encrypting/decrypting database values.
 gem "encryptor", "~> 3.0.0"
