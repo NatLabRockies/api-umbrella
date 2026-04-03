@@ -108,7 +108,6 @@ class Test::AdminUi::Login::TestInvite < Minitest::Capybara::Test
     assert_equal(false, find_field("Resend invite email", :visible => :all).checked?)
     click_button "Save"
     assert_text("Successfully saved the admin")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     admin.reload
     assert_equal("Foo", admin.notes)
@@ -123,7 +122,6 @@ class Test::AdminUi::Login::TestInvite < Minitest::Capybara::Test
     label_check "Resend invite email"
     click_button "Save"
     assert_text("Successfully saved the admin")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     admin.reload
     assert_equal("Bar", admin.notes)

@@ -1,6 +1,5 @@
 import Mixin from '@ember/object/mixin'
-import { inject } from '@ember/service';
-import { success } from '@pnotify/core';
+import { inject as service } from '@ember/service';
 import LoadingButton from 'api-umbrella-admin-ui/utils/loading-button';
 import bootbox from 'bootbox';
 import scrollTo from 'jquery.scrollto';
@@ -8,7 +7,9 @@ import isFunction from 'lodash-es/isFunction';
 
 // eslint-disable-next-line ember/no-new-mixins
 export default Mixin.create({
-  router: inject(),
+  router: service(),
+
+  pendingFlashMessages: service(),
 
   scrollToErrors(button) {
     LoadingButton.reset(button);
@@ -17,12 +18,10 @@ export default Mixin.create({
 
   afterSaveComplete(options, button) {
     LoadingButton.reset(button);
-    success({
-      title: 'Saved',
-      text: (isFunction(options.message)) ? options.message(this.model) : options.message,
-      hide: (isFunction(options.messageHide)) ? options.messageHide(this.model) : options.messageHide,
-      width: (isFunction(options.messageWidth)) ? options.messageWidth(this.model) : options.messageWidth,
-      textTrusted: true,
+
+    this.pendingFlashMessages.add({
+      type: 'success',
+      message: (isFunction(options.message)) ? options.message(this.model) : options.message,
     });
 
     this.router.transitionTo(options.transitionToRoute);
@@ -72,10 +71,10 @@ export default Mixin.create({
     bootbox.confirm(options.prompt, (result) => {
       if(result) {
         this.model.destroyRecord().then(() => {
-          success({
+          this.pendingFlashMessages.add({
+            type: 'success',
             title: 'Deleted',
-            text: (isFunction(options.message)) ? options.message(this.model) : options.message,
-            textTrusted: true,
+            message: (isFunction(options.message)) ? options.message(this.model) : options.message,
           });
 
           this.router.transitionTo(options.transitionToRoute);

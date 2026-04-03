@@ -3,17 +3,17 @@
   <% render("api-umbrella.web-app.views.layout.errors") %>
 
   <div class="form-inputs">
-    <div class="form-group string optional admin_username">
+    <div class="mb-3 string optional admin_username">
       <label class="control-label string optional" for="admin_username"><%= string.format(t("%s %s"), config["web"]["admin"]["auth_strategies"]["ldap"]["options"]["title"] or t("LDAP"), username_label) %></label>
       <input class="form-control string optional" autofocus="autofocus" type="text" name="admin[username]" id="admin_username" value="<%= admin_params["username"] or "" %>" />
     </div>
-    <div class="form-group password optional admin_password">
+    <div class="mb-3 password optional admin_password">
       <label class="control-label password optional" for="admin_password"><%= string.format(t("%s Password"), config["web"]["admin"]["auth_strategies"]["ldap"]["options"]["title"] or t("LDAP")) %></label>
       <input class="form-control password optional" type="password" name="admin[password]" id="admin_password" />
     </div>
   </div>
 
   <div class="form-actions">
-    <input type="submit" name="commit" value="<%= t("Sign in") %>" id="sign_in" class="btn btn-default" />
+    <input type="submit" name="commit" value="<%= t("Sign in") %>" id="sign_in" class="btn btn-primary" />
   </div>
 </form>

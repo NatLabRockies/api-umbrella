@@ -16,8 +16,8 @@ export default class BaseRoute extends AuthenticatedRoute {
     controller.set('allQueryParamValues', this.allQueryParamValues || {});
     controller.set('backendQueryParamValues', this.backendQueryParamValues || {});
 
-    $('ul.navbar-nav li').removeClass('active');
-    $('ul.navbar-nav li.nav-analytics').addClass('active');
+    $('ul.navbar-nav a.nav-link').removeClass('active');
+    $('ul.navbar-nav li.nav-analytics > a.nav-link').addClass('active');
   }
 
   beforeModel() {

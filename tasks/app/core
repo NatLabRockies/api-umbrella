@@ -56,7 +56,7 @@ rsync -a \
   --itemize-changes \
   --delete \
   --delete-excluded \
-  "$WORK_DIR/tasks/app/web-app/precompile/_persist/assets/dist/" \
+  "$WORK_DIR/tasks/app/web-app/precompile/_persist/dist/" \
   "$APP_DIR/build/dist/web-assets/"
 
 # Add symlinks for bin files into the release.

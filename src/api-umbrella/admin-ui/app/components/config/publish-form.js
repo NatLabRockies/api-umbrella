@@ -1,7 +1,7 @@
 // eslint-disable-next-line ember/no-classic-components
 import Component from '@ember/component';
 import { action, computed } from '@ember/object';
-import { success } from '@pnotify/core';
+import { service } from '@ember/service';
 import LoadingButton from 'api-umbrella-admin-ui/utils/loading-button';
 import bootbox from 'bootbox';
 import Diff from 'diff';
@@ -11,6 +11,8 @@ import $ from 'jquery';
 @classic
 export default class PublishForm extends Component {
   tagName = '';
+
+  @service pendingFlashMessages;
 
   @action
   didInsert(element) {
@@ -121,10 +123,11 @@ export default class PublishForm extends Component {
       data: form.serialize(),
     }).then(() => {
       LoadingButton.reset(this.publishButton);
-      success({
+
+      this.pendingFlashMessages.add({
+        type: 'success',
         title: 'Published',
-        text: 'Successfully published the configuration<br>Changes should be live in a few seconds...',
-        textTrusted: true,
+        message: 'Successfully published the configuration<br>Changes should be live in a few seconds...',
       });
 
       this.refreshCurrentRouteController();

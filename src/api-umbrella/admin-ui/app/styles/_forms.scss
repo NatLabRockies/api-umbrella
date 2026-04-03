@@ -3,7 +3,6 @@ label {
   margin-bottom: 0.1rem;
 }
 
-.custom-control-label,
 .form-check-label {
   font-weight: normal;
 }
@@ -16,25 +15,29 @@ label {
   padding-top: 0px;
 }
 
+.form-group {
+  margin-bottom: 1rem;
+}
+
 .form-horizontal.condensed .form-group {
-  margin-bottom: 5px;
+  margin-bottom: 0.25rem;
 }
 
 fieldset {
-  margin: 12px 0px 32px 0px;
-  padding: 6px 0px;
+  margin: 0.5rem 0px 2rem 0px;
+  padding: 0.25rem 0px;
 }
 
 fieldset.collapsible {
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 
-  .collapse.in {
-    margin-bottom: 24px;
+  .collapse.show {
+    margin-bottom: 2rem;
   }
 }
 
 legend {
-  margin-bottom: 2px;
+  margin-bottom: 0.5rem;
   border-width: 0px 0px 1px 0px;
   border-style: solid;
   border-color: $gray-600;
@@ -54,26 +57,21 @@ legend a,
 legend button.btn-link {
   display: block;
   color: $link-color !important;
-}
+  text-decoration: none !important;
 
-legend a:hover,
-legend button.btn-link:hover {
-  color: $link-hover-color !important;
-  text-decoration: none;
-}
-
-legend button.btn-link:focus {
-  text-decoration: none;
+  &:hover {
+    color: $link-hover-color !important;
+  }
 }
 
 .fieldset-note {
-  font-size: 85%;
+  font-size: 0.85rem;
   color: $text-muted;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 fieldset .table {
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .has-error {
@@ -89,7 +87,7 @@ fieldset .table {
 
 .error-messages {
   h4 {
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
   }
 
   ul {
@@ -121,27 +119,12 @@ fieldset .table {
   margin-top: 20px;
 }
 
-.custom-control.custom-control-no-label {
-  display: inline-block;
-  padding-left: 1rem;
-
-  .custom-control-label {
-    display: block;
-    width: 0px;
-  }
-
-  .custom-control-label::before,
-  .custom-control-label::after {
-    left: -1rem;
-  }
-}
-
 .btn {
   .btn-loading-label {
     display: none;
 
     .svg-inline--fa:first-child {
-      @extend .mr-2;
+      @extend .me-2;
     }
   }
 
@@ -161,4 +144,8 @@ fieldset .table {
     padding-left: 1.5rem;
     margin-bottom: 0px;
   }
+}
+
+.btn-light {
+  --bs-btn-active-bg: #{$gray-500};
 }

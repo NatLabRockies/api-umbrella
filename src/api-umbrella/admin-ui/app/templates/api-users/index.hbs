@@ -1,7 +1,7 @@
 <h1>API Users</h1>
 
 {{#if this.currentAdmin.permissions.user_manage}}
-  <div class="button-actions button-actions-down">
+  <div class="table-button-actions">
     <LinkTo @route="api_users.new" class="btn btn-primary"><FaIcon @icon="plus" /> Add New API User</LinkTo>
   </div>
 {{/if}}

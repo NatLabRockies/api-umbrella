@@ -16,7 +16,8 @@ rsync -a \
   --delete \
   --delete-excluded \
   --include=/assets/*** \
-  --include=/webpack.config.js \
+  --include=/package.json \
+  --include=/vite.config.js \
   --exclude=* \
   "$SOURCE_DIR/src/api-umbrella/web-app/" \
   ./
@@ -30,6 +31,6 @@ rsync -a \
 node_modules_dir="$WORK_DIR/tasks/app-deps/web-app/pnpm/_persist/node_modules"
 mkdir -p "${node_modules_dir}/.pnpm"
 ln -s "$node_modules_dir" ./node_modules
-PATH="$DEV_PATH" ./node_modules/.bin/webpack
+PATH="$DEV_PATH" pnpm run build
 
 stamp

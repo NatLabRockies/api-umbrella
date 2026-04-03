@@ -125,7 +125,7 @@ class Test::AdminUi::Login::TestLocalProvider < Minitest::Capybara::Test
     # but capybara seems to read it as absolute. That's fine, but noting it in
     # case Capybara's future behavior changes).
     stylesheet = find("link[rel=stylesheet]", :visible => :hidden)
-    assert_match(%r{\Ahttps://127\.0\.0\.1:9081/web-assets/login-\w{20}\.css\z}, stylesheet[:href])
+    assert_match(%r{\Ahttps://127\.0\.0\.1:9081/web-assets/assets/login-\w{8}\.css\z}, stylesheet[:href])
 
     # Verify that the asset URL can be fetched and returns data.
     response = Typhoeus.get(stylesheet[:href], keyless_http_options)
@@ -198,7 +198,6 @@ class Test::AdminUi::Login::TestLocalProvider < Minitest::Capybara::Test
     fill_in "Confirm New Password", :with => "password234567"
     click_button "Save"
     assert_text("Successfully saved the admin")
-    page.execute_script("window.PNotifyRemoveAll()")
     @admin.reload
     assert(@admin.password_hash)
     refute_equal(original_password_hash, @admin.password_hash)

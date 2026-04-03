@@ -11,14 +11,14 @@
     <% render("api-umbrella.web-app.views.layout.errors") %>
 
     <div class="form-inputs">
-      <div class="form-group string optional admin_username">
-        <label class="control-label string optional" for="admin_username"><%= username_label %></label>
+      <div class="mb-3 string optional admin_username">
+        <label class="form-label string optional" for="admin_username"><%= username_label %></label>
         <input class="form-control string optional" autofocus="autofocus" type="text" name="admin[username]" id="admin_username" value="<%= admin_params["username"] or "" %>" />
       </div>
     </div>
 
     <div class="form-actions">
-      <input type="submit" name="commit" value="<%= t("Sign in") %>" id="sign_in" class="btn btn-default" />
+      <input type="submit" name="commit" value="<%= t("Sign in") %>" id="sign_in" class="btn btn-primary" />
     </div>
   </form>
 </div>

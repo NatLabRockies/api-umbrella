@@ -10,21 +10,21 @@
       <input type="hidden" name="reset_password_token" value="<%= params["reset_password_token"] %>" />
       <%- field_errors("reset_password_token") %>
 
-      <div class="form-group password required admin_password<%= field_errors_class("password") %>">
-        <label class="control-label password required" for="admin_password"><%= t("New Password") %></label>
+      <div class="mb-3 password required admin_password<%= field_errors_class("password") %>">
+        <label class="form-label password required" for="admin_password"><%= t("New Password") %></label>
         <input class="form-control password required" required="required" aria-required="true" type="password" name="admin[password]" id="admin_password" />
         <%- field_errors("password") %>
         <p class="help-block"><%= string.format(t("%d characters minimum"), config["web"]["admin"]["password_length_min"]) %></p>
       </div>
-      <div class="form-group password required admin_password_confirmation<%= field_errors_class("password_confirmation") %>">
-        <label class="control-label password required" for="admin_password_confirmation"><%= t("Confirm New Password") %></label>
+      <div class="mb-3 password required admin_password_confirmation<%= field_errors_class("password_confirmation") %>">
+        <label class="form-label password required" for="admin_password_confirmation"><%= t("Confirm New Password") %></label>
         <input class="form-control password required" required="required" aria-required="true" type="password" name="admin[password_confirmation]" id="admin_password_confirmation" />
         <%- field_errors("password_confirmation") %>
       </div>
     </div>
 
     <div class="form-actions">
-      <input type="submit" name="commit" value="<%= t("Change My Password") %>" class="btn btn-default" />
+      <input type="submit" name="commit" value="<%= t("Change My Password") %>" class="btn btn-primary" />
     </div>
   </form>
 </div>

@@ -5,7 +5,7 @@ export default class BaseRoute extends AuthenticatedRoute {
   setupController(controller, model) {
     controller.set('model', model);
 
-    $('ul.navbar-nav li').removeClass('active');
-    $('ul.navbar-nav li.nav-config').addClass('active');
+    $('ul.navbar-nav a.nav-link').removeClass('active');
+    $('ul.navbar-nav li.nav-config > a.nav-link').addClass('active');
   }
 }

@@ -1,0 +1,10 @@
+{{#if this.isReorderable}}
+  <button type="button" id="{{@tableId}}_reorder" class="btn btn-light btn-sm" {{on "click" this.toggleReordering}}>
+    <FaIcon @icon="grip-vertical" />
+    {{#if this.isReordering}}
+      Done
+    {{else}}
+      Reorder
+    {{/if}}
+  </button>
+{{/if}}
