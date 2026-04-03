@@ -414,6 +414,7 @@ import "path"
   router: {
     api_backends: {
       keepalive_idle_timeout: uint | *120
+      keepalive_connections_max_age: uint | *1800
     }
     trusted_proxies: [...string] | *[]
     global_rate_limits: {

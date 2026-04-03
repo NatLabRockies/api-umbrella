@@ -123,6 +123,13 @@ local function build_cluster_resource(cluster_name, options)
           -- important to improving performance by keeping pre-established
           -- connections around.
           idle_timeout = file_config["router"]["api_backends"]["keepalive_idle_timeout"] .. "s",
+
+          -- Maximum lifetime for any connection to an API backend, regardless
+          -- of activity. This ensures connections are periodically
+          -- re-established so that DNS or routing changes on the backend side
+          -- are picked up in a timely fashion, rather than holding open
+          -- connections indefinitely.
+          max_connection_duration = file_config["router"]["api_backends"]["keepalive_connections_max_age"] .. "s",
         },
       },
     },

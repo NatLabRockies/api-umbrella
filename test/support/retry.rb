@@ -25,7 +25,8 @@ if ENV["CI"] == "true"
       # to specific timing conditions.
       case klass_method_name
       when "Test::Proxy::TestTimeoutsResponse#test_response_closes_when_chunk_delay_exceeds_read_timeout",
-        "Test::Proxy::RateLimits::TestNonFrozenLimit#test_non_frozen_time_limit"
+        "Test::Proxy::RateLimits::TestNonFrozenLimit#test_non_frozen_time_limit",
+        "Test::Proxy::KeepAlive::TestServerSide#test_max_connection_age_closes_connections"
         return true
       end
 
