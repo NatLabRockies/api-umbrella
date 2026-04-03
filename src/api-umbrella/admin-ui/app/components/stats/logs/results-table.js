@@ -51,6 +51,7 @@ export default class ResultsTable extends Component {
               theme: 'light-border forced-wide',
               arrow: true,
               delay: 200,
+              appendTo: $cell[0],
             });
           }
         });

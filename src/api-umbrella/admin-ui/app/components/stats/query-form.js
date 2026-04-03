@@ -8,13 +8,13 @@ import { tagName } from '@ember-decorators/component';
 import { observes } from '@ember-decorators/object';
 import Logs from 'api-umbrella-admin-ui/models/stats/logs';
 import { t } from 'api-umbrella-admin-ui/utils/i18n';
-import Popover from 'bootstrap/js/dist/popover'
 import classic from 'ember-classic-decorator';
 import $ from 'jquery';
 import QueryBuilder from 'jQuery-QueryBuilder';
 import forEach from 'lodash-es/forEach';
 import { marked } from 'marked';
 import moment from 'moment-timezone';
+import tippy from 'tippy.js';
 
 marked.use({
   gfm: true,
@@ -32,7 +32,7 @@ QueryBuilder.define('filter-description', function() {
       if(!buttonEl) {
         buttonEl = document.createElement('button');
         buttonEl.type = 'button';
-        buttonEl.className = 'btn btn-sm btn-info filter-description btn-tooltip tooltip-trigger';
+        buttonEl.className = 'btn btn-sm btn-link border filter-description tooltip-trigger';
         buttonEl.innerHTML = '<i class="fas fa-question-circle"></i>';
 
         const ruleActionEl = rule.$el[0].querySelector(QueryBuilder.selectors.rule_actions);
@@ -478,27 +478,30 @@ export default class QueryForm extends Component {
 
     const helpTriggerLink = document.querySelector('.lucene-help-link');
     const helpContent = document.getElementById('query_syntax_help_content');
-
     if(helpTriggerLink && helpContent) {
-      helpTriggerLink.addEventListener('click', (e) => {
-        e.preventDefault();
-    });
-
-      this.popoverInstance = new Popover(helpTriggerLink, {
-        container: 'body',
-        html: true,
+      this.helpTippy = tippy(helpTriggerLink, {
+        trigger: 'click',
+        interactive: true,
+        theme: 'light-border',
+        arrow: true,
+        allowHTML: true,
         content: helpContent.innerHTML,
-        trigger: 'focus',
-    });
-  }
-}
+        placement: 'bottom-start',
+        maxWidth: 'none',
+        // Below the sticky navigation header, since this popover can be so
+        // large and cause the page to scroll.
+        zIndex: 1019,
+      });
 
-willDestroy() {
-  if(this.popoverInstance) {
-    this.popoverInstance.dispose();
+    }
   }
-  super.willDestroy(...arguments);
-}
+
+  willDestroy() {
+    if(this.helpTippy) {
+      this.helpTippy.destroy();
+    }
+    super.willDestroy(...arguments);
+  }
 
   // eslint-disable-next-line ember/no-observers
   @observes('query')

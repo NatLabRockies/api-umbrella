@@ -292,12 +292,14 @@ function _M.search(self)
   -- can assume the total count matches the overall hit count, and the missing
   -- IPs are zero. But we'll fake the structure needed for `aggregation_result`
   -- below.
-  results["aggregations"]["value_count_request_ip"] = {
-    value = results["hits"]["_total_value"],
-  }
-  results["aggregations"]["missing_request_ip"] = {
-    doc_count = 0,
-  }
+  if results["aggregations"] then
+    results["aggregations"]["value_count_request_ip"] = {
+      value = results["hits"]["_total_value"],
+    }
+    results["aggregations"]["missing_request_ip"] = {
+      doc_count = 0,
+    }
+  end
 
   local response = {
     stats = {

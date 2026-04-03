@@ -38,7 +38,7 @@ class Test::AdminUi::TestCacheControl < Minitest::Test
       assert_nil(response.headers["Pragma"])
     end
     stylesheets.each do |stylesheet|
-      assert_match(%r{\A/admin/assets/[\w-]+-\w{32}\.css\z}, stylesheet[:href])
+      assert_match(%r{\A/admin/assets/([\w-]+-\w{32}|chunk\.\d+\.\w{20})\.css\z}, stylesheet[:href])
 
       response = Typhoeus.get("https://127.0.0.1:9081#{stylesheet[:href]}", keyless_http_options)
       assert_response_code(200, response)
@@ -65,7 +65,7 @@ class Test::AdminUi::TestCacheControl < Minitest::Test
     # Ensure that all the linked assets use fingerprinted filenames (for cache
     # busting), and return long cache-control headers.
     stylesheets.each do |stylesheet|
-      assert_match(%r{\A/web-assets/[\w-]+-\w{20}\.css\z}, stylesheet[:href])
+      assert_match(%r{\A/web-assets/assets/[\w-]+-\w{8}\.css\z}, stylesheet[:href])
 
       response = Typhoeus.get("https://127.0.0.1:9081#{stylesheet[:href]}", keyless_http_options)
       assert_response_code(200, response)

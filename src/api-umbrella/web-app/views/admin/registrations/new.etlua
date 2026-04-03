@@ -8,26 +8,26 @@
     <% render("api-umbrella.web-app.views.layout.errors") %>
 
     <div class="form-inputs">
-      <div class="form-group string required admin_username<%= field_errors_class("username") %>">
-        <label class="control-label string required" for="admin_username"><%= username_label %></label>
+      <div class="mb-3 string required admin_username<%= field_errors_class("username") %>">
+        <label class="form-label string required" for="admin_username"><%= username_label %></label>
         <input class="form-control string required" autofocus="autofocus" required="required" aria-required="true" type="text" name="admin[username]" id="admin_username" value="<%= admin_params["username"] or "" %>" />
         <%- field_errors("username") %>
       </div>
-      <div class="form-group password required admin_password<%= field_errors_class("password") %>">
-        <label class="control-label password required" for="admin_password"><%= t("Password") %></label>
+      <div class="mb-3 password required admin_password<%= field_errors_class("password") %>">
+        <label class="form-label password required" for="admin_password"><%= t("Password") %></label>
         <input class="form-control password required" required="required" aria-required="true" type="password" name="admin[password]" id="admin_password" />
         <%- field_errors("password") %>
         <p class="help-block"><%= string.format(t("%d characters minimum"), config["web"]["admin"]["password_length_min"]) %></p>
       </div>
-      <div class="form-group password required admin_password_confirmation<%= field_errors_class("password_confirmation") %>">
-        <label class="control-label password required" for="admin_password_confirmation"><%= t("Password Confirmation") %></label>
+      <div class="mb-3 password required admin_password_confirmation<%= field_errors_class("password_confirmation") %>">
+        <label class="form-label password required" for="admin_password_confirmation"><%= t("Password Confirmation") %></label>
         <input class="form-control password required" required="required" aria-required="true" type="password" name="admin[password_confirmation]" id="admin_password_confirmation" />
         <%- field_errors("password_confirmation") %>
       </div>
     </div>
 
     <div class="form-actions">
-      <input type="submit" name="commit" value="<%= t("Sign up") %>" class="btn btn-default" />
+      <input type="submit" name="commit" value="<%= t("Sign up") %>" class="btn btn-primary" />
     </div>
   </form>
 </div>

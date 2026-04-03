@@ -1,7 +1,7 @@
 <h1>API Scopes</h1>
 
 {{#if this.currentAdmin.permissions.admin_manage}}
-  <div class="button-actions button-actions-down">
+  <div class="table-button-actions">
     <LinkTo @route="api_scopes.new" class="btn btn-primary"><FaIcon @icon="plus" /> Add New API Scope</LinkTo>
   </div>
 {{else}}

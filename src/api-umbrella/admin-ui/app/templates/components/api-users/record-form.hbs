@@ -52,12 +52,12 @@
       </fieldset>
 
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-auto">
           {{#unless this.isDisabled}}
             <button type="submit" class="btn btn-lg btn-primary save-button"><span class="btn-label">Save</span><span class="btn-loading-label"><FaIcon @icon="sync-alt" @spin={{true}}/>Saving...</span></button>
           {{/unless}}
         </div>
-        <div class="col-sm-6 record-details">
+        <div class="col-sm record-details">
           Created: {{format-date this.model.createdAt}}{{#if this.model.creator}} by {{this.model.creator.username}}{{/if}}<br>
           Last Updated: {{format-date this.model.updatedAt}}{{#if this.model.updater}} by {{this.model.updater.username}}{{/if}}<br>
           E-mail Verified: {{this.model.emailVerified}}<br>

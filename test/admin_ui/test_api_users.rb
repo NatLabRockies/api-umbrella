@@ -41,7 +41,6 @@ class Test::AdminUi::TestApiUsers < Minitest::Capybara::Test
 
     click_button("Save")
     assert_text("Successfully saved")
-    page.execute_script("window.PNotifyRemoveAll()")
 
     user = ApiUser.order(:created_at => :desc).first
     visit "/admin/#/api_users/#{user.id}/edit"
