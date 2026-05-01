@@ -432,4 +432,71 @@ class Test::AdminUi::TestApis < Minitest::Capybara::Test
       assert_select("HTTP Method", :selected => "OPTIONS")
     end
   end
+
+  def test_duplicate_creates_new_record_with_copied_data
+    source = FactoryBot.create(:api_backend_with_all_relationships, :name => "Source Backend Test")
+    source_id = source.id
+    source_server_ids = source.servers.map(&:id)
+    source_url_match_ids = source.url_matches.map(&:id)
+    source_settings_id = source.settings&.id
+    source_sub_settings_ids = source.sub_settings.map(&:id)
+    source_rewrites_ids = source.rewrites.map(&:id)
+
+    admin_login
+    visit "/admin/#/apis/#{source.id}/edit"
+    assert_field("Name", :with => "Source Backend Test")
+
+    find("a.duplicate-action", :text => /Duplicate API/).click
+
+    assert_current_path %r{/admin/#/apis/new\?duplicate_id=#{source.id}}, :url => true
+    assert_text("Duplicated from Source Backend Test")
+    assert_field("Name", :with => "Source Backend Test")
+    assert_field("Frontend Host", :with => source.frontend_host)
+
+    fill_in("Name", :with => "Duplicate Backend Test")
+    click_button("Save")
+    assert_text("Successfully saved")
+
+    duplicate = ApiBackend.where(:name => "Duplicate Backend Test").order(:created_at => :desc).first
+    refute_nil(duplicate, "duplicate backend was created")
+    refute_equal(source_id, duplicate.id, "duplicate has a different id from source")
+
+    assert_equal(source.servers.count, duplicate.servers.count, "duplicate has same number of servers")
+    duplicate.servers.each do |server|
+      refute_includes(source_server_ids, server.id, "duplicate server has fresh id")
+      assert_equal(duplicate.id, server.api_backend_id, "duplicate server FK points to duplicate")
+    end
+
+    assert_equal(source.url_matches.count, duplicate.url_matches.count, "duplicate has same number of url_matches")
+    duplicate.url_matches.each do |um|
+      refute_includes(source_url_match_ids, um.id, "duplicate url_match has fresh id")
+      assert_equal(duplicate.id, um.api_backend_id, "duplicate url_match FK points to duplicate")
+    end
+
+    if source.settings
+      refute_nil(duplicate.settings, "duplicate has settings")
+      refute_equal(source_settings_id, duplicate.settings.id, "duplicate settings has fresh id")
+      assert_equal(duplicate.id, duplicate.settings.api_backend_id, "duplicate settings FK points to duplicate")
+    end
+
+    assert_equal(source.sub_settings.count, duplicate.sub_settings.count, "duplicate has same number of sub_settings")
+    duplicate.sub_settings.each do |ss|
+      refute_includes(source_sub_settings_ids, ss.id, "duplicate sub-setting has fresh id")
+      assert_equal(duplicate.id, ss.api_backend_id, "duplicate sub-setting FK points to duplicate")
+      if ss.settings
+        refute_nil(ss.settings, "duplicate sub-setting has nested settings")
+        refute_includes([source_settings_id], ss.settings.id, "duplicate nested settings has fresh id")
+      end
+    end
+
+    assert_equal(source.rewrites.count, duplicate.rewrites.count, "duplicate has same number of rewrites")
+    duplicate.rewrites.each do |rw|
+      refute_includes(source_rewrites_ids, rw.id, "duplicate rewrite has fresh id")
+      assert_equal(duplicate.id, rw.api_backend_id, "duplicate rewrite FK points to duplicate")
+    end
+
+    source.reload
+    assert_equal("Source Backend Test", source.name, "source name unchanged")
+    assert_equal(source_server_ids.sort, source.servers.map(&:id).sort, "source servers unchanged")
+  end
 end

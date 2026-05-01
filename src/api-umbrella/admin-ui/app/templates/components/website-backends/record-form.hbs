@@ -23,7 +23,7 @@
       </div>
       {{#if this.model.id}}
         <div class="form-extra-actions">
-          <LinkTo @route="website-backends.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate Website Backend</LinkTo>
+          <LinkTo @route="website_backends.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate Website Backend</LinkTo>
           <a href="#" class="remove-action" {{action "delete"}}><FaIcon @icon="times" />Delete Website Backend</a>
         </div>
       {{/if}}

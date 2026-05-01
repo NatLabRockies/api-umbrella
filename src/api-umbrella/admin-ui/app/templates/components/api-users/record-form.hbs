@@ -78,7 +78,7 @@
     </FieldsFor>
     {{#if this.model.id}}
       <div class="form-extra-actions">
-        <LinkTo @route="api-users.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate API User</LinkTo>
+        <LinkTo @route="api_users.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate API User</LinkTo>
       </div>
     {{/if}}
   </form>

@@ -57,7 +57,7 @@
       {{#if this.model.id}}
         {{#unless this.isDisabled}}
           <div class="form-extra-actions">
-            <LinkTo @route="api-scopes.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate API Scope</LinkTo>
+            <LinkTo @route="api_scopes.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate API Scope</LinkTo>
             <a href="#" class="remove-action" {{action "delete"}}><FaIcon @icon="times" />Delete API Scope</a>
           </div>
         {{/unless}}

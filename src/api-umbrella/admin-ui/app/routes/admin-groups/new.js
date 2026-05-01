@@ -13,11 +13,11 @@ export default class NewRoute extends Form {
   };
 
   async model(params) {
-    clearStoreCache(this.store);
     let record;
     if (params.duplicate_id) {
       record = await this.duplicateRecord.cloneFromId('admin-group', params.duplicate_id);
     } else {
+      clearStoreCache(this.store);
       record = this.store.createRecord('admin-group');
     }
     return this.fetchModels(record);
