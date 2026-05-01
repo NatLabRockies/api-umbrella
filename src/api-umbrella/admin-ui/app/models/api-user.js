@@ -25,6 +25,7 @@ class ApiUser extends Model.extend(Validations) {
   static urlRoot = '/api-umbrella/v1/users';
   static singlePayloadKey = 'user';
   static arrayPayloadKey = 'data';
+  static duplicateExclude = ['apiKey', 'apiKeyHidesAt', 'apiKeyPreview', 'email', 'emailVerified'];
 
   @attr()
   apiKey;
