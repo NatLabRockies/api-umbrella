@@ -43,6 +43,7 @@
       {{#if this.model.id}}
         {{#unless this.isDisabled}}
           <div class="form-extra-actions">
+            <LinkTo @route="admin-groups.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate Admin Group</LinkTo>
             <a href="#" class="remove-action" {{action "delete"}}><FaIcon @icon="times" />Delete Admin Group</a>
           </div>
         {{/unless}}

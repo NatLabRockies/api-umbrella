@@ -87,6 +87,7 @@
       {{#if this.currentAdmin.permissions.admin_manage}}
         {{#if this.model.id}}
           <div class="form-extra-actions">
+            <LinkTo @route="admins.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate Admin</LinkTo>
             <a href="#" class="remove-action" {{action "delete"}}><FaIcon @icon="times" />Delete Admin</a>
           </div>
         {{/if}}
