@@ -71,4 +71,37 @@ class Test::AdminUi::TestAdminGroups < Minitest::Capybara::Test
       "backend_manage",
     ].sort, admin_group.permission_ids.sort)
   end
+
+  def test_duplicate_creates_new_record_with_copied_data
+    api_scope = FactoryBot.create(:api_scope, :name => "Scope For Duplicate")
+    source = FactoryBot.create(:admin_group, :name => "Source Group For Duplicate", :api_scopes => [api_scope])
+    source_id = source.id
+    source_api_scope_ids = source.api_scope_ids.sort
+    source_permission_ids = source.permission_ids.sort
+
+    admin_login
+    visit "/admin/#/admin_groups/#{source.id}/edit"
+    assert_field("Group Name", :with => "Source Group For Duplicate")
+
+    find("a.duplicate-action", :text => /Duplicate Admin Group/).click
+
+    assert_current_path %r{/admin/#/admin_groups/new\?duplicate_id=#{source.id}}, :url => true
+    assert_text("Duplicated from Source Group For Duplicate")
+    assert_field("Group Name", :with => "Source Group For Duplicate")
+    assert_checked_field("Scope For Duplicate", :visible => :all)
+
+    fill_in("Group Name", :with => "Duplicate Group For Duplicate")
+    click_button("Save")
+    assert_text("Successfully saved")
+
+    duplicate = AdminGroup.where(:name => "Duplicate Group For Duplicate").order(:created_at => :desc).first
+    refute_nil(duplicate, "duplicate group was created")
+    refute_equal(source_id, duplicate.id, "duplicate has fresh id")
+    assert_equal(source_api_scope_ids, duplicate.api_scope_ids.sort, "duplicate references same scopes as source")
+    assert_equal(source_permission_ids, duplicate.permission_ids.sort, "duplicate references same permissions as source")
+
+    source.reload
+    assert_equal("Source Group For Duplicate", source.name, "source name unchanged")
+    assert_equal(source_api_scope_ids, source.api_scope_ids.sort, "source scopes unchanged")
+  end
 end
