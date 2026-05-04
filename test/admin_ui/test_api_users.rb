@@ -80,4 +80,58 @@ class Test::AdminUi::TestApiUsers < Minitest::Capybara::Test
     assert_text("Created: 2015-01-15 11:06 PM MST by ")
     assert_text("Last Updated: 2015-07-16 12:09 AM MDT by ")
   end
+
+  def test_duplicate_creates_new_record_with_email_cleared
+    source = FactoryBot.create(:api_user, :first_name => "Source", :last_name => "User", :email => "source.user@example.com", :use_description => "Some description")
+    source_id = source.id
+    source_email = source.email
+    source_api_key = source.api_key
+    source_api_key_hash = source.api_key_hash
+    source_settings_id = source.settings&.id
+    source_roles = source.roles.dup if source.roles
+
+    admin_login
+    visit "/admin/#/api_users/#{source.id}/edit"
+    assert_field("First Name", :with => "Source")
+
+    find("a.duplicate-action", :text => /Duplicate API User/).click
+
+    assert_current_path %r{/admin/#/api_users/new\?duplicate_id=#{source.id}}, :url => true
+    assert_text("Duplicated from #{source.email}")
+    assert_field("E-mail", :with => "")
+    assert_field("First Name", :with => "Source")
+    assert_field("Last Name", :with => "User")
+
+    fill_in("E-mail", :with => "duplicate.user@example.com")
+    label_check "User agrees to the terms and conditions"
+    click_button("Save")
+    assert_text("Successfully saved")
+
+    duplicate = ApiUser.where(:email => "duplicate.user@example.com").order(:created_at => :desc).first
+    refute_nil(duplicate, "duplicate user was created")
+    refute_equal(source_id, duplicate.id, "duplicate has fresh id")
+    refute_equal(source_email, duplicate.email, "duplicate has fresh email")
+    refute_equal(source_api_key, duplicate.api_key, "duplicate has fresh api_key")
+    refute_equal(source_api_key_hash, duplicate.api_key_hash, "duplicate has fresh api_key_hash")
+
+    if source.settings
+      refute_nil(duplicate.settings, "duplicate has settings")
+      refute_equal(source_settings_id, duplicate.settings.id, "duplicate settings has fresh id")
+    end
+
+    if source_roles
+      assert_equal(source_roles.sort, (duplicate.roles || []).sort, "duplicate roles preserved by value")
+    end
+
+    source.reload
+    assert_equal(source_email, source.email, "source email unchanged")
+    assert_equal(source_api_key, source.api_key, "source api_key unchanged")
+  end
+
+  def test_duplicate_link_hidden_on_new_form
+    admin_login
+    visit "/admin/#/api_users/new"
+    assert_field("E-mail")
+    refute_selector("a.duplicate-action")
+  end
 end
