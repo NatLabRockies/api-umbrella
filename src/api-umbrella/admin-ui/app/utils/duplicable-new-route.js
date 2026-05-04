@@ -3,7 +3,7 @@ import { success } from '@pnotify/core';
 import { clearStoreCache } from 'api-umbrella-admin-ui/utils/uncached-model';
 
 // Returns a route class that adds support for cloning a source record
-// when `duplicate_id` is present in the query string. Each new-route in
+// when `duplicate_id` is present in the query string. Each new route in
 // the admin UI extends `duplicableNewRoute(Form)` instead of `Form`
 // directly, so this class sits between Form and the resource's NewRoute.
 //
