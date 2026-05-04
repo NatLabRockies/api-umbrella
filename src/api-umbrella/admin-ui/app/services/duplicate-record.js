@@ -23,7 +23,7 @@ export default class DuplicateRecordService extends Service {
     const attrs = {};
 
     modelClass.eachAttribute((name) => {
-      if (exclude.has(name)) {
+      if(exclude.has(name)) {
         return;
       }
       const value = source.get(name);
@@ -31,13 +31,13 @@ export default class DuplicateRecordService extends Service {
     });
 
     modelClass.eachRelationship((name, descriptor) => {
-      if (exclude.has(name)) {
+      if(exclude.has(name)) {
         return;
       }
       const related = source.get(name);
-      if (descriptor.kind === 'belongsTo') {
+      if(descriptor.kind === 'belongsTo') {
         attrs[name] = related ? this._cloneRecord(descriptor.type, related) : null;
-      } else if (descriptor.kind === 'hasMany') {
+      } else if(descriptor.kind === 'hasMany') {
         attrs[name] = (related || []).map((child) => this._cloneRecord(descriptor.type, child));
       }
     });
@@ -46,10 +46,10 @@ export default class DuplicateRecordService extends Service {
   }
 
   _isPlainStructure(value) {
-    if (value === null || value === undefined) {
+    if(value === null || value === undefined) {
       return false;
     }
-    if (Array.isArray(value)) {
+    if(Array.isArray(value)) {
       return true;
     }
     return typeof value === 'object' && value.constructor === Object;

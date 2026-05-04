@@ -41,7 +41,7 @@ export default function duplicableNewRoute(SuperClass) {
 
     async model(params) {
       let record;
-      if (params.duplicate_id) {
+      if(params.duplicate_id) {
         record = await this.duplicateRecord.cloneFromId(this.duplicateModelName, params.duplicate_id);
       } else {
         clearStoreCache(this.store);
@@ -52,7 +52,7 @@ export default function duplicableNewRoute(SuperClass) {
 
     afterModel(resolved) {
       const record = this.modelFromResolved(resolved);
-      if (record && record._duplicatedFromName) {
+      if(record && record._duplicatedFromName) {
         success({
           title: 'Duplicated',
           text: `Duplicated from ${record._duplicatedFromName}`,
