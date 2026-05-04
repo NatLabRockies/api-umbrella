@@ -112,12 +112,9 @@ class Api extends Model.extend(Validations) {
       this.set('settings', this.store.createRecord('api/settings'));
     }
 
-    // Force every embedded api/settings record (top-level + each sub_setting's
-    // own settings) to materialize now. Each settings record's own init/
-    // setDefaults runs the first time the record is accessed; if those firings
-    // are deferred until rendering, the model state changes mid-render and
-    // breaks Confirmation.isPageDirty (it sees a stable initial serialize that
-    // doesn't match a later serialize once setDefaults has fired).
+    // This can go away once we move from Ember Data's classic model layer
+    // to schema records/WarpDrive. We'd need to upgrade to
+    // ember data 5.x to do that kind of refactor.
     this.subSettings.forEach((subSetting) => {
       // Accessing the relationship is enough to materialize and fire init.
       // eslint-disable-next-line no-unused-expressions
