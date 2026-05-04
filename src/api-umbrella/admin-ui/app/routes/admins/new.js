@@ -1,36 +1,19 @@
-import { inject as service } from '@ember/service';
-import { success } from '@pnotify/core';
-import { clearStoreCache } from 'api-umbrella-admin-ui/utils/uncached-model';
+import duplicableNewRoute from 'api-umbrella-admin-ui/utils/duplicable-new-route';
 
 import Form from './form';
 
-export default class NewRoute extends Form {
-  @service store;
-  @service duplicateRecord;
+export default class NewRoute extends duplicableNewRoute(Form) {
+  duplicateModelName = 'admin';
 
-  queryParams = {
-    duplicate_id: { refreshModel: true },
-  };
+  newRecordAttrs() {
+    return { sendInviteEmail: true };
+  }
 
-  async model(params) {
-    let record;
-    if (params.duplicate_id) {
-      record = await this.duplicateRecord.cloneFromId('admin', params.duplicate_id);
-    } else {
-      clearStoreCache(this.store);
-      record = this.store.createRecord('admin', { sendInviteEmail: true });
-    }
+  wrapModel(record) {
     return this.fetchModels(record);
   }
 
-  afterModel(resolved) {
-    const record = resolved && resolved.record;
-    if (record && record._duplicatedFromName) {
-      success({
-        title: 'Duplicated',
-        text: `Duplicated from ${record._duplicatedFromName}`,
-      });
-      record._duplicatedFromName = null;
-    }
+  modelFromResolved(resolved) {
+    return resolved && resolved.record;
   }
 }
