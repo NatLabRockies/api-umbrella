@@ -401,6 +401,94 @@ class Test::Apis::V1::Analytics::TestDrilldown < Minitest::Test
     ] }, data["hits_over_time"]["rows"][1])
   end
 
+  def test_hits_over_time_max_buckets
+    13.times do |i|
+      FactoryBot.create(:log_item, :request_host => "127.0.0.#{i + 1}", :request_at => Time.parse("2015-01-15T00:00:00Z").utc)
+    end
+    LogItem.refresh_indices!
+
+    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/analytics/drilldown.json", http_options.deep_merge(admin_token).deep_merge({
+      :params => {
+        :search => "",
+        :start_at => "2015-01-13",
+        :end_at => "2015-01-18",
+        :interval => "day",
+        :prefix => "0/",
+        :hits_over_time_max_buckets => 13,
+      },
+    }))
+
+    assert_response_code(200, response)
+    data = MultiJson.load(response.body)
+    assert_equal(13, data["results"].length)
+
+    # With hits_over_time_max_buckets=13, all 13 hosts should appear in the
+    # chart columns (date + 13 hosts = 14 columns, no "Other" column).
+    assert_equal(14, data["hits_over_time"]["cols"].length)
+    assert_equal({ "id" => "date", "label" => "Date", "type" => "datetime" }, data["hits_over_time"]["cols"][0])
+
+    # Verify the data row has 14 cells (date + 13 hosts, no "Other").
+    assert_equal(14, data["hits_over_time"]["rows"][1]["c"].length)
+  end
+
+  def test_hits_over_time_max_buckets_out_of_range
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-01-15T00:00:00Z").utc)
+    LogItem.refresh_indices!
+
+    # Value over 100 should return a validation error.
+    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/analytics/drilldown.json", http_options.deep_merge(admin_token).deep_merge({
+      :params => {
+        :search => "",
+        :start_at => "2015-01-13",
+        :end_at => "2015-01-18",
+        :interval => "day",
+        :prefix => "0/",
+        :hits_over_time_max_buckets => 101,
+      },
+    }))
+
+    assert_response_code(422, response)
+
+    # Value of 0 should return a validation error.
+    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/analytics/drilldown.json", http_options.deep_merge(admin_token).deep_merge({
+      :params => {
+        :search => "",
+        :start_at => "2015-01-13",
+        :end_at => "2015-01-18",
+        :interval => "day",
+        :prefix => "0/",
+        :hits_over_time_max_buckets => 0,
+      },
+    }))
+
+    assert_response_code(422, response)
+  end
+
+  def test_hits_over_time_max_buckets_defaults_to_10
+    13.times do |i|
+      FactoryBot.create(:log_item, :request_host => "127.0.0.#{i + 1}", :request_at => Time.parse("2015-01-15T00:00:00Z").utc)
+    end
+    LogItem.refresh_indices!
+
+    # Without hits_over_time_max_buckets, the chart should default to top 10
+    # (date + 10 hosts + "Other" = 12 columns).
+    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/analytics/drilldown.json", http_options.deep_merge(admin_token).deep_merge({
+      :params => {
+        :search => "",
+        :start_at => "2015-01-13",
+        :end_at => "2015-01-18",
+        :interval => "day",
+        :prefix => "0/",
+      },
+    }))
+
+    assert_response_code(200, response)
+    data = MultiJson.load(response.body)
+    assert_equal(13, data["results"].length)
+    assert_equal(12, data["hits_over_time"]["cols"].length)
+    assert_equal({ "id" => "other", "label" => "Other", "type" => "number" }, data["hits_over_time"]["cols"][11])
+  end
+
   def test_time_zone
     Time.use_zone("America/Denver") do
       FactoryBot.create(:log_item, :request_at => Time.zone.parse("2015-01-12T23:59:59"))
