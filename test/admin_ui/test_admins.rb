@@ -99,4 +99,45 @@ class Test::AdminUi::TestAdmins < Minitest::Capybara::Test
     assert_text(admin.authentication_token)
     refute_button("Save")
   end
+
+  def test_duplicate_creates_new_record_with_email_cleared
+    group = FactoryBot.create(:admin_group, :name => "Group For Duplicate")
+    source = FactoryBot.create(:limited_admin, :username => "source.admin@example.com", :groups => [group])
+    source_id = source.id
+    source_username = source.username
+    source_email = source.email
+    source_group_ids = source.group_ids.sort
+
+    admin_login
+    visit "/admin/#/admins/#{source.id}/edit"
+    assert_field("Email", :with => "source.admin@example.com")
+
+    find("a.duplicate-action", :text => /Duplicate Admin/).click
+
+    assert_current_path %r{/admin/#/admins/new\?duplicate_id=#{source.id}}, :url => true
+    assert_text("Duplicated from")
+    assert_field("Email", :with => "")
+
+    fill_in("Email", :with => "duplicate.admin@example.com")
+    click_button("Save")
+    assert_text("Successfully saved the admin")
+
+    duplicate = Admin.where(:username => "duplicate.admin@example.com").order(:created_at => :desc).first
+    refute_nil(duplicate, "duplicate admin was created")
+    refute_equal(source_id, duplicate.id, "duplicate has fresh id")
+    refute_equal(source_username, duplicate.username, "duplicate has fresh username")
+    refute_equal(source_email, duplicate.email, "duplicate has fresh email")
+    assert_equal(source_group_ids, duplicate.group_ids.sort, "duplicate references same groups as source")
+
+    source.reload
+    assert_equal(source_username, source.username, "source username unchanged")
+    assert_equal(source_email, source.email, "source email unchanged")
+  end
+
+  def test_duplicate_link_hidden_on_new_form
+    admin_login
+    visit "/admin/#/admins/new"
+    assert_text("Email")
+    refute_selector("a.duplicate-action")
+  end
 end

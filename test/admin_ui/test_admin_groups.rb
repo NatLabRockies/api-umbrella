@@ -104,4 +104,11 @@ class Test::AdminUi::TestAdminGroups < Minitest::Capybara::Test
     assert_equal("Source Group For Duplicate", source.name, "source name unchanged")
     assert_equal(source_api_scope_ids, source.api_scope_ids.sort, "source scopes unchanged")
   end
+
+  def test_duplicate_link_hidden_on_new_form
+    admin_login
+    visit "/admin/#/admin_groups/new"
+    assert_field("Group Name")
+    refute_selector("a.duplicate-action")
+  end
 end

@@ -127,4 +127,11 @@ class Test::AdminUi::TestApiUsers < Minitest::Capybara::Test
     assert_equal(source_email, source.email, "source email unchanged")
     assert_equal(source_api_key, source.api_key, "source api_key unchanged")
   end
+
+  def test_duplicate_link_hidden_on_new_form
+    admin_login
+    visit "/admin/#/api_users/new"
+    assert_field("E-mail")
+    refute_selector("a.duplicate-action")
+  end
 end

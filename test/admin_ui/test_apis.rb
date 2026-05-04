@@ -499,4 +499,11 @@ class Test::AdminUi::TestApis < Minitest::Capybara::Test
     assert_equal("Source Backend Test", source.name, "source name unchanged")
     assert_equal(source_server_ids.sort, source.servers.map(&:id).sort, "source servers unchanged")
   end
+
+  def test_duplicate_link_hidden_on_new_form
+    admin_login
+    visit "/admin/#/apis/new"
+    assert_field("Name")
+    refute_selector("a.duplicate-action")
+  end
 end
