@@ -13,6 +13,13 @@ mkdir -p /etc/api-umbrella
   echo "  password: dev_password"
   echo "  migrations:"
   echo "    password: dev_password"
+  if [ -f /ssl/localhost.pem ] && [ -f /ssl/localhost-key.pem ]; then
+    echo "hosts:"
+    echo "  - hostname: \"*\""
+    echo "    default: true"
+    echo "    ssl_cert: /ssl/localhost.pem"
+    echo "    ssl_cert_key: /ssl/localhost-key.pem"
+  fi
 } > /etc/api-umbrella/api-umbrella.yml
 
 mkdir -p /build/.task
