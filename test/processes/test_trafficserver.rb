@@ -38,18 +38,22 @@ class Test::Processes::TestTrafficserver < Minitest::Test
       current_log = current_log_tail.read_until(response.headers["X-Api-Umbrella-Request-ID"], timeout: 30)
       assert_match("200 id=#{response.headers["X-Api-Umbrella-Request-ID"]} up_status=200 time=", current_log)
 
-      log_glob = File.join($config["log_dir"], "trafficserver/*.{log,out,old}")
-      assert_equal([], Dir.glob(log_glob))
+      log_paths = Dir.glob(log_glob)
+      # Ignore crash log files, since the restart to set this setting may have
+      # triggered an empty crash log file generation (even though there was no
+      # actual crash).
+      log_paths.reject! { |path| File.basename(path).start_with?("crash-") }
+      assert_equal([], log_paths)
     end
   end
 
-  def test_does_not_run_crashlog
+  def test_runs_crashlog
     output, status = run_shell("ps", "-e", "-o", "cmd")
     if status != 0
       raise "ps failed (status: #{status}): #{output}"
     end
 
     assert_match("traffic_server", output)
-    refute_match("traffic_crashlog", output)
+    assert_match("traffic_crashlog", output)
   end
 end

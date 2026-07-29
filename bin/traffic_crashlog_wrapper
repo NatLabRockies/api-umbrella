@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Pass along the `--debug` flag to output to stdout instead of to a file, for
+# better output when the app is configured to only output to stdout/stderr.
+exec traffic_crashlog --debug "$@"

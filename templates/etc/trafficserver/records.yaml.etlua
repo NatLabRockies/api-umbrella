@@ -1,8 +1,10 @@
 records:
   incoming_ip_to_bind: <%- json_encode(config["trafficserver"]["host"]) %>
 
-  # Disable extra crashlog reporter process.
-  crash_log_helper: null
+  <% if config["log"]["destination"] == "console" then %>
+  # Wrap crashlog reporter to output to stdout.
+  crash_log_helper: <%- json_encode(path_join(config["_src_root_dir"], "bin/traffic_crashlog_wrapper")) %>
+  <% end %>
 
   admin:
     # Use the special "#-1" value to keep running as the current user (perp
@@ -49,6 +51,12 @@ records:
     # either output to stdout or rotate log files with logrotate (to be
     # consistent with all the other API Umbrella components).
     rolling_enabled: 0
+
+    # Since we're not using TraficServer's log rotation, disable other checks
+    # it still performs that don't make sense, but could still prevent
+    # outputting to stdout even if no disk space is needed.
+    auto_delete_rolled_files: 0
+    max_space_mb_headroom: 0
 
   # Traffic Server uses this proxy_name in the Via response headers. By default,
   # this is a hex-encoded IP address, but returning that information may not be
