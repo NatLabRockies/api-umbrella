@@ -35,6 +35,7 @@ class Outdated < Thor
     "glauth" => {
       :git => "https://github.com/glauth/glauth.git",
       :github_release => "glauth/glauth",
+      :github_release_tag => proc { |version| "GLAuth-v#{version.fetch(:wanted_version)}" },
     },
     "hugo" => {
       :git => "https://github.com/gohugoio/hugo.git",
@@ -185,7 +186,12 @@ class Outdated < Thor
       if repo[:github_release]
         release_json_path = tmp_dir.join("github_release.json")
         unless release_json_path.exist?
-          system "curl", "-f", "-L", "-o", release_json_path.to_s, "https://api.github.com/repos/#{repo.fetch(:github_release)}/releases/tags/v#{version.fetch(:wanted_version)}", exception: true
+          if repo[:github_release_tag]
+            tag = repo[:github_release_tag].call(version)
+          else
+            tag = "v#{version.fetch(:wanted_version)}"
+          end
+          system "curl", "-f", "-L", "-o", release_json_path.to_s, "https://api.github.com/repos/#{repo.fetch(:github_release)}/releases/tags/#{tag}", exception: true
         end
         github_release = JSON.parse(release_json_path.read(encoding: "utf-8"))
 
