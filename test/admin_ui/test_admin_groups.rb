@@ -71,4 +71,20 @@ class Test::AdminUi::TestAdminGroups < Minitest::Capybara::Test
       "backend_manage",
     ].sort, admin_group.permission_ids.sort)
   end
+
+  def test_delete_shows_success_notification_and_no_error
+    admin_group = FactoryBot.create(:admin_group, :name => "Delete Me Group")
+
+    admin_login
+    visit "/admin/#/admin_groups/#{admin_group.id}/edit"
+    assert_field("Group Name", :with => "Delete Me Group")
+
+    find("a.remove-action", :text => /Delete Admin Group/).click
+    click_button("OK")
+
+    assert_text("Successfully deleted")
+    refute_text("Unexpected error deleting record")
+
+    assert_nil(AdminGroup.where(:id => admin_group.id).first)
+  end
 end

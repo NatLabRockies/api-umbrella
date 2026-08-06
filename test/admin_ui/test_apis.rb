@@ -432,4 +432,24 @@ class Test::AdminUi::TestApis < Minitest::Capybara::Test
       assert_select("HTTP Method", :selected => "OPTIONS")
     end
   end
+
+  def test_delete_shows_success_notification_and_no_error
+    api = FactoryBot.create(:api_backend, :name => "Delete Me API")
+
+    admin_login
+    visit "/admin/#/apis/#{api.id}/edit"
+    assert_field("Name", :with => "Delete Me API")
+
+    # Click the "Delete API" link in the form, then confirm in the bootbox.
+    find("a.remove-action", :text => /Delete API/).click
+    click_button("OK")
+
+    # The success pnotify must appear...
+    assert_text("Successfully deleted")
+    # ...and the misleading error alert must NOT.
+    refute_text("Unexpected error deleting record")
+
+    # And the record must actually be gone.
+    assert_nil(ApiBackend.where(:id => api.id).first)
+  end
 end
