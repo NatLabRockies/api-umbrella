@@ -11,6 +11,7 @@ services:
     volumes:
       - .:/app
       - build_cache:/build
+      - ./dev/ssl:/ssl:ro
     environment:
       HTTP_PORT: 8200
       HTTPS_PORT: 8201
