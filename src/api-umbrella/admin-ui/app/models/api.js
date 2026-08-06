@@ -111,6 +111,15 @@ class Api extends Model.extend(Validations) {
     if(!this.settings) {
       this.set('settings', this.store.createRecord('api/settings'));
     }
+
+    // This can go away once we move from Ember Data's classic model layer
+    // to schema records/WarpDrive. We'd need to upgrade to
+    // ember data 5.x to do that kind of refactor.
+    this.subSettings.forEach((subSetting) => {
+      // Accessing the relationship is enough to materialize and fire init.
+      // eslint-disable-next-line no-unused-expressions
+      subSetting.settings;
+    });
   }
 
   get exampleIncomingUrlRoot() {
