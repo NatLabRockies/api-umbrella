@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e -u
+
+# Redirect stderr to stdout
+exec 2>&1
+
+umask "<%- config['umask'] %>"
+
+if [ "${1}" = "start" ]; then
+  echo "starting ${2}..."
+
+  run_args=("-e" "rc.env")
+  exec runtool ${run_args[@]+"${run_args[@]}"} "<%- config['_src_root_dir'] %>/bin/api-umbrella-health-stats"
+fi
+
+exit 0

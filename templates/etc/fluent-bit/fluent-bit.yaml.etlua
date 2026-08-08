@@ -1,5 +1,7 @@
 service:
-  log_level: <%- json_encode(config["fluent_bit"]["service"]["log_level"]) %>
+  # log_level: <%- json_encode(config["fluent_bit"]["service"]["log_level"]) %>
+  log_level: trace
+  log_file: /tmp/debug-fluent-bit.log
   # How often to flush inputs to the outputs.
   flush: <%- json_encode(config["fluent_bit"]["service"]["flush"]) %>
   storage.path: <%- json_encode(path_join(config["db_dir"], "fluent-bit")) %>
@@ -51,7 +53,7 @@ pipeline:
     # Print what we would log to stdout for extra redundancy.
     - name: stdout
       match: "*"
-      format: msgpack
+      format: json_lines
 
     <% if config["fluent_bit"]["outputs"]["opensearch"]["enabled"] then %>
     # Send API analytics to OpenSearch analytics DB.

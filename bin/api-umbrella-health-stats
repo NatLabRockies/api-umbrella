@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+nginx_port=$(jq -r '.api_server.port' "$API_UMBRELLA_RUNTIME_CONFIG")
+trafficserver_port=$(jq -r '.trafficserver.port' "$API_UMBRELLA_RUNTIME_CONFIG")
+
+set +Eeo pipefail
+
+while true; do
+  printf "nginx stats: "
+  curl -fsS "http://127.0.0.1:${nginx_port}/_nginx-status" | jq -c
+
+  printf "trafficserver stats: "
+  curl -fsS -H "Host: api-umbrella-trafficserver-health.internal" "http://127.0.0.1:${trafficserver_port}/_trafficserver-stats" | jq -c
+
+  sleep 5
+done

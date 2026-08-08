@@ -5,6 +5,7 @@ local api_users_store_refresh_local_cache = require "api-umbrella.proxy.jobs.api
 local db_expirations = require "api-umbrella.proxy.jobs.db_expirations"
 local distributed_rate_limit_puller = require "api-umbrella.proxy.jobs.distributed_rate_limit_puller"
 local distributed_rate_limit_pusher = require "api-umbrella.proxy.jobs.distributed_rate_limit_pusher"
+local health_stats = require "api-umbrella.proxy.jobs.health_stats"
 local opensearch_setup = require "api-umbrella.proxy.startup.opensearch_setup"
 local random_seed = require "api-umbrella.utils.random_seed"
 local seed_database = require "api-umbrella.proxy.startup.seed_database"
@@ -21,5 +22,6 @@ api_users_store_refresh_local_cache.spawn()
 db_expirations.spawn()
 distributed_rate_limit_puller.spawn()
 distributed_rate_limit_pusher.spawn()
+health_stats.spawn()
 opensearch_setup.spawn()
 seed_database.spawn()

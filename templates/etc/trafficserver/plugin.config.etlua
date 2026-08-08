@@ -15,7 +15,6 @@ cachekey.so --include-headers=Host,X-Api-Umbrella-Backend-Host,X-Api-Umbrella-Ca
   tslua.so "<%- config["etc_dir"] %>/trafficserver/strip_response_cookies.lua" "<%- config["etc_dir"] %>/trafficserver/strip_response_cookies_regex.txt"
 <% end %>
 
-<% if config["_test_env?"] then %>
-  # Provide endpoint for Traffic Server stats.
-  stats_over_http.so _trafficserver_stats
-<% end %>
+# Provide endpoint for Traffic Server stats.
+stats_over_http.so _trafficserver-stats
+# system_stats.so

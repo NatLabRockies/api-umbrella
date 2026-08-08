@@ -1,0 +1,10 @@
+includes:
+  - ./rc-log-common.yaml
+
+pipeline:
+  outputs:
+    - name: stdout
+      match: "*"
+      format: json_lines
+      json_date_format: iso8601
+      json_date_key: _log_time

@@ -19,6 +19,7 @@ patch -p1 < "$SOURCE_DIR/build/patches/trafficserver-stderr-logging.patch"
 
 cmake -B build \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX_EMBEDDED" \
+  -DBUILD_EXPERIMENTAL_PLUGINS=ON \
   -DENABLE_LUAJIT=ON \
   -Dluajit_INCLUDE_DIRS="$STAGE_EMBEDDED_DIR/openresty/luajit/include/luajit-2.1" \
   -Dluajit_LIBRARY_DIRS="$STAGE_EMBEDDED_DIR/openresty/luajit/lib" \

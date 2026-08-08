@@ -1,54 +1,12 @@
 logging:
   formats:
-    - name: extended_custom
-      # Netscape Common
-      # chi: Client: IP address of the client’s host.
-      # caun: Client Request: Authentication User name
-      # cqtn: Client Request: Client request timestamp
-      # cqhm: Client Request: HTTP method
-      # pqu: Proxy Request: URL
-      # cqpv: Client Request: Request protocol and version
-      # pssc: Proxy Response: HTTP response status code sent by Traffic Server proxy to the client.
-      # pscl: Proxy Response: Content body length of the Traffic Server proxy response.
-      #
-      # Netscape Extended-2
-      # sssc: Origin Response: HTTP response status code sent by the origin server to the Traffic Server proxy.
-      # sscl: Origin Response: Content body length of the origin server response to Traffic Server.
-      # cqcl: Client Request: Client request content length, in bytes.
-      # pqcl: Proxy Request: Content body length of the Traffic Server proxy request to the origin server.
-      # pqcl: Proxy Request: Content body length of the Traffic Server proxy request to the origin server.
-      # cqhl: Client Request: Client request header length, in bytes.
-      # pshl: Proxy Response: Header length of the Traffic Server response to client.
-      # pqhl: Proxy Request: Header length of the Traffic Server proxy request to the origin server.
-      # sshl: Origin Response: Header length of the origin server response.
-      # ttms: Client-Proxy Connection: Time in milliseconds spent by Traffic Server processing the entire client request. Measured from the time the connection between the client and Traffic Server proxy was established until the last byte of the proxy response was delivered to the client.
-      # stms: Proxy-Origin Connection: Time (in milliseconds) spent accessing the origin server. Measured from the time the connection between proxy and origin is established to the time it was closed.
-      # phr: Proxy: Proxy Hierarchy Route. Specifies the route through configured hierarchical caches used to retrieve the object.
-      # cfsc: Client Request: Finish status code specifying whether the client request to Traffic Server was successfully completed (FIN) or interrupted (INTR).
-      # pfsc: Proxy Request: Finish status code specifying whether the proxy request from Traffic Server to the origin server was successfully completed (FIN), interrupted (INTR), or timed out (TIMEOUT).
-      # crc: Proxy Cache: Cache Result Code. The result of Traffic Server attempting to obtain the object from cache.
-      #
-      # Custom
-      # crsc: Proxy Cache: Cache Result Sub-Code. More specific code to complement the Cache Result Code.
-      # chm: Proxy Cache: Cache Hit-Miss status. Specifies the level of cache from which this request was served by Traffic Server. Currently supports only RAM (HIT_RAM) vs disk (HIT_DISK).
-      # cwr: Proxy Cache: Cache Write Result. Specifies the result of attempting to write to cache: not relevant (-), no cache write (WL_MISS), write interrupted (INTR), error while writing (ERR), or cache write successful (FIN).
-      # sca: Proxy: Number of attempts within the current transaction by Traffic Server in connecting to the origin server.
-      # sstc: Proxy: Number of transactions between the Traffic Server proxy and the origin server from a single session. Any value greater than zero indicates connection reuse.
-      # psct: Origin Server: Response Content type of the document obtained by Traffic Server from the origin server response.
-      # crec: Client Request: Error code in hex which Traffic Server received
-      # ctec: Client Response: Error code in hex which Traffic Server transmitted
-      # shi: Origin Server: IP address resolved via DNS by Traffic Server for the origin server. For hosts with multiple IP addresses, the address used by Traffic Server for the connection will be reported.
-      # shn: Origin Server: Host name of the origin server.
-      # pqsp: Proxy Request: Port number from which Traffic Server issued the proxy request to the origin server. Cache hits will yield a value of 0.
-      # cqpv: Client Request: Client request protocol and version.
-      # sshv: Origin Response: Origin server’s response HTTP version.
-      # pqssl: Proxy Request: Indicates whether the connection from Traffic Server to the origin was over SSL or not.
-      # csssc: Cached Proxy: Response HTTP response status code of the origin server response, as cached by Traffic Server.
-      # cqtr: Client Request: TCP reused status of the connection between the client and Traffic Server proxy, indicating whether the request was delivered through an already established connection.
-      # cquuc: Client Request: Canonical (prior to remapping) effective URL from client request.
-      format: '[%<cqtn>] "%<cqhm> %<pqu> %<cqpv>" %<pssc> id=%<{X-Api-Umbrella-Request-ID}cqh> up_status=%<sssc> time=%<ttms> origin_time=%<stms> client_finish=%<cfsc> proxy_finish=%<pfsc> cache=%<crc> cache_sub=%<crsc> cache_hit=%<chm> cache_write=%<cwr> con_attempt=%<sca> '
+    - name: custom_json
+      escape: json
+      # Field reference:
+      # https://docs.trafficserver.apache.org/en/latest/admin-guide/logging/formatting.en.html#log-fields
+      format: '{"time":"%<cqtn>","method":"%<cqhm>","uri":"%<pqu>","proto":"%<cqpv>","status":"%<pssc>","id":"%<{X-Api-Umbrella-Request-ID}cqh>","up_status":"%<sssc>","req_time":"%<ttms>","up_time":"%<stms>","client_finish":"%<cfsc>","proxy_finish":"%<pfsc>","cache":"%<crc>","cache_sub":"%<crsc>","cache_hit":"%<chm>","cache_write":"%<cwr>","con_attempt":"%<sca>","req_err":"%<crec>","resp_err":"%<ctec>"}'
 
   logs:
-    - format: extended_custom
+    - format: custom_json
       filename: <%- (config["log"]["destination"] == "console") and "stdout" or "access.log" %>
       rolling_enabled: 0

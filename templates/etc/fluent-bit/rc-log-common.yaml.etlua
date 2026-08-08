@@ -1,0 +1,12 @@
+pipeline:
+  inputs:
+    - name: stdin
+      buffer_size: 16m
+      parser: try_json
+      tag: ${API_UMBRELLA_LOG_SERVICE}
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: "service"
+            value: ${API_UMBRELLA_LOG_SERVICE}

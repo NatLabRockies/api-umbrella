@@ -109,6 +109,9 @@ http {
     }
   <% end %>
 
+  vhost_traffic_status_zone;
+  vhost_traffic_status_measure_status_codes all;
+
   <% if config["ban"]["ips"] and #config["ban"]["ips"] > 0 then %>
     geo $banned_ip {
       default 0;
@@ -213,6 +216,10 @@ http {
 
     location /api-umbrella/v0/shared-memory-stats {
       content_by_lua_file '<%- config["_src_root_dir"] %>/src/api-umbrella/http-api/shared_memory_stats.lua';
+    }
+
+    location /_nginx-status {
+      vhost_traffic_status_display;
     }
   }
 

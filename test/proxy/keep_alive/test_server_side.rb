@@ -414,7 +414,7 @@ class Test::Proxy::KeepAlive::TestServerSide < Minitest::Test
     assert_response_code(200, response)
     stats[:envoy] = MultiJson.load(response.body).fetch("stats").each_with_object({}) { |stat, data| data[stat["name"]] = stat["value"] if stat["name"] }
 
-    response = Typhoeus.get("http://127.0.0.1:13009/_trafficserver_stats", http_options)
+    response = Typhoeus.get("http://127.0.0.1:13009/_trafficserver-stats", http_options)
     assert_response_code(200, response)
     stats[:trafficserver] = MultiJson.load(response.body).fetch("global").transform_values { |value| Integer(value, exception: false) || Float(value, exception: false) || value }
 

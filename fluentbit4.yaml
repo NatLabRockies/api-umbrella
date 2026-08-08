@@ -1,0 +1,48 @@
+service:
+  flush: 1
+  log_level: info
+  parsers_file: /build/build/work/stage/opt/api-umbrella/embedded/etc/fluent-bit/parsers.conf
+  # parsers_file: parsers.yaml
+
+pipeline:
+  inputs:
+    - name: syslog
+      tag: syslog
+      # mode: unix_udp
+      path: /tmp/blah.sock
+      parser: syslog-rfc5424
+
+    - name: prometheus_scrape
+      host: 127.0.0.1
+      port: 2021
+      tag: syslog
+      scrape_interval: 2
+
+    - name: prometheus_scrape
+      host: 127.0.0.1
+      port: 13010
+      tag: syslog
+      metrics_path: /_nginx-status/format/prometheus
+      scrape_interval: 2s
+
+    - name: process_exporter_metrics
+      tag:  process_metrics
+      scrape_interval: 2
+
+  filters:
+    - name: parser
+      match: "*"
+      key_name: message
+      parser: json
+      preserve_key: true
+      reserve_data: true
+
+  outputs:
+    - name: stdout
+      match: syslog
+      format: json
+
+    - name: prometheus_exporter
+      match: process_metrics
+      host: 127.0.0.1
+      port: 2021

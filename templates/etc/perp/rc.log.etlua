@@ -12,43 +12,40 @@ if [ "${1}" = "start" ]; then
   api_umbrella_user="<%- config['user'] %>"
   api_umbrella_group="<%- config['group'] %>"
   destination="<%- config['log']['destination'] %>"
+  log_dir="$api_umbrella_log_dir/$service"
 
   # Set arguments for runtool.
-  run_args=()
   if [ -n "$api_umbrella_user" ]; then
     run_args+=("-u" "$api_umbrella_user")
   fi
 
-  # Set arguments for svlogd.
-  log_dir="$api_umbrella_log_dir/$service"
-  log_args=("-ttt" "$log_dir")
-
-  # Create the log directory.
-  dirs=("$log_dir")
-  runtool mkdir -p "${dirs[@]}"
-  chmod 750 "${dirs[@]}"
-  if [ -n "$api_umbrella_user" ]; then
-    chown "$api_umbrella_user":"$api_umbrella_group" "${dirs[@]}"
-  fi
-
-  # Define a configuration file for svlogd to disable internal log rotation
-  # (since we'll rely on the system and logrotated for that).
-  printf 's0\nn0\n' > "$log_dir/config"
-  if [ -n "$api_umbrella_user" ]; then
-    chown "$api_umbrella_user":"$api_umbrella_group" "$log_dir/config"
-  fi
+  fluent_bit_args=("--parser" "<%- config['etc_dir'] %>/fluent-bit/parsers.yaml")
 
   if [ "$destination" = "console" ]; then
-    # If outputting directly to stdout, use "gawk" to prefix the timestamp and
-    # the name of the service to each line (the GNU version of awk is needed to
-    # ensure strftime support). Otherwise, it's hard to keep track of the
-    # different services when the logging it all combined. (Ideally we could
-    # use svlogd's prefix for this for better tooling consistency, but it can't
-    # re-output to stdout).
-    exec runtool ${run_args[@]+"${run_args[@]}"} gawk "{ print strftime(\"%Y-%m-%dT%H:%M:%SZ [$service] \")\$0; fflush() }"
+    fluent_bit_args+=("--config" "<%- config['etc_dir'] %>/fluent-bit/rc-log-console.yaml")
+    if [ -n "$api_umbrella_user" ]; then
+      chown "$api_umbrella_user":"$api_umbrella_group" /dev/stdout
+      chown "$api_umbrella_user":"$api_umbrella_group" /dev/stderr
+    fi
   else
-    exec runtool ${run_args[@]+"${run_args[@]}"} svlogd "${log_args[@]}"
+    # Create the log directory.
+    dirs=("$log_dir")
+    runtool mkdir -p "${dirs[@]}"
+    chmod 750 "${dirs[@]}"
+    if [ -n "$api_umbrella_user" ]; then
+      chown "$api_umbrella_user":"$api_umbrella_group" "${dirs[@]}"
+    fi
+
+    fluent_bit_args+=("--config" "<%- config['etc_dir'] %>/fluent-bit/rc-log-file.yaml")
   fi
+
+  export API_UMBRELLA_LOG_SERVICE="$service"
+  export API_UMBRELLA_LOG_DIR="$log_dir"
+  # exec runtool ${run_args[@]+"${run_args[@]}"} \
+  #   fluent-bit ${fluent_bit_args[@]+"${fluent_bit_args[@]}"}
+  # exec tee "/tmp/debug-$service.log"
+  # exec fluent-bit ${fluent_bit_args[@]+"${fluent_bit_args[@]}"}
+  exec logger --socket /tmp/blah.sock --tag "$service" --rfc5424=nohost,notq --size 32000
 fi
 
 exit 0

@@ -27,7 +27,7 @@ local function status_response(quick, ignore_trafficserver)
   local httpc = http.new()
   httpc:set_timeout(3000)
 
-  local res, err = httpc:request_uri("http://127.0.0.1:" .. config["trafficserver"]["port"] .. "/_trafficserver-health/nocache/1", {
+  local res, err = httpc:request_uri("http://127.0.0.1:" .. config["trafficserver"]["port"] .. "/_trafficserver-health", {
     headers = {
       ["Host"] = "api-umbrella-trafficserver-health.internal",
     },
