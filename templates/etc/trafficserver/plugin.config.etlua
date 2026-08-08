@@ -17,4 +17,3 @@ cachekey.so --include-headers=Host,X-Api-Umbrella-Backend-Host,X-Api-Umbrella-Ca
 
 # Provide endpoint for Traffic Server stats.
 stats_over_http.so _trafficserver-stats
-# system_stats.so

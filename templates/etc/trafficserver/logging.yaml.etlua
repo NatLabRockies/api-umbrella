@@ -4,7 +4,7 @@ logging:
       escape: json
       # Field reference:
       # https://docs.trafficserver.apache.org/en/latest/admin-guide/logging/formatting.en.html#log-fields
-      format: '{"time":"%<cqtn>","method":"%<cqhm>","uri":"%<pqu>","proto":"%<cqpv>","status":"%<pssc>","id":"%<{X-Api-Umbrella-Request-ID}cqh>","up_status":"%<sssc>","req_time":"%<ttms>","up_time":"%<stms>","client_finish":"%<cfsc>","proxy_finish":"%<pfsc>","cache":"%<crc>","cache_sub":"%<crsc>","cache_hit":"%<chm>","cache_write":"%<cwr>","con_attempt":"%<sca>","req_err":"%<crec>","resp_err":"%<ctec>"}'
+      format: '{"timestamp":"%<cqtd>T%<cqtt>","timestamp_ms":"%<cqtq>","service":"trafficserver","method":"%<cqhm>","uri":"%<pqu>","proto":"%<cqpv>","status":"%<pssc>","id":"%<{X-Api-Umbrella-Request-ID}cqh>","up_status":"%<sssc>","req_time":"%<ttms>","up_time":"%<stms>","client_finish":"%<cfsc>","proxy_finish":"%<pfsc>","cache":"%<crc>","cache_sub":"%<crsc>","cache_hit":"%<chm>","cache_write":"%<cwr>","con_attempt":"%<sca>","req_err":"%<crec>","resp_err":"%<ctec>"}'
 
   logs:
     - format: custom_json

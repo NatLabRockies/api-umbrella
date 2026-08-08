@@ -64,6 +64,9 @@ class Outdated < Thor
       :git => "https://github.com/axllent/mailpit.git",
       :github_release => "axllent/mailpit",
     },
+    "nginx_module_vts" => {
+      :git => "https://github.com/vozlt/nginx-module-vts.git",
+    },
     "ngx_http_geoip2_module" => {
       :git => "https://github.com/leev/ngx_http_geoip2_module.git",
     },

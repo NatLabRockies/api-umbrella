@@ -172,6 +172,7 @@ elif [[ "$ID_NORMALIZED" == "debian" ]]; then
     logrotate
     openssl
     postgresql-client-18
+    runit
     zlib1g
 
     # geoip-auto-updater

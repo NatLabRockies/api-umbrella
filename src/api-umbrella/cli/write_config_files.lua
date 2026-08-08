@@ -247,7 +247,6 @@ local function activate_services()
     end
     active_services["envoy-control-plane"] = 1
     active_services["fluent-bit"] = 1
-    active_services["health-stats"] = 1
     active_services["nginx"] = 1
     active_services["trafficserver"] = 1
   end

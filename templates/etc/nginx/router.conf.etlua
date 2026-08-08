@@ -25,35 +25,8 @@ env API_UMBRELLA_RUNTIME_CONFIG;
 pcre_jit on;
 
 http {
-  log_format combined_extended escape=json
-    '{'
-      '"time":"$time_iso8601",'
-      '"ip":"$remote_addr",'
-      '"method":"$request_method",'
-      '"uri":"$request_uri",'
-      '"proto":"$server_protocol",'
-      '"status":"$status",'
-      '"referer":"$http_referer",'
-      '"user_agent":"$http_user_agent",'
-      '"id":"$x_api_umbrella_request_id",'
-      '"cache":"$sent_http_x_cache",'
-      '"scheme":"$scheme",'
-      '"host":"$host",'
-      '"port":"$server_port",'
-      '"resp_size":"$bytes_sent",'
-      '"req_size":"$request_length",'
-      '"req_time":"$request_time",'
-      '"up_conn_time":"$upstream_connect_time",'
-      '"up_head_time":"$upstream_header_time",'
-      '"up_resp_time":"$upstream_response_time",'
-      '"up_status":"$upstream_status",'
-      '"con_active":"$connections_active",'
-      '"con_read":"$connections_reading",'
-      '"con_write":"$connections_writing",'
-      '"con_wait":"$connections_waiting",'
-      '"con_reqs":"$connection_requests"'
-    '}';
-  access_log <%- config["log_dir"] %>/nginx/<%- config["nginx"]["access_log_filename"] %> combined_extended <%- config["nginx"]["access_log_options"] or "" %>;
+  include ./log_format.conf;
+  access_log <%- config["log_dir"] %>/nginx/<%- config["nginx"]["access_log_filename"] %> custom_json <%- config["nginx"]["access_log_options"] or "" %>;
 
   client_body_temp_path <%- config["tmp_dir"] %>/nginx-client_body_temp;
   proxy_temp_path <%- config["tmp_dir"] %>/nginx-proxy_temp;
@@ -204,6 +177,7 @@ http {
   server {
     listen <%- config["api_server"]["listen"]["host"] %>:<%- config["api_server"]["listen"]["port"] %> so_keepalive=<%- config["nginx"]["listen_so_keepalive"] %><% if config["nginx"]["listen_backlog"] then %> backlog=<%- config["nginx"]["listen_backlog"] %><% end %>;
 
+    set $log_service "nginx";
     set $x_api_umbrella_request_id $http_x_api_umbrella_request_id;
 
     location /api-umbrella/v1/health {
@@ -230,6 +204,8 @@ http {
         listen <%- address %>:<%- config["https_port"] %> ssl<% if host["default"] then %> default_server so_keepalive=<%- config["nginx"]["listen_so_keepalive"] %><% if config["nginx"]["listen_backlog"] then %> backlog=<%- config["nginx"]["listen_backlog"] %><% end %><% end %>;
       <% end %>
       server_name <%- host["_nginx_server_name"] %>;
+
+      set $log_service "nginx";
 
       <% if host["ssl_cert"] then %>
         ssl_certificate <%- host["ssl_cert"] %>;
@@ -294,6 +270,7 @@ http {
     server {
       listen <%- config["static_site"]["listen"]["host"] %>:<%- config["static_site"]["listen"]["port"] %> so_keepalive=<%- config["nginx"]["listen_so_keepalive"] %><% if config["nginx"]["listen_backlog"] then %> backlog=<%- config["nginx"]["listen_backlog"] %><% end %>;
 
+      set $log_service "nginx";
       set $x_api_umbrella_request_id $http_x_api_umbrella_request_id;
       root <%- config["static_site"]["build_dir"] %>;
 

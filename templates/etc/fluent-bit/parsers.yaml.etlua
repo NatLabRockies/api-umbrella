@@ -1,5 +1,0 @@
-parsers:
-  - name: try_json
-    format: regex
-    regex: "^(?<msg>[^\n]*)"
-    decode_field_as: json msg

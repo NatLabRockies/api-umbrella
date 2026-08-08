@@ -12,22 +12,29 @@ if [ "${1}" = "start" ]; then
   api_umbrella_user="<%- config['user'] %>"
   api_umbrella_group="<%- config['group'] %>"
   destination="<%- config['log']['destination'] %>"
-  log_dir="$api_umbrella_log_dir/$service"
 
   # Set arguments for runtool.
+  run_args=()
   if [ -n "$api_umbrella_user" ]; then
     run_args+=("-u" "$api_umbrella_user")
   fi
 
-  fluent_bit_args=("--parser" "<%- config['etc_dir'] %>/fluent-bit/parsers.yaml")
-
   if [ "$destination" = "console" ]; then
-    fluent_bit_args+=("--config" "<%- config['etc_dir'] %>/fluent-bit/rc-log-console.yaml")
-    if [ -n "$api_umbrella_user" ]; then
-      chown "$api_umbrella_user":"$api_umbrella_group" /dev/stdout
-      chown "$api_umbrella_user":"$api_umbrella_group" /dev/stderr
-    fi
+    # If outputting directly to stdout, filter through "gawk" for some
+    # lightweight manipulation:
+    #
+    # - For text logs, prefix the timestamp and the name of the service to each
+    #   line (the GNU version of awk is needed to ensure strftime support).
+    #   Otherwise, it's hard to keep track of the different services when the
+    #   logging it all combined.
+    # - If JSON log ouptut is detected, output as-is, since it's assumed the
+    #   JSON logs already include similar metadata.
+    exec runtool ${run_args[@]+"${run_args[@]}"} gawk '{ if (substr($0, 1, 2) == "{\"") print $0; else print strftime("%Y-%m-%dT%H:%M:%SZ", systime(), 1)" ['"$service"'] "$0 }'
   else
+    # Set arguments for svlogd.
+    log_dir="$api_umbrella_log_dir/$service"
+    log_args=("-ttt" "$log_dir")
+
     # Create the log directory.
     dirs=("$log_dir")
     runtool mkdir -p "${dirs[@]}"
@@ -36,16 +43,15 @@ if [ "${1}" = "start" ]; then
       chown "$api_umbrella_user":"$api_umbrella_group" "${dirs[@]}"
     fi
 
-    fluent_bit_args+=("--config" "<%- config['etc_dir'] %>/fluent-bit/rc-log-file.yaml")
-  fi
+    # Define a configuration file for svlogd to disable internal log rotation
+    # (since we'll rely on the system and logrotated for that).
+    printf 's0\nn0\n' > "$log_dir/config"
+    if [ -n "$api_umbrella_user" ]; then
+      chown "$api_umbrella_user":"$api_umbrella_group" "$log_dir/config"
+    fi
 
-  export API_UMBRELLA_LOG_SERVICE="$service"
-  export API_UMBRELLA_LOG_DIR="$log_dir"
-  # exec runtool ${run_args[@]+"${run_args[@]}"} \
-  #   fluent-bit ${fluent_bit_args[@]+"${fluent_bit_args[@]}"}
-  # exec tee "/tmp/debug-$service.log"
-  # exec fluent-bit ${fluent_bit_args[@]+"${fluent_bit_args[@]}"}
-  exec logger --socket /tmp/blah.sock --tag "$service" --rfc5424=nohost,notq --size 32000
+    exec runtool ${run_args[@]+"${run_args[@]}"} svlogd "${log_args[@]}"
+  fi
 fi
 
 exit 0
