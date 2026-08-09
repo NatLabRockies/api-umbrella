@@ -152,7 +152,7 @@ pipeline:
       match: "analytics.*"
       host: <%- json_encode(config["opensearch"]["_first_server"]["host"]) %>
       port: <%- json_encode(config["opensearch"]["_first_server"]["port"]) %>
-      tls: <%- config["opensearch"]["_first_server"]["_https?"] and true or false %>
+      tls: <%- json_encode(config["opensearch"]["_first_server"]["_https?"]) %>
       <% if config["opensearch"]["_first_server"]["user"] then %>
       http_user: <%- json_encode(config["opensearch"]["_first_server"]["user"]) %>
       <% end %>
@@ -160,7 +160,11 @@ pipeline:
       http_passwd: <%- json_encode(config["opensearch"]["_first_server"]["password"]) %>"
       <% end %>
       <% if config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] then %>
-      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"]) %>
+      # Specific to the opensearch output plugin, the `aws_auth` boolean has to
+      # be an explicit "on" or "off":
+      # https://github.com/fluent/fluent-bit/issues/10947
+      # https://github.com/fluent/fluent-bit/issues/10228
+      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] and "on" or "off") %>
       aws_region: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_region"]) %>
       aws_service_name: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_service_name"]) %>
       <% end %>
