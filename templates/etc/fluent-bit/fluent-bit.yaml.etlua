@@ -44,7 +44,7 @@ pipeline:
 
     - name: health
       tag: health.api_server
-      host: <%- json_encode(config["api_server"]["host"]) %>
+      host: 127.0.0.1
       port: <%- json_encode(config["api_server"]["port"]) %>
       interval_sec: 1
       alert: true
@@ -57,7 +57,7 @@ pipeline:
 
     - name: health
       tag: health.web_app
-      host: <%- json_encode(config["web"]["host"]) %>
+      host: 127.0.0.1
       port: <%- json_encode(config["web"]["port"]) %>
       interval_sec: 1
       alert: true
@@ -70,7 +70,7 @@ pipeline:
 
     - name: health
       tag: health.trafficserver
-      host: <%- json_encode(config["trafficserver"]["host"]) %>
+      host: 127.0.0.1
       port: <%- json_encode(config["trafficserver"]["port"]) %>
       interval_sec: 1
       alert: true
@@ -90,7 +90,7 @@ pipeline:
 
     - name: prometheus_scrape
       tag: metrics.trafficserver
-      host: <%- json_encode(config["trafficserver"]["host"]) %>
+      host: 127.0.0.1
       port: <%- json_encode(config["trafficserver"]["port"]) %>
       metrics_path: /_trafficserver-stats/prometheus
       scrape_interval: 5s
@@ -161,7 +161,7 @@ pipeline:
       <% end %>
       <% if config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] then %>
       # Specific to the opensearch output plugin, the `aws_auth` boolean has to
-      # be an explicit "on" or "off":
+      # be an explicit "on" or "off", unless these issues are fixed:
       # https://github.com/fluent/fluent-bit/issues/10947
       # https://github.com/fluent/fluent-bit/issues/10228
       aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] and "on" or "off") %>
