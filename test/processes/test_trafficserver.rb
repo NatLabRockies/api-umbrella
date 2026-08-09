@@ -16,7 +16,11 @@ class Test::Processes::TestTrafficserver < Minitest::Test
     response = Typhoeus.get("http://127.0.0.1:9080/api/hello", http_options)
 
     access_log = access_log_tail.read_until(response.headers["X-Api-Umbrella-Request-ID"], timeout: 30)
-    assert_match("200 id=#{response.headers["X-Api-Umbrella-Request-ID"]} up_status=200 time=", access_log)
+    log_line = access_log.match(/^.*#{response.headers["X-Api-Umbrella-Request-ID"]}.*$/)[0]
+    log_row = MultiJson.load(log_line)
+    assert_equal("200", log_row.fetch("status"))
+    assert_equal(response.headers["X-Api-Umbrella-Request-ID"], log_row.fetch("id"))
+    assert_equal("200", log_row.fetch("up_status"))
 
     log_glob = File.join($config["log_dir"], "trafficserver/*.{log,out,old}")
     log_paths = Dir.glob(log_glob)
@@ -36,7 +40,18 @@ class Test::Processes::TestTrafficserver < Minitest::Test
       response = Typhoeus.get("http://127.0.0.1:9080/api/hello", http_options)
 
       current_log = current_log_tail.read_until(response.headers["X-Api-Umbrella-Request-ID"], timeout: 30)
-      assert_match("200 id=#{response.headers["X-Api-Umbrella-Request-ID"]} up_status=200 time=", current_log)
+      log_line = current_log.match(/^.*#{response.headers["X-Api-Umbrella-Request-ID"]}.*$/)[0]
+      # Remove the timestamp prefix from the log line.
+      #
+      # When really outputting to stdout, this won't happen (since gawk won't
+      # append it for JSON line), but in this test environment, stdout is still
+      # being output to svlogd because we haven't fully restarted perp and the
+      # regenerated the rc.log file.
+      log_line = log_line.split(" ", 2).last
+      log_row = MultiJson.load(log_line)
+      assert_equal("200", log_row.fetch("status"))
+      assert_equal(response.headers["X-Api-Umbrella-Request-ID"], log_row.fetch("id"))
+      assert_equal("200", log_row.fetch("up_status"))
 
       log_paths = Dir.glob(log_glob)
       # Ignore crash log files, since the restart to set this setting may have

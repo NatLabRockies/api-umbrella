@@ -143,6 +143,8 @@ pipeline:
     - name: stdout
       match: "analytics.*"
       format: json_lines
+      json_date_key: _log_timestamp
+      json_date_format: iso8601
 
     <% if config["fluent_bit"]["outputs"]["opensearch"]["enabled"] then %>
     # Send API analytics to OpenSearch analytics DB.
