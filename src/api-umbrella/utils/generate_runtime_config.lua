@@ -334,9 +334,7 @@ local function set_computed_config(config)
           end
         end
 
-        if parsed["scheme"] == "https" then
-          parsed["_https?"] = true
-        end
+        parsed["_https?"] = parsed["scheme"] == "https"
 
         table.insert(config["opensearch"]["_servers"], parsed)
       end
