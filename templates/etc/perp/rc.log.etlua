@@ -30,7 +30,7 @@ if [ "${1}" = "start" ]; then
     # - If JSON log ouptut is detected, output as-is, since it's assumed the
     #   JSON logs already include similar metadata.
     # shellcheck disable=SC2016
-    exec runtool ${run_args[@]+"${run_args[@]}"} gawk '{ if (substr($0, 1, 2) == "{\"") print $0; else print strftime("%Y-%m-%dT%H:%M:%SZ", systime(), 1)" ['"$service"'] "$0 }'
+    exec runtool ${run_args[@]+"${run_args[@]}"} gawk '{ if (substr($0, 1, 2) == "{\"") print $0; else print strftime("%Y-%m-%dT%H:%M:%SZ", systime(), 1)" ['"$service"'] "$0; fflush() }'
   else
     # Set arguments for svlogd.
     log_dir="$api_umbrella_log_dir/$service"
