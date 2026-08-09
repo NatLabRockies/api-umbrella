@@ -59,7 +59,7 @@ function _M.query(path, options)
     return nil, "opensearch connect error: " .. (connect_err or "")
   end
 
-  if config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] == "on" then
+  if config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] then
     aws_sign(
       config["fluent_bit"]["outputs"]["opensearch"]["aws_region"],
       config["fluent_bit"]["outputs"]["opensearch"]["aws_service_name"],
