@@ -33,7 +33,7 @@ log_format custom_json escape=json <%- json_encode(json_encode({
     original = "$http_user_agent",
   },
   cache = "$sent_http_x_cache",
-  req_time = "$request_time",
+  duration = "$request_time",
   up_conn_time = "$upstream_connect_time",
   up_head_time = "$upstream_header_time",
   up_resp_time = "$upstream_response_time",
@@ -56,7 +56,6 @@ log_format custom_json escape=json <%- json_encode(json_encode({
     uri = "$request_uri",
   },
   status = "$status",
-  duration = "$request_time",
   referer = "$http_referer",
   userAgent = "$http_user_agent",
 })) %>;
