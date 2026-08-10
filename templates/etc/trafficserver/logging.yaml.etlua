@@ -9,11 +9,106 @@ logging:
   formats:
     - name: custom_json
       escape: json
-      format: '{"timestamp":"%<cqtd>T%<cqtt>","timestamp_ms":"%<cqtq>","service":{"type":"trafficserver","name":"access"},"url":{"domain":"%<{X-Api-Umbrella-Backend-Host}cqh>","original":"%<pqu>"},"http":{"request":{"method":"%<cqhm>","id":"%<{X-Api-Umbrella-Request-ID}cqh>"},"response":{"status_code":"%<pssc>"}},"up_status":"%<sssc>","req_time":"%<ttms>","up_time":"%<stms>","client_finish":"%<cfsc>","proxy_finish":"%<pfsc>","cache":"%<crc>","cache_sub":"%<crsc>","cache_hit":"%<chm>","cache_write":"%<cwr>","con_attempt":"%<sca>","req_err":"%<crec>","resp_err":"%<ctec>"}'
+      format: <%- json_encode(json_encode({
+        ["@timestamp"] = "%<cqtq>",
+        timestamp = "%<cqtd>T%<cqtt>",
+        service = {
+          type = "trafficserver",
+          name = "access",
+        },
+        url = {
+          domain = "%<{X-Api-Umbrella-Backend-Host}cqh>",
+          original = "%<pqu>",
+        },
+        http = {
+          request = {
+            method = "%<cqhm>",
+            id = "%<{X-Api-Umbrella-Request-ID}cqh>",
+          },
+          response = {
+            status_code = "%<pssc>",
+          },
+        },
+        up_status = "%<sssc>",
+        duration = "%<ttms>",
+        up_duration = "%<stms>",
+        client_finish = "%<cfsc>",
+        proxy_finish = "%<pfsc>",
+        cache = "%<crc>",
+        cache_sub = "%<crsc>",
+        cache_hit = "%<chm>",
+        cache_write = "%<cwr>",
+        con_attempt = "%<sca>",
+        req_err = "%<crec>",
+        resp_err = "%<ctec>",
+
+        -- Cloud.gov formatting:
+        -- https://github.com/cloud-gov/opensearch-boshrelease/blob/752e16bf75c9e1cd7b04d356aa432d7a4cdf25ab/src/cf-logstash-filters/src/logstash-filters/snippets/app-logmessage-app.conf#L52-L91
+        request = {
+          domain = "%<{X-Api-Umbrella-Backend-Host}cqh>",
+          id = "%<{X-Api-Umbrella-Request-ID}cqh>",
+          method = "%<cqhm>",
+          uri = "%<pqu>",
+        },
+        status = "%<pssc>",
+      })) %>
 
     - name: slowlog_json
       escape: json
-      format: '{"timestamp":"%<cqtd>T%<cqtt>","timestamp_ms":"%<cqtq>","service":{"type":"trafficserver","name":"slow"},"url":{"domain":"%<{X-Api-Umbrella-Backend-Host}cqh>","original":"%<pqu>"},"http":{"request":{"id":"%<{X-Api-Umbrella-Request-ID}cqh>"},"response":{"status_code":"%<pssc>"}},"client_ip":"%<chi>:%<chp>","protocol":"%<cqpv>","bytes":"%<pscl>","client_state":"%<cfsc>","server_state":"%<sssc>","tls_handshake":"%<{TS_MILESTONE_TLS_HANDSHAKE_END-TS_MILESTONE_TLS_HANDSHAKE_START}msdms>","ua_begin":"%<{TS_MILESTONE_UA_BEGIN-TS_MILESTONE_SM_START}msdms>","ua_first_read":"%<{TS_MILESTONE_UA_FIRST_READ-TS_MILESTONE_SM_START}msdms>","ua_read_header_done":"%<{TS_MILESTONE_UA_READ_HEADER_DONE-TS_MILESTONE_SM_START}msdms>","cache_open_read_begin":"%<{TS_MILESTONE_CACHE_OPEN_READ_BEGIN-TS_MILESTONE_SM_START}msdms>","cache_open_read_end":"%<{TS_MILESTONE_CACHE_OPEN_READ_END-TS_MILESTONE_SM_START}msdms>","cache_open_write_begin":"%<{TS_MILESTONE_CACHE_OPEN_WRITE_BEGIN-TS_MILESTONE_SM_START}msdms>","cache_open_write_end":"%<{TS_MILESTONE_CACHE_OPEN_WRITE_END-TS_MILESTONE_SM_START}msdms>","dns_lookup_begin":"%<{TS_MILESTONE_DNS_LOOKUP_BEGIN-TS_MILESTONE_SM_START}msdms>","dns_lookup_end":"%<{TS_MILESTONE_DNS_LOOKUP_END-TS_MILESTONE_SM_START}msdms>","server_connect":"%<{TS_MILESTONE_SERVER_CONNECT-TS_MILESTONE_SM_START}msdms>","server_connect_end":"%<{TS_MILESTONE_SERVER_CONNECT_END-TS_MILESTONE_SM_START}msdms>","server_first_read":"%<{TS_MILESTONE_SERVER_FIRST_READ-TS_MILESTONE_SM_START}msdms>","server_read_header_done":"%<{TS_MILESTONE_SERVER_READ_HEADER_DONE-TS_MILESTONE_SM_START}msdms>","server_close":"%<{TS_MILESTONE_SERVER_CLOSE-TS_MILESTONE_SM_START}msdms>","ua_write":"%<{TS_MILESTONE_UA_BEGIN_WRITE-TS_MILESTONE_SM_START}msdms>","ua_close":"%<{TS_MILESTONE_UA_CLOSE-TS_MILESTONE_SM_START}msdms>","sm_finish":"%<{TS_MILESTONE_SM_FINISH-TS_MILESTONE_SM_START}msdms>","plugin_active":"%<{TS_MILESTONE_PLUGIN_ACTIVE-TS_MILESTONE_SM_START}msdms>","plugin_total":"%<{TS_MILESTONE_PLUGIN_TOTAL-TS_MILESTONE_SM_START}msdms>"}'
+      format: <%- json_encode(json_encode({
+        ["@timestamp"] = "%<cqtq>",
+        timestamp = "%<cqtd>T%<cqtt>",
+        service = {
+          type = "trafficserver",
+          name = "slow",
+        },
+        url = {
+          domain = "%<{X-Api-Umbrella-Backend-Host}cqh>",
+          original = "%<pqu>",
+        },
+        http = {
+          request = {
+            id = "%<{X-Api-Umbrella-Request-ID}cqh>",
+          },
+          response = {
+            status_code = "%<pssc>",
+            bytes = "%<pscl>",
+          },
+          version = "%<cqpv>",
+        },
+        client_ip = "%<chi>:%<chp>",
+        client_state = "%<cfsc>",
+        server_state = "%<sssc>",
+        tls_handshake = "%<{TS_MILESTONE_TLS_HANDSHAKE_END-TS_MILESTONE_TLS_HANDSHAKE_START}msdms>",
+        ua_begin = "%<{TS_MILESTONE_UA_BEGIN-TS_MILESTONE_SM_START}msdms>",
+        ua_first_read = "%<{TS_MILESTONE_UA_FIRST_READ-TS_MILESTONE_SM_START}msdms>",
+        ua_read_header_done = "%<{TS_MILESTONE_UA_READ_HEADER_DONE-TS_MILESTONE_SM_START}msdms>",
+        cache_open_read_begin = "%<{TS_MILESTONE_CACHE_OPEN_READ_BEGIN-TS_MILESTONE_SM_START}msdms>",
+        cache_open_read_end = "%<{TS_MILESTONE_CACHE_OPEN_READ_END-TS_MILESTONE_SM_START}msdms>",
+        cache_open_write_begin = "%<{TS_MILESTONE_CACHE_OPEN_WRITE_BEGIN-TS_MILESTONE_SM_START}msdms>",
+        cache_open_write_end = "%<{TS_MILESTONE_CACHE_OPEN_WRITE_END-TS_MILESTONE_SM_START}msdms>",
+        dns_lookup_begin = "%<{TS_MILESTONE_DNS_LOOKUP_BEGIN-TS_MILESTONE_SM_START}msdms>",
+        dns_lookup_end = "%<{TS_MILESTONE_DNS_LOOKUP_END-TS_MILESTONE_SM_START}msdms>",
+        server_connect = "%<{TS_MILESTONE_SERVER_CONNECT-TS_MILESTONE_SM_START}msdms>",
+        server_connect_end = "%<{TS_MILESTONE_SERVER_CONNECT_END-TS_MILESTONE_SM_START}msdms>",
+        server_first_read = "%<{TS_MILESTONE_SERVER_FIRST_READ-TS_MILESTONE_SM_START}msdms>",
+        server_read_header_done = "%<{TS_MILESTONE_SERVER_READ_HEADER_DONE-TS_MILESTONE_SM_START}msdms>",
+        server_close = "%<{TS_MILESTONE_SERVER_CLOSE-TS_MILESTONE_SM_START}msdms>",
+        ua_write = "%<{TS_MILESTONE_UA_BEGIN_WRITE-TS_MILESTONE_SM_START}msdms>",
+        ua_close = "%<{TS_MILESTONE_UA_CLOSE-TS_MILESTONE_SM_START}msdms>",
+        duration = "%<{TS_MILESTONE_SM_FINISH-TS_MILESTONE_SM_START}msdms>",
+        plugin_active = "%<{TS_MILESTONE_PLUGIN_ACTIVE-TS_MILESTONE_SM_START}msdms>",
+        plugin_total = "%<{TS_MILESTONE_PLUGIN_TOTAL-TS_MILESTONE_SM_START}msdms>",
+
+        -- Cloud.gov formatting:
+        -- https://github.com/cloud-gov/opensearch-boshrelease/blob/752e16bf75c9e1cd7b04d356aa432d7a4cdf25ab/src/cf-logstash-filters/src/logstash-filters/snippets/app-logmessage-app.conf#L52-L91
+        request = {
+          domain = "%<{X-Api-Umbrella-Backend-Host}cqh>",
+          id = "%<{X-Api-Umbrella-Request-ID}cqh>",
+          uri = "%<pqu>",
+        },
+        status = "%<pssc>",
+      })) %>
 
   logs:
     - format: custom_json

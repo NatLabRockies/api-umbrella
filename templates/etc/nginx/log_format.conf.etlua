@@ -1,45 +1,62 @@
-log_format custom_json escape=json
-  '{'
-    '"timestamp":"$time_iso8601",'
-    '"timestamp_ms":"$msec",'
-    '"service":{'
-      '"name":"$log_service",'
-      '"type":"nginx"'
-    '},'
-    '"client":{'
-      '"ip":"$remote_addr"'
-    '},'
-    '"url":{'
-      '"scheme":"$scheme",'
-      '"domain":"$host",'
-      '"original":"$request_uri"'
-    '},'
-    '"http":{'
-      '"request":{'
-        '"method":"$request_method",'
-        '"referrer":"$http_referer",'
-        '"id":"$x_api_umbrella_request_id"'
-      '},'
-      '"response":{'
-        '"status_code":"$status"'
-      '}'
-    '},'
-    '"proto":"$server_protocol",'
-    '"user_agent":{'
-      '"original":"$http_user_agent"'
-    '},'
-    '"cache":"$sent_http_x_cache",'
-    '"port":"$server_port",'
-    '"resp_size":"$bytes_sent",'
-    '"req_size":"$request_length",'
-    '"req_time":"$request_time",'
-    '"up_conn_time":"$upstream_connect_time",'
-    '"up_head_time":"$upstream_header_time",'
-    '"up_resp_time":"$upstream_response_time",'
-    '"up_status":"$upstream_status",'
-    '"con_active":"$connections_active",'
-    '"con_read":"$connections_reading",'
-    '"con_write":"$connections_writing",'
-    '"con_wait":"$connections_waiting",'
-    '"con_reqs":"$connection_requests"'
-  '}';
+log_format custom_json escape=json <%- json_encode(json_encode({
+  ["@timestamp"] = "$msec",
+  timestamp = "$time_iso8601",
+  service = {
+    type = "nginx",
+    name = "$log_service",
+  },
+  client = {
+    ip = "$remote_addr",
+  },
+  url = {
+    domain = "$host",
+    original = "$request_uri",
+    scheme = "$scheme",
+  },
+  http = {
+    request = {
+      bytes = "$request_length",
+      id = "$x_api_umbrella_request_id",
+      method = "$request_method",
+      referrer = "$http_referer",
+    },
+    response = {
+      status_code = "$status",
+      bytes = "$bytes_sent",
+    },
+    version = "$server_protocol",
+  },
+  server = {
+    port = "$server_port",
+  },
+  user_agent = {
+    original = "$http_user_agent",
+  },
+  cache = "$sent_http_x_cache",
+  req_time = "$request_time",
+  up_conn_time = "$upstream_connect_time",
+  up_head_time = "$upstream_header_time",
+  up_resp_time = "$upstream_response_time",
+  up_status = "$upstream_status",
+  con_active = "$connections_active",
+  con_read = "$connections_reading",
+  con_write = "$connections_writing",
+  con_wait = "$connections_waiting",
+  con_reqs = "$connection_requests",
+
+  -- Cloud.gov formatting:
+  -- https://github.com/cloud-gov/opensearch-boshrelease/blob/752e16bf75c9e1cd7b04d356aa432d7a4cdf25ab/src/cf-logstash-filters/src/logstash-filters/snippets/app-logmessage-app.conf#L52-L91
+  request = {
+    bytes = "$request_length",
+    client_ip = "$remote_addr",
+    domain = "$host",
+    id = "$x_api_umbrella_request_id",
+    method = "$request_method",
+    proto = "$server_protocol",
+    uri = "$request_uri",
+  },
+  status = "$status",
+  duration = "$request_time",
+  referer = "$http_referer",
+  userAgent = "$http_user_agent",
+})) %>;
