@@ -45,7 +45,7 @@ logging:
         -- Cloud.gov formatting:
         -- https://github.com/cloud-gov/opensearch-boshrelease/blob/752e16bf75c9e1cd7b04d356aa432d7a4cdf25ab/src/cf-logstash-filters/src/logstash-filters/snippets/app-logmessage-app.conf#L52-L91
         request = {
-          domain = "%<{X-Api-Umbrella-Backend-Host}cqh>",
+          host = "%<{X-Api-Umbrella-Backend-Host}cqh>",
           id = "%<{X-Api-Umbrella-Request-ID}cqh>",
           method = "%<cqhm>",
           uri = "%<pqu>",
@@ -103,7 +103,7 @@ logging:
         -- Cloud.gov formatting:
         -- https://github.com/cloud-gov/opensearch-boshrelease/blob/752e16bf75c9e1cd7b04d356aa432d7a4cdf25ab/src/cf-logstash-filters/src/logstash-filters/snippets/app-logmessage-app.conf#L52-L91
         request = {
-          domain = "%<{X-Api-Umbrella-Backend-Host}cqh>",
+          host = "%<{X-Api-Umbrella-Backend-Host}cqh>",
           id = "%<{X-Api-Umbrella-Request-ID}cqh>",
           uri = "%<pqu>",
         },
