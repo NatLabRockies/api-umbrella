@@ -204,6 +204,7 @@ RUN cargo build --release --target "$(arch)-unknown-linux-musl"
 # fluent-bit as sidecar.
 ###
 # Version should be kept in sync with `tasks/deps/fluent-bit` version.
+FROM busybox:musl AS busybox
 FROM fluent/fluent-bit:5.1.0 AS runtime-egress
 
 # Create the needed directories as the non-root user, and then switch back to
@@ -216,6 +217,10 @@ WORKDIR /home/nonroot
 # this distroless image.
 COPY --from=envoy-config-wrapper-build --chown=0:0 --chmod=755 ./target/*/release/envoy-config-wrapper /usr/local/bin/
 COPY --from=build --chown=0:0 --chmod=755 /app/build/work/stage/opt/api-umbrella/embedded/bin/envoy /usr/local/bin/
+
+# Add sh, which seems to be necessary for CloudFoundry when specifying a custom
+# `command` attribute (as we do for the fluentbit sidecar).
+COPY --from=busybox /bin/sh /bin/sh
 
 EXPOSE 14001
 
