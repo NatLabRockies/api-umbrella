@@ -489,6 +489,21 @@ import "path"
         aws_region?: string
         aws_service: string | *"monitoring"
       }
+
+      prometheus_metrics: {
+        enabled: bool | *false
+        host?: string
+        port: uint16 | *80
+        tls: bool | *false
+        uri?: string
+        compression: string | *"snappy"
+        header?: string
+        add_label?: [...string]
+        aws_auth: bool | *false
+        aws_region?: string
+        aws_service: string | *"aps"
+      }
+
     }
   }
 

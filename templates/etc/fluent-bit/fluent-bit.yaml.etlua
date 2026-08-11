@@ -25,7 +25,7 @@ pipeline:
       storage.type: filesystem
     <% end %>
 
-    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] then %>
+    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] or config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
     - name: fluentbit_metrics
       tag: metrics.fluentbit
       scrape_interval: 120
@@ -153,7 +153,7 @@ pipeline:
       remove: response_status_str
     <% end %>
 
-    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] then %>
+    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] or config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
     - name: log_to_metrics
       match: "health.*"
       tag: metrics.health
@@ -269,5 +269,26 @@ pipeline:
       aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_auth"]) %>
       aws_region: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_region"]) %>
       aws_service: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_service"]) %>
+      <% end %>
+    <% end %>
+
+    <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
+    - name: prometheus_remote_write
+      match: "metrics.*"
+      host: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["host"]) %>
+      port: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["port"]) %>
+      tls: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["tls"]) %>
+      uri: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["uri"]) %>
+      compression: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["compression"]) %>
+      <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["header"] then %>
+      header: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["header"]) %>
+      <% end %>
+      <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["add_label"] then %>
+      add_label: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["add_label"]) %>
+      <% end %>
+      <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_auth"] then %>
+      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_auth"]) %>
+      aws_region: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_region"]) %>
+      aws_service: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_service"]) %>
       <% end %>
     <% end %>
