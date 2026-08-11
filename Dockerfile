@@ -200,8 +200,11 @@ RUN cargo build --release --target "$(arch)-unknown-linux-musl"
 ###
 # Runtime - Egress Only
 # https://github.com/envoyproxy/envoy/blob/release/v1.27/ci/Dockerfile-envoy#L60-L69
+# Built on top of distroless fluent-bit container so the image can also run
+# fluent-bit as sidecar.
 ###
-FROM gcr.io/distroless/base-nossl-debian12:nonroot AS runtime-egress
+# Version should be kept in sync with `tasks/deps/fluent-bit` version.
+FROM fluent/fluent-bit:5.1.0 AS runtime-egress
 
 # Create the needed directories as the non-root user, and then switch back to
 # the defalt workdir.
@@ -217,4 +220,4 @@ COPY --from=build --chown=0:0 --chmod=755 /app/build/work/stage/opt/api-umbrella
 EXPOSE 14001
 
 ENTRYPOINT ["/usr/local/bin/envoy-config-wrapper"]
-CMD ["-c", "/etc/envoy/envoy.yaml", "--use-dynamic-base-id", "--base-id-path", "/var/run/envoy/base-id"]
+CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml", "--use-dynamic-base-id", "--base-id-path", "/var/run/envoy/base-id"]

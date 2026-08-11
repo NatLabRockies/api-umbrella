@@ -16,19 +16,22 @@ service:
 
 pipeline:
   inputs:
+    <% if config["_service_router_enabled?"] then %>
     - name: tcp
       tag: analytics.allowed
       listen: <%- json_encode(config["fluent_bit"]["host"]) %>
       port: <%- json_encode(config["fluent_bit"]["port"]) %>
       format: json
       storage.type: filesystem
+    <% end %>
 
     <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] then %>
     - name: fluentbit_metrics
       tag: metrics.fluentbit
-      scrape_interval: 60
+      scrape_interval: 120
       scrape_on_start: true
 
+    <% if config["_service_router_enabled?"] then %>
     - name: health
       tag: health.router
       host: 127.0.0.1
@@ -86,27 +89,51 @@ pipeline:
       host: 127.0.0.1
       port: <%- json_encode(config["api_server"]["port"]) %>
       metrics_path: /_nginx-status/format/prometheus
-      scrape_interval: 5s
+      scrape_interval: 30s
 
     - name: prometheus_scrape
       tag: metrics.trafficserver
       host: 127.0.0.1
       port: <%- json_encode(config["trafficserver"]["port"]) %>
       metrics_path: /_trafficserver-stats/prometheus
-      scrape_interval: 5s
+      scrape_interval: 30s
+    <% end %>
+
+    <% if config["_service_egress_enabled?"] then %>
+    - name: health
+      tag: health.envoy
+      host: 127.0.0.1
+      port: <%- json_encode(config["envoy"]["port"]) %>
+      interval_sec: 1
+      alert: true
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: name
+            value: envoy
+
+    - name: prometheus_scrape
+      tag: metrics.envoy
+      host: 127.0.0.1
+      port: <%- json_encode(config["envoy"]["admin"]["port"]) %>
+      metrics_path: /stats?format=prometheus&usedonly
+      scrape_interval: 30s
+    <% end %>
 
     - name: node_exporter_metrics
       tag: metrics.node
-      scrape_interval: 5s
+      scrape_interval: 30s
       metrics: cpu,meminfo,diskstats,filesystem,uname,stat,time,loadavg,vmstat,netdev,netstat,sockstat,filefd
 
     - name: process_exporter_metrics
       tag: metrics.process
-      scrape_interval: 5s
+      scrape_interval: 30s
       metrics: cpu,io,memory,state,context_switches,fd,start_time
     <% end %>
 
   filters:
+    <% if config["_service_router_enabled?"] then %>
     - name: rewrite_tag
       match: analytics.allowed
       rule: "$gatekeeper_denied_code ^. analytics.denied false"
@@ -124,6 +151,7 @@ pipeline:
     - name: modify
       match: "analytics.*"
       remove: response_status_str
+    <% end %>
 
     <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] then %>
     - name: log_to_metrics
@@ -139,6 +167,7 @@ pipeline:
     <% end %>
 
   outputs:
+    <% if config["_service_router_enabled?"] then %>
     # Print what we would log to stdout for extra redundancy.
     - name: stdout
       match: "analytics.*"
@@ -222,6 +251,7 @@ pipeline:
       auto_retry_requests: <%- json_encode(config["fluent_bit"]["outputs"]["s3"]["auto_retry_requests"]) %>
       retry_limit: <%- json_encode(config["fluent_bit"]["outputs"]["s3"]["retry_limit"]) %>
       preserve_data_ordering: <%- json_encode(config["fluent_bit"]["outputs"]["s3"]["preserve_data_ordering"]) %>
+    <% end %>
     <% end %>
 
     <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] then %>

@@ -15,6 +15,7 @@ cd "fluent-bit-${fluent_bit_version}/build"
 cmake \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX_EMBEDDED" \
   -DFLB_CUSTOM_CALYPTIA="Off" \
+  -DFLB_SHARED_LIB="Off" \
   -DFLB_EXAMPLES="Off" \
   -DFLB_JEMALLOC="On" \
   -DFLB_KAFKA="Off" \
