@@ -28,7 +28,7 @@ pipeline:
     <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] or config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
     - name: fluentbit_metrics
       tag: metrics.fluentbit
-      scrape_interval: 120
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"]) %>
       scrape_on_start: true
 
     <% if config["_service_router_enabled?"] then %>
@@ -89,14 +89,14 @@ pipeline:
       host: 127.0.0.1
       port: <%- json_encode(config["api_server"]["port"]) %>
       metrics_path: /_nginx-status/format/prometheus
-      scrape_interval: 30s
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
 
     - name: prometheus_scrape
       tag: metrics.trafficserver
       host: 127.0.0.1
       port: <%- json_encode(config["trafficserver"]["port"]) %>
       metrics_path: /_trafficserver-stats/prometheus
-      scrape_interval: 30s
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
     <% end %>
 
     <% if config["_service_egress_enabled?"] then %>
@@ -118,17 +118,17 @@ pipeline:
       host: 127.0.0.1
       port: <%- json_encode(config["envoy"]["admin"]["port"]) %>
       metrics_path: /stats?format=prometheus&usedonly
-      scrape_interval: 30s
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
     <% end %>
 
     - name: node_exporter_metrics
       tag: metrics.node
-      scrape_interval: 30s
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
       metrics: cpu,meminfo,diskstats,filesystem,uname,stat,time,loadavg,vmstat,netdev,netstat,sockstat,filefd
 
     - name: process_exporter_metrics
       tag: metrics.process
-      scrape_interval: 30s
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
       metrics: cpu,io,memory,state,context_switches,fd,start_time
     <% end %>
 
@@ -163,7 +163,7 @@ pipeline:
       metric_description: Counts TCP healthcheck failures
       label_field:
         - name
-      flush_interval_sec: 5
+      flush_interval_sec: <%- json_encode(config["fluent_bit"]["metrics_interval"]) %>
     <% end %>
 
   outputs:

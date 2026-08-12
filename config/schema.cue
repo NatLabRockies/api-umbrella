@@ -447,6 +447,7 @@ import "path"
     }
     aws_access_key_id?: string
     aws_secret_access_key?: string
+    metrics_interval: uint16 | *60
     outputs: {
       opensearch: {
         enabled: bool | *true
