@@ -226,3 +226,15 @@ EXPOSE 14001
 
 ENTRYPOINT ["/usr/local/bin/envoy-config-wrapper"]
 CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml", "--use-dynamic-base-id", "--base-id-path", "/var/run/envoy/base-id"]
+
+###
+# Runtime - otelcol Only
+###
+FROM public.ecr.aws/aws-observability/aws-otel-collector:v0.49.0 AS runtime-otelcol
+
+# Add sh, which seems to be necessary for CloudFoundry when specifying a custom
+# `command` attribute.
+COPY --from=busybox /bin/sh /bin/sh
+
+# Add env for specifying environment variables on custom `command`.
+COPY --from=busybox /bin/env /bin/env
