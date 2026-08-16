@@ -149,6 +149,10 @@ records:
 
       post_method: 0
 
+    # Close aborted client requests throughout Trafficserver and other layers,
+    # instead of trying to wait for the requests to complete.
+    allow_half_open: 0
+
   cache:
     ram_cache:
       size: <%- json_encode(config["trafficserver"]["records"]["cache"]["ram_cache"]["size"]) %>

@@ -1,0 +1,15 @@
+diff --git a/src/proxy/http/HttpSM.cc b/src/proxy/http/HttpSM.cc
+index 9107b6164d86..5e1036162bdf 100644
+--- a/src/proxy/http/HttpSM.cc
++++ b/src/proxy/http/HttpSM.cc
+@@ -921,10 +921,6 @@ HttpSM::state_watch_for_client_abort(int event, void *data)
+           // do_io_shutdown() as a no-op.
+           _ua.get_txn()->do_io_shutdown(IO_SHUTDOWN_READ);
+         }
+-      } else if (t_state.txn_conf->cache_http &&
+-                 (server_entry != nullptr && server_entry->vc_read_handler == &HttpSM::state_read_server_response_header)) {
+-        // if HttpSM is waiting response header from origin server, keep it for a while to run background fetch
+-        _ua.get_txn()->do_io_shutdown(IO_SHUTDOWN_READWRITE);
+       } else {
+         _ua.get_txn()->do_io_close();
+         vc_table.cleanup_entry(_ua.get_entry());

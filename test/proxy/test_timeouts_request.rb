@@ -85,6 +85,11 @@ class Test::Proxy::TestTimeoutsRequest < Minitest::Test
   end
 
   def test_request_closes_when_chunk_delay_exceeds_send_timeout
+    router_log_tail = LogTail.new("nginx/access.log")
+    trafficserver_log_tail = LogTail.new("trafficserver/access.log")
+    envoy_log_tail = LogTail.new("envoy/access.log")
+    api_backend_log_tail = LogTail.new("test-env-nginx/access.log")
+
     delay1 = 1
     delay2 = $config["nginx"]["proxy_send_timeout"] + 2
     assert_operator(delay1, :>, 0)
@@ -101,12 +106,49 @@ class Test::Proxy::TestTimeoutsRequest < Minitest::Test
         :data => "bar",
         :sleep => delay2 - delay1,
       },
-    ])
+    ], url: "http://127.0.0.1:9080/api/request-body-streaming/?unique_test_id=#{unique_test_id}")
 
     assert_equal(408, easy.response_code)
     assert_match("Inactivity Timeout", easy.response_body)
-    assert_operator(easy.total_time, :>=, delay1 + $config["nginx"]["proxy_send_timeout"] - BUFFER_TIME_LOWER)
-    assert_operator(easy.total_time, :<=, delay1 + $config["nginx"]["proxy_send_timeout"] + BUFFER_TIME_UPPER)
+    expected_timeout = delay1 + $config["nginx"]["proxy_send_timeout"]
+    assert_operator(easy.total_time, :>=, expected_timeout - BUFFER_TIME_LOWER)
+    assert_operator(easy.total_time, :<=, expected_timeout + BUFFER_TIME_UPPER)
+
+    # Verify the request that timed out was aborted in all of the different
+    # server layers after the expected timeout time (to ensure the request
+    # didn't just timeout at one layer, but is still running at other layers).
+    router_log = MultiJson.load(router_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    router_time = router_log.fetch("duration").to_f
+    assert_operator(router_time, :>, expected_timeout - BUFFER_TIME_LOWER)
+    assert_operator(router_time, :<=, expected_timeout + BUFFER_TIME_UPPER)
+    assert_equal("408", router_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("408", router_log.fetch("up_status"))
+
+    trafficserver_log = MultiJson.load(trafficserver_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    trafficserver_time = trafficserver_log.fetch("duration").to_f / 1000
+    assert_operator(trafficserver_time, :>, expected_timeout - BUFFER_TIME_LOWER)
+    assert_operator(trafficserver_time, :<=, expected_timeout + BUFFER_TIME_UPPER)
+    assert_equal("408", trafficserver_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("000", trafficserver_log.fetch("up_status"))
+    assert_equal("FIN", trafficserver_log.fetch("client_finish"))
+    assert_equal("FIN", trafficserver_log.fetch("proxy_finish"))
+    assert_equal("-", trafficserver_log.fetch("req_err"))
+    assert_equal("-", trafficserver_log.fetch("resp_err"))
+
+    envoy_log = MultiJson.load(envoy_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    envoy_time = envoy_log.fetch("duration").to_f / 1000
+    assert_operator(envoy_time, :>, expected_timeout - BUFFER_TIME_LOWER)
+    assert_operator(envoy_time, :<=, expected_timeout + BUFFER_TIME_UPPER)
+    assert_equal(0, envoy_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("DC", envoy_log.fetch("resp_flags"))
+    assert_equal("downstream_remote_disconnect", envoy_log.fetch("resp_detail"))
+    assert_nil(envoy_log.fetch("up_fail"))
+
+    api_backend_log = MultiJson.load(api_backend_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    api_backend_time = api_backend_log.fetch("duration").to_f
+    assert_operator(api_backend_time, :>, expected_timeout - BUFFER_TIME_LOWER)
+    assert_operator(api_backend_time, :<=, expected_timeout + BUFFER_TIME_UPPER)
+    assert_equal("000", api_backend_log.fetch("http").fetch("response").fetch("status_code"))
   end
 
   # This is mainly done to ensure that any connection collapsing the cache is

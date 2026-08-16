@@ -20,7 +20,8 @@ error_log stderr;
 pcre_jit on;
 
 http {
-  access_log <%- config["log_dir"] %>/test-env-nginx/access.log combined;
+  include <%- config["etc_dir"] %>/nginx/log_format.conf;
+  access_log <%- config["log_dir"] %>/test-env-nginx/<%- config["nginx"]["access_log_filename"] %> custom_json <%- config["nginx"]["access_log_options"] or "" %>;
 
   client_body_temp_path <%- config["tmp_dir"] %>/nginx-client_body_temp;
   proxy_temp_path <%- config["tmp_dir"] %>/nginx-proxy_temp;
@@ -31,6 +32,7 @@ http {
 
   lua_package_path '<%- config["_package_path"] %>';
   lua_package_cpath '<%- config["_package_cpath"] %>';
+  lua_check_client_abort on;
 
   gzip on;
   gzip_comp_level 2;

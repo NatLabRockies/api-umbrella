@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 
-trafficserver_version="10.1.4"
-trafficserver_hash="31808a603059ac5540d2fa4303ed2862d928ca5a934bf9530d9ff0470aad171401c813be1cf769abcb107b4070a5b66d6471a69797e7eaacaf794d3b361b3c0f"
+trafficserver_version="10.2.0-rc1"
+trafficserver_base_version="10.2.0"
+trafficserver_hash="dc32cb6da0fc0b4eb4dc0ac7c1bb465eebc3fa27ff5c8611b686958b295a548492b336f0b4356d1848999ada2988d926c4538f678c68b0ba38cf3252bef72119"
 
 set -e -u -x
 source ./tasks/helpers.sh
 source ./tasks/helpers/detect_os_release.sh
 
 task_working_dir
-download "https://archive.apache.org/dist/trafficserver/trafficserver-$trafficserver_version.tar.bz2" "sha512" "$trafficserver_hash"
+download "https://dist.apache.org/repos/dist/dev/trafficserver/$trafficserver_base_version/trafficserver-$trafficserver_version.tar.bz2" "sha512" "$trafficserver_hash"
 extract_download "trafficserver-$trafficserver_version.tar.bz2"
 
-cd "trafficserver-$trafficserver_version"
+cd "trafficserver-$trafficserver_base_version"
 
-# Since we log directly to stderr/stdout, backport this patch:
-# https://github.com/apache/trafficserver/pull/12407
-patch -p1 < "$SOURCE_DIR/build/patches/trafficserver-stderr-logging.patch"
+# Propagate client aborts throughout the other proxy layers and to the upstream
+# server:
+# https://github.com/apache/trafficserver/issues/13549
+patch -p1 < "$SOURCE_DIR/build/patches/trafficserver-client-aborts.patch"
 
 cmake -B build \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX_EMBEDDED" \
