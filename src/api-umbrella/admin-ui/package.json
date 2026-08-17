@@ -117,7 +117,7 @@
     "timekeeper": "^2.3.1",
     "tippy.js": "~6.3.7",
     "tracked-built-ins": "^3.4.0",
-    "webpack": "^5.109.2"
+    "webpack": "~5.108.4"
   },
   "engines": {
     "node": "14.* || 16.* || >= 18"
