@@ -17,9 +17,6 @@ gem "minitest-hooks", "~> 1.5.4"
 # Retry certain flaky tests.
 gem "minitest-retry", "~> 0.3.0"
 
-# Test metadata for CI environment.
-gem "minitest-ci", "~> 3.4.0"
-
 # Ruby lint/style checker
 gem "rubocop", "~> 1.88", :require => false
 gem "rubocop-minitest", "~> 0.40.0", :require => false
