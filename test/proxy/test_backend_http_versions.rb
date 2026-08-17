@@ -143,12 +143,15 @@ class Test::Proxy::TestBackendHttpVersions < Minitest::Test
     # sense.
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/https/", http_opts)
     assert_response_code(0, response)
-    assert_equal(:got_nothing, response.return_code)
+    assert_equal(:http2, response.return_code)
 
+    # We don't have nginx actually configured for http2, so forced http2
+    # connections will fail. This previously worked with curl 7 being used for
+    # tests, since curl would still accept HTTP 1.1, but curl 8.10.0+ changes
+    # this, so it makes more sense that forced http2 connections will fail
+    # against our server that is not configured for http2.
     response = Typhoeus.get("https://127.0.0.1:9081/#{unique_test_class_id}/https/", http_opts)
-    assert_response_code(200, response)
-    assert_match("HTTP/1.1 200", response.response_headers)
-    data = MultiJson.load(response.body)
-    assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
+    assert_response_code(0, response)
+    assert_equal(:ssl_connect_error, response.return_code)
   end
 end
