@@ -2,6 +2,7 @@ require_relative "../test_helper"
 
 class Test::Proxy::TestTimeoutsResponse < Minitest::Test
   include ApiUmbrellaTestHelpers::Setup
+  include Minitest::Hooks
 
   # While these tests can be parallelized, given the timing sensitivities of
   # them, we will not parallelize them to cut down on flaky tests due to the

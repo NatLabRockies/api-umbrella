@@ -48,6 +48,8 @@ import "path"
     worker_connections: uint | *8192
     listen_so_keepalive: string | *"on"
     listen_backlog?: uint
+    lingering_close: string | *"on"
+    lingering_timeout: uint | *5
     error_log_level: string | *"notice"
     access_log_filename: string | *"access.log"
     access_log_options: string | null | *"buffer=256k flush=10s"

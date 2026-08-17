@@ -205,6 +205,9 @@ http {
       <% end %>
       server_name <%- host["_nginx_server_name"] %>;
 
+      lingering_close <%- config["nginx"]["lingering_close"] %>;
+      lingering_timeout <%- config["nginx"]["lingering_timeout"] %>s;
+
       set $log_service "nginx";
 
       <% if host["ssl_cert"] then %>
