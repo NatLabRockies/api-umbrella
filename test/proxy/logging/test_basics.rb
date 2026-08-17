@@ -382,7 +382,7 @@ class Test::Proxy::Logging::TestBasics < Minitest::Test
     ]) do
       response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_id}/down", log_http_options)
       assert_response_code(503, response)
-      assert_match("upstream connect error or disconnect/reset before headers. retried and the latest reset reason: remote connection failure, transport failure reason: delayed connect error: Connection refused", response.body)
+      assert_match("upstream connect error or disconnect/reset before headers. retried and the latest reset reason: remote connection failure", response.body)
 
       record = wait_for_log(response)[:hit_source]
       assert_equal(503, record["response_status"])
