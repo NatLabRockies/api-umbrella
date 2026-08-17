@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://rubygems.org", cooldown: 7
 
 ruby "~> 3.1"
 
@@ -6,10 +6,7 @@ ruby "~> 3.1"
 gem "thor", "~> 1.5.0"
 
 # Tests
-gem "minitest", "~> 5.26"
-
-# CLI helper for running tests
-gem "minitest-sprint", "~> 1.3.0"
+gem "minitest", "~> 6.0"
 
 # More test outputs
 gem "minitest-reporters", "~> 1.8.0"
@@ -34,11 +31,11 @@ gem "childprocess"
 gem "typhoeus", "~> 1.6.0"
 
 # JSON parsing
-gem "multi_json", "~> 1.19"
+gem "multi_json", "~> 1.21"
 gem "oj", "~> 3.17"
 
 # Database libraries
-gem "activerecord", "~> 7.2.3", :require => "active_record"
+gem "activerecord", "~> 8.1.3", :require => "active_record"
 gem "pg", "~> 1.6.2"
 gem "opensearch-ruby", "~> 3.4.0"
 gem "faraday-typhoeus", "~> 2.0.0"
@@ -55,7 +52,7 @@ gem "addressable", "~> 2.9.0"
 
 # Browser/JavaScript integration tests
 gem "capybara", "~> 3.32"
-gem "selenium-webdriver", "~> 4.32"
+gem "selenium-webdriver", "~> 4.46"
 
 # Take screenshots on capybara test failures
 gem "capybara-screenshot", "~> 1.0.27"
@@ -64,13 +61,13 @@ gem "capybara-screenshot", "~> 1.0.27"
 gem "capybara-shadowdom", "~> 0.3.0"
 
 # HTML or XML parsing
-gem "nokogiri", "~> 1.18"
+gem "nokogiri", "~> 1.19"
 
 # Useful additions
-gem "activesupport", "~> 7.2.3"
+gem "activesupport", "~> 8.1.3"
 
 # Generating fake strings and data.
-gem "faker", "~> 3.0"
+gem "faker", "~> 3.8"
 
 # Concurrency helpers.
 gem "concurrent-ruby", "~> 1.3.8"

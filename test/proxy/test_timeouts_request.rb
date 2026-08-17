@@ -37,20 +37,25 @@ class Test::Proxy::TestTimeoutsRequest < Minitest::Test
     easy = make_streaming_body_request([
       {
         :data => "foo",
-        :sleep => delay1,
+        :sleep => 0,
       },
       {
         :data => "bar",
+        :sleep => delay1,
+      },
+      {
+        :data => "baz",
         :sleep => delay2 - delay1,
       },
     ])
 
     assert_equal(200, easy.response_code)
     data = MultiJson.load(easy.response_body)
-    assert_equal(["foo", "bar"], data.fetch("chunks"))
-    assert_equal(2, data.fetch("chunk_time_gaps").length)
-    assert_in_delta(delay1, data.fetch("chunk_time_gaps")[0], 0.3)
-    assert_in_delta(delay2 - delay1, data.fetch("chunk_time_gaps")[1], 0.3)
+    assert_equal(["foo", "bar", "baz"], data.fetch("chunks"))
+    assert_equal(3, data.fetch("chunk_time_gaps").length)
+    assert_in_delta(0, data.fetch("chunk_time_gaps")[0], 0.3)
+    assert_in_delta(delay1, data.fetch("chunk_time_gaps")[1], 0.3)
+    assert_in_delta(delay2 - delay1, data.fetch("chunk_time_gaps")[2], 0.3)
     assert_operator(easy.total_time, :>=, delay2 - BUFFER_TIME_LOWER)
     assert_operator(easy.total_time, :<=, delay2 + BUFFER_TIME_UPPER)
   end
@@ -66,20 +71,25 @@ class Test::Proxy::TestTimeoutsRequest < Minitest::Test
     easy = make_streaming_body_request([
       {
         :data => "foo",
-        :sleep => delay1,
+        :sleep => 0,
       },
       {
         :data => "bar",
+        :sleep => delay1,
+      },
+      {
+        :data => "baz",
         :sleep => delay2 - delay1,
       },
     ])
 
     assert_equal(200, easy.response_code)
     data = MultiJson.load(easy.response_body)
-    assert_equal(["foo", "bar"], data.fetch("chunks"))
-    assert_equal(2, data.fetch("chunk_time_gaps").length)
-    assert_in_delta(delay1, data.fetch("chunk_time_gaps")[0], 0.3)
-    assert_in_delta(delay2 - delay1, data.fetch("chunk_time_gaps")[1], 0.3)
+    assert_equal(["foo", "bar", "baz"], data.fetch("chunks"))
+    assert_equal(3, data.fetch("chunk_time_gaps").length)
+    assert_in_delta(0, data.fetch("chunk_time_gaps")[0], 0.3)
+    assert_in_delta(delay1, data.fetch("chunk_time_gaps")[1], 0.3)
+    assert_in_delta(delay2 - delay1, data.fetch("chunk_time_gaps")[2], 0.3)
     assert_operator(easy.total_time, :>=, delay2 - BUFFER_TIME_LOWER)
     assert_operator(easy.total_time, :<=, delay2 + BUFFER_TIME_UPPER)
   end
@@ -100,10 +110,14 @@ class Test::Proxy::TestTimeoutsRequest < Minitest::Test
     easy = make_streaming_body_request([
       {
         :data => "foo",
-        :sleep => delay1,
+        :sleep => 0,
       },
       {
         :data => "bar",
+        :sleep => delay1,
+      },
+      {
+        :data => "baz",
         :sleep => delay2 - delay1,
       },
     ], url: "http://127.0.0.1:9080/api/request-body-streaming/?unique_test_id=#{unique_test_id}")
