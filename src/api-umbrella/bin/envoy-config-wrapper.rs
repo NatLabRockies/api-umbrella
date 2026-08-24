@@ -12,9 +12,8 @@ use std::process::Command;
 // integrate our configuration from environment variables in Cloud Foundry
 // (since it can't mount files into the container).
 fn main() {
-    let config_yaml = env::var("ENVOY_CONFIG_YAML");
-    if config_yaml.is_ok() {
-        fs::write("/etc/envoy/envoy.yaml", config_yaml.unwrap())
+    if let Ok(config_yaml) = env::var("ENVOY_CONFIG_YAML") {
+        fs::write("/etc/envoy/envoy.yaml", config_yaml)
             .expect("Error writing '/etc/envoy/envoy.yaml' file");
     }
 

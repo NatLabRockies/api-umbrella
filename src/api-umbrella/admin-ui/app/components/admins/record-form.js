@@ -25,6 +25,11 @@ export default class RecordForm extends Component.extend(Save) {
     return !this.currentAdmin.permissions.admin_manage;
   }
 
+  @computed('currentAdmin.id', 'model.id')
+  get isOwnProfile() {
+    return this.currentAdmin?.id && this.model?.id && this.currentAdmin.id === this.model.id;
+  }
+
   get usernameLabel() {
     return usernameLabel();
   }

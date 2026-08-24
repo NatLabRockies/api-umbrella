@@ -104,7 +104,11 @@ function _M.authorize_modify(current_admin, data, permission_id)
     permission_id = "admin_manage"
   end
 
-  local allowed = _M.is_authorized_show(current_admin, data, permission_id)
+  -- Allow admins to always update their own record (for password changes when
+  -- using local authentication). The admin_params function restricts which
+  -- fields can be updated in this case to prevent privilege escalation.
+  local allowed = _M.is_authorized_show(current_admin, data, permission_id) or
+    (current_admin.id and data["id"] and current_admin.id == data["id"])
   if allowed then
     return true
   else
@@ -115,10 +119,7 @@ end
 function _M.authorize_show(current_admin, data, permission_id)
   -- Allow admins to always view their own record, even if they don't have the
   -- admin_view privilege (so they can view their admin token).
-  --
-  -- TODO: An admin should also be able to update their own password if using
-  -- local password authentication, but that is not yet implemented.
-  local allowed =  _M.is_authorized_show(current_admin, data, permission_id) or (current_admin.id and data["id"] and current_admin.id == data["id"])
+  local allowed = _M.is_authorized_show(current_admin, data, permission_id) or (current_admin.id and data["id"] and current_admin.id == data["id"])
   if allowed then
     return true
   else

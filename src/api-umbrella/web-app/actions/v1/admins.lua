@@ -113,24 +113,40 @@ function _M.admin_params(self)
   local params = {}
   if self.params and type(self.params["admin"]) == "table" then
     local input = self.params["admin"]
-    params = dbify_json_nulls({
-      username = input["username"],
-      password = input["password"],
-      password_confirmation = input["password_confirmation"],
-      current_password = input["current_password"],
-      email = input["email"],
-      name = input["name"],
-      notes = input["notes"],
-      superuser = input["superuser"],
-      group_ids = input["group_ids"],
-    })
+    local is_admin_manage = self.current_admin and self.current_admin:allows_permission("admin_manage")
 
-    -- Only allow the current admin to update their own password. For creates
-    -- we assume that invites are sent with a password reset e-mail link.
-    if not self.admin or not self.current_admin or self.admin.id ~= self.current_admin.id then
-      params["password"] = nil
-      params["password_confirmation"] = nil
-      params["current_password"] = nil
+    if is_admin_manage then
+      -- Admin managers can update all fields.
+      params = dbify_json_nulls({
+        username = input["username"],
+        password = input["password"],
+        password_confirmation = input["password_confirmation"],
+        current_password = input["current_password"],
+        email = input["email"],
+        name = input["name"],
+        notes = input["notes"],
+        superuser = input["superuser"],
+        group_ids = input["group_ids"],
+      })
+
+      -- Password can only be changed when editing own profile.
+      if not self.admin or not self.current_admin or self.admin.id ~= self.current_admin.id then
+        params["password"] = nil
+        params["password_confirmation"] = nil
+        params["current_password"] = nil
+      end
+    else
+      -- Non-admin-managers can only update their own password. Restricting to
+      -- only password fields prevents privilege escalation (e.g., self-granting
+      -- superuser or different group memberships).
+      local is_own_profile = self.admin and self.current_admin and self.admin.id == self.current_admin.id
+      if is_own_profile then
+        params = dbify_json_nulls({
+          password = input["password"],
+          password_confirmation = input["password_confirmation"],
+          current_password = input["current_password"],
+        })
+      end
     end
   end
 
