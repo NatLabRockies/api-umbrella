@@ -1,2 +1,2 @@
-FROM public.ecr.aws/opensearchproject/opensearch:2.17.1
+FROM public.ecr.aws/opensearchproject/opensearch:3.3.2
 RUN /usr/share/opensearch/bin/opensearch-plugin install --batch mapper-murmur3

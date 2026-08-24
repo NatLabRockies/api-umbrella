@@ -167,6 +167,10 @@ return function(ngx_ctx, denied_code, settings, extra_data)
   -- also allowed via CORS).
   ngx_header["Access-Control-Allow-Origin"] = "*"
 
+  if error_data["cache_control"] then
+    ngx_header["Cache-Control"] = error_data["cache_control"]
+  end
+
   ngx.status = status_code
   ngx_header.content_type = content_type
   ngx_print(output)

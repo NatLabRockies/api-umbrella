@@ -23,7 +23,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => true,
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
@@ -42,7 +41,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => false,
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
@@ -61,7 +59,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => false,
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
@@ -79,7 +76,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
 
@@ -98,7 +94,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => true,
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
@@ -117,7 +112,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => true,
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
@@ -145,7 +139,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     refute_match(user.api_key, response.body)
 
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => true,
       "site_name" => "API Umbrella",
       "verify_email" => true,
@@ -171,7 +164,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_response_code(201, response)
     data = MultiJson.load(response.body)
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "send_welcome_email" => true,
       "site_name" => "API Umbrella",
     }, data.fetch("options"))
@@ -209,8 +201,8 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     refute_match("Here's an example", message.fetch("Text"))
 
     # Contact URL
-    assert_match(%(<a href="https://localhost/contact/">contact us</a>), message.fetch("HTML"))
-    assert_match("contact us ( https://localhost/contact/ )", message.fetch("Text"))
+    assert_match("please contact us.", message.fetch("Text"))
+    assert_match("please contact us.", message.fetch("HTML"))
 
     # Support footer
     assert_match("Account Email: #{user.email}", message.fetch("HTML"))
@@ -283,8 +275,8 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
       refute_match("https://example.com/api.json", message.fetch("Text"))
 
       # Contact URL
-      assert_match(%(<a href="https://example.com/contact-us">contact us</a>), message.fetch("HTML"))
-      assert_match("contact us ( https://example.com/contact-us )", message.fetch("Text"))
+      assert_match(%(please <a href="https://example.com/contact-us">contact us</a>.), message.fetch("HTML"))
+      assert_match("please contact us ( https://example.com/contact-us ).", message.fetch("Text"))
     end
   end
 

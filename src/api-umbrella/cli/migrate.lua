@@ -62,7 +62,7 @@ return function()
     local clean_lines = {}
     local removing_comments = true
     for _, line in ipairs(lines) do
-      if not removing_comments or (line ~= "" and not startswith(line, "--")) then
+      if (not removing_comments or (line ~= "" and not startswith(line, "--"))) and not startswith(line, "\\restrict") and not startswith(line, "\\unrestrict") then
         if startswith(line, "COMMENT ON EXTENSION") then
           line = "-- " .. line
         end

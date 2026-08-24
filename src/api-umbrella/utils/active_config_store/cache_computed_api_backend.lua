@@ -1,5 +1,7 @@
+local append_array = require "api-umbrella.utils.append_array"
 local escape_regex = require "api-umbrella.utils.escape_regex"
 local host_normalize = require "api-umbrella.utils.host_normalize"
+local matches_hostname = require "api-umbrella.utils.matches_hostname"
 local mustache_unescape = require "api-umbrella.utils.mustache_unescape"
 local set_hostname_regex = require "api-umbrella.utils.active_config_store.set_hostname_regex"
 local split = require("pl.utils").split
@@ -9,7 +11,24 @@ local table_size = require("pl.tablex").size
 local decode_args = ngx.decode_args
 local re_gsub = ngx.re.gsub
 
-return function(api)
+local function cache_scheduled_brownouts(config, api)
+  local hosts = config["hosts"]
+  if hosts then
+    local frontend_host_normalized = api["_frontend_host_normalized"]
+    for _, host in ipairs(hosts) do
+      local scheduled_brownouts = host["scheduled_brownouts"]
+      if scheduled_brownouts and (frontend_host_normalized == host["_hostname_normalized"] or matches_hostname(frontend_host_normalized, host["_hostname_normalized"], host["_hostname_wildcard_regex"])) then
+        if api["_scheduled_brownouts"] == nil then
+          api["_scheduled_brownouts"] = {}
+        end
+
+        append_array(api["_scheduled_brownouts"], scheduled_brownouts)
+      end
+    end
+  end
+end
+
+return function(config, api)
   if not api then return end
 
   if api["frontend_host"] then
@@ -118,4 +137,6 @@ return function(api)
       end
     end
   end
+
+  cache_scheduled_brownouts(config, api)
 end

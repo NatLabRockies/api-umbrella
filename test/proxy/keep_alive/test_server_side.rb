@@ -94,6 +94,93 @@ class Test::Proxy::KeepAlive::TestServerSide < Minitest::Test
     end
   end
 
+  def test_max_connection_age_closes_connections
+    envoy_upstream_keepalive_connections_max_age = 5
+    envoy_upstream_keepalive_idle_timeout = 120
+    override_config({
+      :router => {
+        :api_backends => {
+          # Set a long idle timeout so it doesn't interfere with the max age
+          # behavior being tested.
+          :keepalive_idle_timeout => envoy_upstream_keepalive_idle_timeout,
+          :keepalive_connections_max_age => envoy_upstream_keepalive_connections_max_age,
+        },
+      },
+    }) do
+      # Open a bunch of concurrent connections to establish a connection pool.
+      max_concurrency = 100
+      saturate_connections("/#{unique_test_class_id}/keepalive-default/delay/500", num_requests: 300, max_concurrency: max_concurrency)
+
+      # Immediately after the requests, verify that Envoy has idle connections
+      # to the API backend (the connection pool is populated).
+      stats = connection_stats
+      max_concurrency_delta_buffer = (max_concurrency * 0.3).round
+      assert_in_delta(max_concurrency, stats.fetch(:envoy_to_api_backend_active_connections_per_envoy), max_concurrency_delta_buffer)
+      assert_in_delta(max_concurrency, stats.fetch(:envoy_to_api_backend_active_connections_per_api_backend), max_concurrency_delta_buffer)
+      assert_in_delta(max_concurrency, stats.fetch(:envoy_to_api_backend_idle_connections_per_api_backend), max_concurrency_delta_buffer)
+
+      # Record the baseline count of locally-destroyed connections.
+      baseline_destroy_local = stats.fetch(:envoy_to_api_backend_destroy_local_connections_per_envoy)
+
+      # Wait for the max connection age to expire and verify Envoy closes the
+      # connections, even though the idle timeout (120s) hasn't been reached.
+      # Also measure the timing to verify it corresponds with the configured
+      # max age setting.
+      begin_time = Time.now
+      timing = nil
+      begin
+        stats = nil
+        # This should generally happen within the configured timeout seconds.
+        Timeout.timeout(envoy_upstream_keepalive_connections_max_age * 3) do
+          loop do
+            stats = connection_stats
+            elapsed_time = Time.now - begin_time
+
+            # Once Envoy's active connections to the API backend drop to zero,
+            # note the elapsed time.
+            if !timing && stats.fetch(:envoy_to_api_backend_active_connections_per_envoy) == 0
+              timing = elapsed_time
+              break
+            end
+
+            sleep 0.1
+          end
+        end
+      rescue Timeout::Error
+        flunk("Envoy did not close connections after max connection age expired. Last connection stats: #{stats.inspect}")
+      end
+
+      # Verify Envoy closed the connections and the API backend agrees
+      # (although, note that nginx may still think there are some connections
+      # remaining open, but we're not trying to test that backend behavior
+      # here, so accept some discrepancies there).
+      stats = connection_stats
+      assert_equal(0, stats.fetch(:envoy_to_api_backend_active_connections_per_envoy))
+      assert_operator(stats.fetch(:envoy_to_api_backend_active_connections_per_api_backend), :<=, max_concurrency_delta_buffer)
+      assert_operator(stats.fetch(:envoy_to_api_backend_idle_connections_per_api_backend), :<=, max_concurrency_delta_buffer)
+
+      # Verify that Envoy initiated the connection closures (destroy_local
+      # should have increased to correspond to the number of max connections
+      # established).
+      num_destroyed = stats.fetch(:envoy_to_api_backend_destroy_local_connections_per_envoy) - baseline_destroy_local
+      assert_in_delta(max_concurrency, num_destroyed, max_concurrency_delta_buffer)
+
+      # Check the timing of when connections were closed. This verifies that
+      # the observed behavior corresponds with the configured max age setting.
+      assert_in_delta(envoy_upstream_keepalive_connections_max_age, timing, 2)
+
+      # Make another batch of requests after the max age has expired to ensure
+      # that new connections work successfully.
+      saturate_connections("/#{unique_test_class_id}/keepalive-default/delay/500", num_requests: 300, max_concurrency: max_concurrency)
+
+      # Verify new connections were established.
+      stats = connection_stats
+      assert_in_delta(max_concurrency, stats.fetch(:envoy_to_api_backend_active_connections_per_envoy), max_concurrency_delta_buffer)
+      assert_in_delta(max_concurrency, stats.fetch(:envoy_to_api_backend_active_connections_per_api_backend), max_concurrency_delta_buffer)
+      assert_in_delta(max_concurrency, stats.fetch(:envoy_to_api_backend_idle_connections_per_api_backend), max_concurrency_delta_buffer)
+    end
+  end
+
   def test_concurrent_backend_connections_can_exceed_keepalive_count
     max_values = {
       client_to_nginx_router_active_connections_per_nginx_router: 0,
@@ -186,17 +273,7 @@ class Test::Proxy::KeepAlive::TestServerSide < Minitest::Test
     # Open a bunch of concurrent connections first, and then inspect the number
     # of number of connections still active afterwards.
     max_concurrency = 190
-    hydra = Typhoeus::Hydra.new(max_concurrency: max_concurrency)
-    requests = Array.new(500) do
-      request = Typhoeus::Request.new("http://127.0.0.1:9080#{path}", http_options)
-      hydra.queue(request)
-      request
-    end
-    hydra.run
-    assert_equal(500, requests.length)
-    requests.each do |req|
-      assert_response_code(200, req.response)
-    end
+    saturate_connections(path, num_requests: 500, max_concurrency: max_concurrency)
 
     # Immediately after opening all the connections, the server should have a
     # bunch of idle connections open, roughly corresponding to the maximum
@@ -217,16 +294,7 @@ class Test::Proxy::KeepAlive::TestServerSide < Minitest::Test
 
     # Make another batch of concurrent requests just to sanity check that the
     # existing idle connections get reused instead of being reestablished.
-    requests = Array.new(300) do
-      request = Typhoeus::Request.new("http://127.0.0.1:9080#{path}", http_options)
-      hydra.queue(request)
-      request
-    end
-    hydra.run
-    assert_equal(300, requests.length)
-    requests.each do |req|
-      assert_response_code(200, req.response)
-    end
+    saturate_connections(path, num_requests: 300, max_concurrency: max_concurrency)
 
     stats = connection_stats
     assert_in_delta(nginx_keepalive_count, stats.fetch(:nginx_router_to_trafficserver_active_connections_per_trafficserver), nginx_keepalive_count_delta_buffer)
@@ -319,16 +387,7 @@ class Test::Proxy::KeepAlive::TestServerSide < Minitest::Test
     # just to ensure that new connections work successfully and any stale
     # connections (like the API backend and Envoy having a different concept of
     # what connections are idle) work properly.
-    requests = Array.new(300) do
-      request = Typhoeus::Request.new("http://127.0.0.1:9080#{path}", http_options)
-      hydra.queue(request)
-      request
-    end
-    hydra.run
-    assert_equal(300, requests.length)
-    requests.each do |req|
-      assert_response_code(200, req.response)
-    end
+    saturate_connections(path, num_requests: 300, max_concurrency: max_concurrency)
 
     stats = connection_stats
     assert_in_delta(nginx_keepalive_count, stats.fetch(:nginx_router_to_trafficserver_active_connections_per_trafficserver), nginx_keepalive_count_delta_buffer)
@@ -379,5 +438,19 @@ class Test::Proxy::KeepAlive::TestServerSide < Minitest::Test
     stats[:envoy_to_api_backend_writing_connections_per_api_backend] = stats.fetch(:api_backend).fetch("connections_writing")
 
     stats
+  end
+
+  def saturate_connections(path, num_requests:, max_concurrency:)
+    hydra = Typhoeus::Hydra.new(max_concurrency: max_concurrency)
+    requests = Array.new(num_requests) do
+      request = Typhoeus::Request.new("http://127.0.0.1:9080#{path}", http_options)
+      hydra.queue(request)
+      request
+    end
+    hydra.run
+    assert_equal(num_requests, requests.length)
+    requests.each do |req|
+      assert_response_code(200, req.response)
+    end
   end
 end

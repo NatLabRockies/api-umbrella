@@ -6,6 +6,8 @@ local mail = require "api-umbrella.utils.mail"
 local t = require("api-umbrella.web-app.utils.gettext").gettext
 local table_copy = require("pl.tablex").copy
 
+local re_sub = ngx.re.sub
+
 local template_html, template_html_err = etlua.compile([[
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
@@ -121,14 +123,22 @@ return function(api_user, options)
   data_text["greeting"] = string.format(data["greeting"], api_user.email)
   data_text["account_email"] = string.format(data["account_email"], api_user.email)
   data_text["account_id"] = string.format(data["account_id"], api_user.id)
-  data_text["support"] = string.format(data["support"], t("contact us") .. " ( " .. options["contact_url"] .. " )")
+  if options["contact_url"] then
+    data_text["support"] = string.format(data["support"], t("contact us") .. " ( " .. re_sub(options["contact_url"], "^mailto:", "", "jo") .. " )")
+  else
+    data_text["support"] = string.format(data["support"], t("contact us"))
+  end
 
   local data_html = table_copy(data)
   data_html["hi"] = data["hi"]
   data_html["greeting"] = string.format(data["greeting"], "<strong>" .. escape_html(api_user.email) .."</strong>")
   data_html["account_email"] = string.format(data["account_email"], escape_html(api_user.email))
   data_html["account_id"] = string.format(data["account_id"], escape_html(api_user.id))
-  data_html["support"] = string.format(data["support"], string.format([[<a href="%s">%s</a>]], escape_html(options["contact_url"]), t("contact us")))
+  if options["contact_url"] then
+    data_html["support"] = string.format(data["support"], string.format([[<a href="%s">%s</a>]], escape_html(options["contact_url"]), t("contact us")))
+  else
+    data_html["support"] = string.format(data["support"], t("contact us"))
+  end
 
   local mailer, mailer_err = mail()
   if not mailer then

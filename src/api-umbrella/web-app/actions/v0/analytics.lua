@@ -14,11 +14,19 @@ local respond_to = require "api-umbrella.web-app.utils.respond_to"
 local stable_object_hash = require "api-umbrella.utils.stable_object_hash"
 local t = require("api-umbrella.web-app.utils.gettext").gettext
 local time = require "api-umbrella.utils.time"
+local timer_at = require "api-umbrella.web-app.utils.timer_at"
+
+local db_statement_timeout_ms = config["web"]["analytics_v0_summary_db_timeout"] * 1000
 
 local _M = {}
 
-local function generate_organization_summary(start_time, end_time, recent_start_time, filters)
-  local cache_id = "analytics_summary:organization:" .. start_time .. ":" .. end_time .. ":" .. recent_start_time .. ":" .. stable_object_hash(filters)
+local function generate_organization_summary(organization_name, start_time, end_time, recent_start_time, filters)
+  local cache_id = "analytics_summary:organization:" .. organization_name .. ":" .. start_time .. ":" .. end_time .. ":" .. recent_start_time .. ":" .. stable_object_hash({
+    filters = filters,
+    timezone = config["analytics"]["timezone"],
+    max_buckets = config["opensearch"]["max_buckets"],
+    analytics_v0_summary_filter = config["web"]["analytics_v0_summary_filter"],
+  })
   local cache = Cache:find(cache_id)
   if cache then
     ngx.log(ngx.NOTICE, "Using cached analytics response for " .. cache_id)
@@ -38,10 +46,50 @@ local function generate_organization_summary(start_time, end_time, recent_start_
   if config["web"]["analytics_v0_summary_filter"] then
     search:set_search_query_string(config["web"]["analytics_v0_summary_filter"])
   end
-  search:set_timeout(20 * 60) -- 20 minutes
+  search:set_timeout(config["web"]["analytics_v0_summary_analytics_timeout"])
   search:set_permission_scope(filters)
 
   local aggregate_sql = [[
+    WITH interval_rows AS (
+      SELECT
+        substring(data_date from 1 for :date_key_length) AS interval_date,
+        hit_count,
+        unique_user_ids,
+        response_time_average
+      FROM analytics_cache
+      WHERE id IN :ids
+    ),
+    interval_unique_user_ids AS (
+      SELECT
+        interval_date,
+        array_agg(DISTINCT user_ids.user_id) FILTER (WHERE user_ids.user_id IS NOT NULL) AS unique_user_ids
+      FROM interval_rows
+      CROSS JOIN LATERAL unnest(unique_user_ids) AS user_ids(user_id)
+      GROUP BY interval_date
+    ),
+    interval_counts AS (
+      SELECT
+        interval_date,
+        SUM(hit_count) AS hit_count,
+        SUM(response_time_average) AS response_time_average
+      FROM interval_rows
+      GROUP BY interval_date
+    ),
+    interval_totals AS (
+      SELECT
+        interval_counts.interval_date,
+        interval_counts.hit_count,
+        interval_unique_user_ids.unique_user_ids,
+        interval_counts.response_time_average
+      FROM interval_counts
+      NATURAL LEFT JOIN interval_unique_user_ids
+      ORDER BY interval_date
+    ),
+    all_unique_users AS (
+      SELECT COUNT(DISTINCT user_ids.user_id) FILTER (WHERE user_ids.user_id IS NOT NULL) AS total_unique_users
+      FROM interval_totals
+      LEFT JOIN LATERAL unnest(interval_totals.unique_user_ids) AS user_ids(user_id) ON true
+    )
     SELECT jsonb_build_object(
       'hits', jsonb_build_object(
         :interval_name, jsonb_agg(jsonb_build_array(interval_totals.interval_date, COALESCE(interval_totals.hit_count, 0))),
@@ -49,39 +97,14 @@ local function generate_organization_summary(start_time, end_time, recent_start_
       ),
       'active_api_keys', jsonb_build_object(
         :interval_name, jsonb_agg(jsonb_build_array(interval_totals.interval_date, COALESCE(array_length(interval_totals.unique_user_ids, 1), 0))),
-        'total', (
-          SELECT COUNT(DISTINCT user_ids.id)
-          FROM unnest(array_accum(interval_totals.unique_user_ids)) AS user_ids(id)
-        )
+        'total', (SELECT total_unique_users FROM all_unique_users)
       ),
       'average_response_times', jsonb_build_object(
         :interval_name, jsonb_agg(jsonb_build_array(interval_totals.interval_date, interval_totals.response_time_average)),
         'average', ROUND(SUM(CASE WHEN interval_totals.response_time_average IS NOT NULL AND interval_totals.hit_count IS NOT NULL THEN interval_totals.response_time_average * interval_totals.hit_count END) / SUM(CASE WHEN interval_totals.response_time_average IS NOT NULL AND interval_totals.hit_count IS NOT NULL THEN interval_totals.hit_count END))
       )
     ) AS response
-    FROM (
-      SELECT
-        interval_date,
-        hit_count,
-        response_time_average,
-        (
-          SELECT array_agg(DISTINCT user_id)
-          FROM unnest(interval_agg.user_ids) AS user_id
-            LEFT JOIN api_users ON user_id = api_users.id
-          WHERE user_id IS NOT NULL AND api_users.disabled_at IS NULL
-        ) AS unique_user_ids
-      FROM (
-        SELECT
-          substring(data->'aggregations'->'hits_over_time'->'buckets'->0->>'key_as_string' from 1 for :date_key_length) AS interval_date,
-          SUM((data->'aggregations'->'hits_over_time'->'buckets'->0->>'doc_count')::bigint) AS hit_count,
-          array_accum(unique_user_ids) AS user_ids,
-          SUM(ROUND((data->'aggregations'->'response_time_average'->>'value')::numeric)) AS response_time_average
-        FROM analytics_cache
-        WHERE id IN :ids
-        GROUP BY interval_date
-        ORDER BY interval_date
-      ) AS interval_agg
-    ) AS interval_totals
+    FROM interval_totals
   ]]
 
   -- Expire the monthly data in 3 months. While the historical data shouldn't
@@ -97,7 +120,7 @@ local function generate_organization_summary(start_time, end_time, recent_start_
     date_key_length = 7,
   }, {
     fatal = true,
-    statement_timeout = 5 * 60 * 1000, -- 5 minutes
+    statement_timeout = db_statement_timeout_ms,
   })[1]["response"]
 
   search:set_start_time(recent_start_time)
@@ -112,12 +135,25 @@ local function generate_organization_summary(start_time, end_time, recent_start_
     date_key_length = 10,
   }, {
     fatal = true,
-    statement_timeout = 5 * 60 * 1000, -- 5 minutes
+    statement_timeout = db_statement_timeout_ms,
   })[1]["response"]
 
   response["hits"]["recent"] = recent_response["hits"]
   response["active_api_keys"]["recent"] = recent_response["active_api_keys"]
   response["average_response_times"]["recent"] = recent_response["average_response_times"]
+
+  -- Only cache the data if it includes the expected latest month of data, and
+  -- also includes all months/days expected. This prevents returning and
+  -- caching incomplete data due to the underlying analytics queries failing
+  -- for certain time periods and forces the data to wait until all of the
+  -- underlying data is cached before returning the overall summary data.
+  local last_month = response["hits"]["monthly"][#response["hits"]["monthly"]]
+  local expected_last_month = string.sub(end_time, 1, 7)
+  local last_day = response["hits"]["recent"]["daily"][#response["hits"]["recent"]["daily"]]
+  local expected_last_day = string.sub(end_time, 1, 10)
+  if last_month[1] ~= expected_last_month or last_day[1] ~= expected_last_day or #analytics_cache_ids ~= #response["hits"]["monthly"] or #recent_analytics_cache_ids ~= #response["hits"]["recent"]["daily"] then
+    return nil, "incomplete data"
+  end
 
   local response_json = json_encode(response)
   expires_at = ngx.now() + 60 * 60 * 24 * 2 -- 2 days
@@ -127,6 +163,8 @@ local function generate_organization_summary(start_time, end_time, recent_start_
 end
 
 local function generate_production_apis_summary(start_time, end_time, recent_start_time)
+  local any_err = false
+
   local data = {
     organizations = {},
   }
@@ -139,7 +177,7 @@ local function generate_production_apis_summary(start_time, end_time, recent_sta
     WHERE api_backends.status_description = 'Production'
   ]], nil, {
     fatal = true,
-    statement_timeout = 5 * 60 * 1000, -- 5 minutes
+    statement_timeout = db_statement_timeout_ms,
   })
   data["organization_count"] = int64_to_json_number(counts[1]["organization_count"])
   data["api_backend_count"] = int64_to_json_number(counts[1]["api_backend_count"])
@@ -162,7 +200,7 @@ local function generate_production_apis_summary(start_time, end_time, recent_sta
     ORDER BY api_backends.organization_name
   ]], nil, {
     fatal = true,
-    statement_timeout = 5 * 60 * 1000, -- 5 minutes
+    statement_timeout = db_statement_timeout_ms,
   })
   for _, organization in ipairs(organizations) do
     local filters = {
@@ -190,18 +228,32 @@ local function generate_production_apis_summary(start_time, end_time, recent_sta
     end
 
     ngx.log(ngx.NOTICE, 'Fetching analytics for organization "' .. organization["organization_name"] .. '"')
-    local organization_data = generate_organization_summary(start_time, end_time, recent_start_time, filters)
-    organization_data["name"] = organization["organization_name"]
-    organization_data["api_backend_count"] = int64_to_json_number(organization["api_backend_count"])
-    organization_data["api_backend_url_match_count"] = int64_to_json_number(organization["api_backend_url_match_count"])
-    table.insert(data["organizations"], organization_data)
+    local organization_data, organization_data_err = generate_organization_summary(organization["organization_name"], start_time, end_time, recent_start_time, filters)
+    if organization_data_err then
+      ngx.log(ngx.ERR, 'Analytics for organization "' .. organization["organization_name"] .. '" failed: ', organization_data_err)
+      any_err = true
+    else
+      organization_data["name"] = organization["organization_name"]
+      organization_data["api_backend_count"] = int64_to_json_number(organization["api_backend_count"])
+      organization_data["api_backend_url_match_count"] = int64_to_json_number(organization["api_backend_url_match_count"])
+      table.insert(data["organizations"], organization_data)
+    end
   end
 
   ngx.log(ngx.NOTICE, "Fetching analytics for all organizations")
-  local all_data = generate_organization_summary(start_time, end_time, recent_start_time, all_filters)
-  data["all"] = all_data
+  local all_data, all_data_err = generate_organization_summary("all", start_time, end_time, recent_start_time, all_filters)
+  if all_data_err then
+    ngx.log(ngx.ERR, "Analytics for all organization failed: ", all_data_err)
+    any_err = true
+  else
+    data["all"] = all_data
+  end
 
-  return data
+  if any_err then
+    return nil, "incomplete data"
+  else
+    return data
+  end
 end
 
 local function generate_summary()
@@ -236,21 +288,24 @@ local function generate_summary()
   date_tz:set(icu_date.fields.MILLISECOND, 0)
   local recent_start_time = date_tz:format(format_iso8601)
 
-  local response = {
-    production_apis = generate_production_apis_summary(start_time, end_time, recent_start_time),
-    start_time = time.timestamp_ms_to_iso8601(start_time_ms),
-    end_time = time.timestamp_ms_to_iso8601(end_time_ms),
-    timezone = date_tz:get_time_zone_id(),
-  }
+  local production_apis, production_apis_err = generate_production_apis_summary(start_time, end_time, recent_start_time)
+  if production_apis_err then
+    ngx.log(ngx.ERR, "Production APIs summary error: ", production_apis_err)
+  else
+    local response = {
+      production_apis = production_apis,
+      start_time = time.timestamp_ms_to_iso8601(start_time_ms),
+      end_time = time.timestamp_ms_to_iso8601(end_time_ms),
+      timezone = date_tz:get_time_zone_id(),
+    }
 
-  response["cached_at"] = time.timestamp_to_iso8601(ngx.now())
+    response["cached_at"] = time.timestamp_to_iso8601(ngx.now())
 
-  local cache_id = "analytics_summary"
-  local response_json = json_encode(response)
-  local expires_at = ngx.now() + 60 * 60 * 24 * 2 -- 2 days
-  Cache:upsert(cache_id, response_json, expires_at)
-
-  return response_json
+    local cache_id = "analytics_summary"
+    local response_json = json_encode(response)
+    local expires_at = nil -- Never expire
+    Cache:upsert(cache_id, response_json, expires_at)
+  end
 end
 
 function _M.summary(self)
@@ -271,7 +326,7 @@ function _M.summary(self)
     -- users don't get a super slow response and we don't overwhelm the server
     -- when it's uncached).
     if cache:updated_at_timestamp() < ngx.now() - 60 * 60 * 6 then
-      ngx.timer.at(0, function()
+      timer_at(0, function()
         -- Ensure only one pre-seed is happening at a time (at least per
         -- server).
         interval_lock.mutex_exec("preseed_analytics_summary_cache", generate_summary)
@@ -283,7 +338,7 @@ function _M.summary(self)
 
     -- Trigger analytics generation in background so if it takes longer than
     -- this request, it can still populate.
-    ngx.timer.at(0, function()
+    timer_at(0, function()
       -- Ensure only one pre-seed is happening at a time (at least per
       -- server).
       interval_lock.mutex_exec("initial_analytics_summary_cache", generate_summary)

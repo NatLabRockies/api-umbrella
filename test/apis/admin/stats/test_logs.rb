@@ -226,4 +226,26 @@ class Test::Apis::Admin::Stats::TestLogs < Minitest::Test
       "recordsTotal" => 0,
     }, data)
   end
+
+  def test_csv_timestamps_in_iso8601_utc_format
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-01-16T06:06:28.816Z").utc, :request_user_agent => unique_test_id)
+    LogItem.refresh_indices!
+
+    response = Typhoeus.get("https://127.0.0.1:9081/admin/stats/logs.csv", http_options.deep_merge(admin_session).deep_merge({
+      :params => {
+        "start_at" => "2015-01-13",
+        "end_at" => "2015-01-18",
+        "interval" => "day",
+        "start" => "0",
+        "length" => "10",
+      },
+    }))
+
+    assert_response_code(200, response)
+
+    csv = CSV.parse(response.body)
+    assert_equal(2, csv.length)
+    assert_equal("Time", csv[0][0])
+    assert_equal("2015-01-16T06:06:28.816Z", csv[1][0])
+  end
 end

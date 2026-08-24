@@ -1,15 +1,15 @@
 local re_find = ngx.re.find
 
-return function(ngx_ctx, normalized_hostname, wildcard_regex)
+return function(normalized_request_host, normalized_hostname, wildcard_regex)
   if wildcard_regex then
-    local find_from, _, find_err = re_find(ngx_ctx.host_normalized, wildcard_regex, "jo")
+    local find_from, _, find_err = re_find(normalized_request_host, wildcard_regex, "jo")
     if find_from then
       return true
     elseif find_err then
       ngx.log(ngx.ERR, "regex error: ", find_err)
     end
   else
-    if ngx_ctx.host_normalized == normalized_hostname then
+    if normalized_request_host == normalized_hostname then
       return true
     end
   end

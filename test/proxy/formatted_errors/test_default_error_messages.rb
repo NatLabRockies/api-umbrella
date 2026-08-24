@@ -50,7 +50,7 @@ class Test::Proxy::FormattedErrors::TestDefaultErrorMessages < Minitest::Test
     assert_equal({
       "error" => {
         "code" => "API_KEY_DISABLED",
-        "message" => "The api_key supplied has been disabled. Contact us at http://127.0.0.1:9080/contact/ for assistance",
+        "message" => "The api_key supplied has been disabled. Contact us for assistance: http://127.0.0.1:9080",
       },
     }, data)
   end

@@ -1,6 +1,7 @@
 // eslint-disable-next-line ember/no-classic-components
 import Component from '@ember/component';
 import { action, computed } from '@ember/object';
+import { inject } from '@ember/service';
 import { observes } from '@ember-decorators/object';
 import DataTablesHelpers from 'api-umbrella-admin-ui/utils/data-tables-helpers';
 import classic from 'ember-classic-decorator';
@@ -13,6 +14,9 @@ import numeral from 'numeral';
 @classic
 export default class ResultsTable extends Component {
   tagName = '';
+
+  @inject('session')
+  session;
 
   @action
   didInsert(element) {
@@ -60,7 +64,7 @@ export default class ResultsTable extends Component {
           type: 'date',
           title: 'Signed Up',
           defaultContent: '-',
-          render: DataTablesHelpers.renderTime,
+          render: DataTablesHelpers.renderTime(this.session.data.authenticated.analytics_timezone),
         },
         {
           data: 'hits',
@@ -79,7 +83,7 @@ export default class ResultsTable extends Component {
           type: 'date',
           title: 'Last Request',
           defaultContent: '-',
-          render: DataTablesHelpers.renderTime,
+          render: DataTablesHelpers.renderTime(this.session.data.authenticated.analytics_timezone),
         },
         {
           data: 'use_description',

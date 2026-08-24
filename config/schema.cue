@@ -380,6 +380,8 @@ import "path"
     analytics_v0_summary_start_time: string | *"2013-07-01T00:00:00.000Z"
     analytics_v0_summary_end_time?: string
     analytics_v0_summary_filter?: string
+    analytics_v0_summary_db_timeout: uint | *900 // 15 minutes
+    analytics_v0_summary_analytics_timeout: uint | *2400 // 40 minutes
     max_body_size: string | *"1m"
     allowed_signup_embed_urls_regex?: string
     default_host?: string
@@ -412,6 +414,7 @@ import "path"
   router: {
     api_backends: {
       keepalive_idle_timeout: uint | *120
+      keepalive_connections_max_age: uint | *1800
     }
     trusted_proxies: [...string] | *[]
     global_rate_limits: {
@@ -562,6 +565,19 @@ import "path"
     ssl_cert?: string
     ssl_cert_key?: string
     rewrites?: [...string]
+
+    #scheduled_brownout: {
+      path_regex: string
+      message?: string
+      status_code?: uint
+
+      #schedule: {
+        start_time: string
+        end_time: string
+      }
+      schedule: [...#schedule]
+    }
+    scheduled_brownouts?: [...#scheduled_brownout]
   }
   hosts: [...#host] | *[]
 
@@ -641,7 +657,7 @@ import "path"
     error_data: {
       common: {
         signup_url: "{{base_url}}"
-        contact_url: "{{base_url}}/contact/"
+        contact_url: "{{base_url}}"
       }
       not_found: {
         status_code: 404
@@ -661,32 +677,37 @@ import "path"
       api_key_disabled: {
         status_code: 403
         code: "API_KEY_DISABLED"
-        message: "The api_key supplied has been disabled. Contact us at {{contact_url}} for assistance"
+        message: "The api_key supplied has been disabled. Contact us for assistance: {{contact_url}}"
       }
       api_key_unverified: {
         status_code: 403
         code: "API_KEY_UNVERIFIED"
-        message: "The api_key supplied has not been verified yet. Please check your e-mail to verify the API key. Contact us at {{contact_url}} for assistance"
+        message: "The api_key supplied has not been verified yet. Please check your e-mail to verify the API key. Contact us for assistance {{contact_url}}"
       }
       api_key_unauthorized: {
         status_code: 403
         code: "API_KEY_UNAUTHORIZED"
-        message: "The api_key supplied is not authorized to access the given service. Contact us at {{contact_url}} for assistance"
+        message: "The api_key supplied is not authorized to access the given service. Contact us for assistance: {{contact_url}}"
       }
       over_rate_limit: {
         status_code: 429
         code: "OVER_RATE_LIMIT"
-        message: "You have exceeded your rate limit. Try again later or contact us at {{contact_url}} for assistance"
+        message: "You have exceeded your rate limit. Try again later or contact us for assistance: {{contact_url}}"
       }
       internal_server_error: {
         status_code: 500
         code: "INTERNAL_SERVER_ERROR"
-        message: "An unexpected error has occurred. Try again later or contact us at {{contact_url}} for assistance"
+        message: "An unexpected error has occurred. Try again later or contact us for assistance: {{contact_url}}"
       }
       https_required: {
         status_code: 400
         code: "HTTPS_REQUIRED"
         message: "Requests must be made over HTTPS. Try accessing the API at: {{https_url}}"
+      }
+      scheduled_brownout: {
+        status_code: 410
+        code: "SCHEDULED_BROWNOUT"
+        message: "This API will be going away. Seek an alternative API. Contact us for assistance: {{contact_url}}"
       }
     }
   }
@@ -740,6 +761,7 @@ import "path"
       over_rate_limit?: {...}
       internal_server_error?: {...}
       https_required?: {...}
+      scheduled_brownout?: {...}
     }
   }
   #api_backend_sub_settings: {

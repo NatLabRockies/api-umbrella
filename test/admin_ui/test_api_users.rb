@@ -68,4 +68,16 @@ class Test::AdminUi::TestApiUsers < Minitest::Capybara::Test
     assert_field("Restrict Access to HTTP Referers", :with => "*.example.com/*\n*//example2.com/*")
     assert_select("Account Enabled", :selected => "Disabled")
   end
+
+  def test_metadata_timezone_display
+    user = FactoryBot.create(:api_user, {
+      :created_at => Time.parse("2015-01-16T06:06:28.816Z").utc,
+      :updated_at => Time.parse("2015-07-16T06:09:33.273Z").utc,
+    })
+    admin_login
+    visit "/admin/#/api_users/#{user.id}/edit"
+
+    assert_text("Created: 2015-01-15 11:06 PM MST by ")
+    assert_text("Last Updated: 2015-07-16 12:09 AM MDT by ")
+  end
 end

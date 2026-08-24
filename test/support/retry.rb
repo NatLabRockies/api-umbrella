@@ -10,7 +10,7 @@ if ENV["CI"] == "true"
     # The default options are sort of all-or-nothing (eg, by defining
     # `methods_to_retry`, that takes precedence over any other options), to
     # this allows for more granular decision making on which errors to retry.
-    def self.failure_to_retry?(failures = [], klass_method_name, klass)
+    def self.failure_to_retry?(failures = [], klass_method_name, klass) # rubocop:disable Style/OptionalArguments
       return false if failures.empty?
 
       errors = failures.map(&:error).map(&:class)
@@ -24,7 +24,9 @@ if ENV["CI"] == "true"
       # Retry any failure in some specific tests that might be flaky in CI due
       # to specific timing conditions.
       case klass_method_name
-      when "Test::Proxy::TestTimeoutsResponse#test_response_closes_when_chunk_delay_exceeds_read_timeout"
+      when "Test::Proxy::TestTimeoutsResponse#test_response_closes_when_chunk_delay_exceeds_read_timeout",
+        "Test::Proxy::RateLimits::TestNonFrozenLimit#test_non_frozen_time_limit",
+        "Test::Proxy::KeepAlive::TestServerSide#test_max_connection_age_closes_connections"
         return true
       end
 

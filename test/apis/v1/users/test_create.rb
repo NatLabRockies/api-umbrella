@@ -819,7 +819,6 @@ class Test::Apis::V1::Users::TestCreate < Minitest::Test
     data = MultiJson.load(response.body)
     user = ApiUser.find(data["user"]["id"])
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "site_name" => "API Umbrella",
     }, user.registration_options)
     assert_nil(user.registration_input_options)
@@ -838,7 +837,6 @@ class Test::Apis::V1::Users::TestCreate < Minitest::Test
     data = MultiJson.load(response.body)
     user = ApiUser.find(data["user"]["id"])
     assert_equal({
-      "contact_url" => "https://localhost/contact/",
       "site_name" => "API Umbrella",
     }, user.registration_options)
     assert_nil(user.registration_input_options)
@@ -864,7 +862,6 @@ class Test::Apis::V1::Users::TestCreate < Minitest::Test
     assert_equal({
       "foo" => "bar",
       "send_welcome_email" => true,
-      "contact_url" => "https://localhost/contact/",
       "email_from_address" => "example@127.0.0.1",
       "site_name" => "API Umbrella",
     }, user.registration_options)
@@ -892,7 +889,6 @@ class Test::Apis::V1::Users::TestCreate < Minitest::Test
     user = ApiUser.find(data["user"]["id"])
     assert_equal({
       "foo" => "a" * 3900,
-      "contact_url" => "https://localhost/contact/",
       "site_name" => "API Umbrella",
     }, user.registration_options)
     assert_equal({

@@ -14,10 +14,11 @@ local function apis_for_request_host(ngx_ctx, active_config)
 
   local all_apis = active_config["api_backends"] or {}
   local apis_for_default_host = {}
+  local host_normalized = ngx_ctx.host_normalized
   for _, api in ipairs(all_apis) do
-    if matches_hostname(ngx_ctx, api["_frontend_host_normalized"], api["_frontend_host_wildcard_regex"]) then
+    if matches_hostname(host_normalized, api["_frontend_host_normalized"], api["_frontend_host_wildcard_regex"]) then
       table.insert(apis, api)
-    elseif api["_frontend_host_normalized"] == config["_default_hostname_normalized"]then
+    elseif api["_frontend_host_normalized"] == config["_default_hostname_normalized"] then
       table.insert(apis_for_default_host, api)
     end
   end

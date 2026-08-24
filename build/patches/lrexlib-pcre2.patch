@@ -1,12 +1,14 @@
-diff --git a/lrexlib-pcre2-2.9.2-1.rockspec b/lrexlib-pcre2-2.9.2-1.rockspec
-index ea788041..9ca5fbf9 100644
---- a/lrexlib-pcre2-2.9.2-1.rockspec
-+++ b/lrexlib-pcre2-2.9.2-1.rockspec
-@@ -32,9 +32,11 @@ build = {
+--- a/lrexlib-pcre2-2.9.3-1.rockspec
++++ b/lrexlib-pcre2-2.9.3-1.rockspec
+@@ -24,6 +24,7 @@
        },
        libdirs = {
          "$(PCRE2_LIBDIR)",
 +        "$(STAGE_EMBEDDED_LIBDIR)",
+       },
+       sources = {
+         "src/common.c",
+@@ -36,6 +37,7 @@
        },
        libraries = {
          "pcre2-8",

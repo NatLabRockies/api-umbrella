@@ -11,6 +11,7 @@ local host_normalize = require "api-umbrella.utils.host_normalize"
 local invert_table = require "api-umbrella.utils.invert_table"
 local is_empty = require "api-umbrella.utils.is_empty"
 local isfile = require("pl.path").isfile
+local iso8601_to_timestamp = require("api-umbrella.utils.time").iso8601_to_timestamp
 local json_decode = require("cjson").decode
 local json_encode = require "api-umbrella.utils.json_encode"
 local mkdir_p = require "api-umbrella.utils.mkdir_p"
@@ -19,6 +20,7 @@ local path_exists = require "api-umbrella.utils.path_exists"
 local path_join = require "api-umbrella.utils.path_join"
 local pl_utils = require "pl.utils"
 local random_token = require "api-umbrella.utils.random_token"
+local set_hostname_regex = require "api-umbrella.utils.active_config_store.set_hostname_regex"
 local shell_blocking_capture = require("shell-games").capture
 local stat = require "posix.sys.stat"
 local strip = require("pl.stringx").strip
@@ -179,6 +181,8 @@ local function set_computed_config(config)
 
   local default_host_exists = false
   for _, host in ipairs(config["hosts"]) do
+    set_hostname_regex(host, "hostname")
+
     if host["default"] then
       default_host_exists = true
     end
@@ -187,6 +191,15 @@ local function set_computed_config(config)
       host["_nginx_server_name"] = "_"
     else
       host["_nginx_server_name"] = host["hostname"]
+    end
+
+    if host["scheduled_brownouts"] then
+      for _, scheduled_brownout in ipairs(host["scheduled_brownouts"]) do
+        for _, schedule in ipairs(scheduled_brownout["schedule"]) do
+          schedule["_start_time_timestamp"] = iso8601_to_timestamp(schedule["start_time"])
+          schedule["_end_time_timestamp"] = iso8601_to_timestamp(schedule["end_time"])
+        end
+      end
     end
   end
 

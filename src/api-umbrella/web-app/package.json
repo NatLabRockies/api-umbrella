@@ -12,10 +12,10 @@
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.32.0",
-    "mini-css-extract-plugin": "^2.9.4",
-    "sass": "^1.97.1",
+    "mini-css-extract-plugin": "^2.10.2",
+    "sass": "^1.101.0",
     "sass-loader": "^13.3.3",
-    "webpack": "^5.104.1",
+    "webpack": "^5.108.4",
     "webpack-cli": "^5.1.4"
   }
 }

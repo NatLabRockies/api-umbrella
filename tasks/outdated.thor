@@ -187,7 +187,7 @@ class Outdated < Thor
         unless release_json_path.exist?
           system "curl", "-f", "-L", "-o", release_json_path.to_s, "https://api.github.com/repos/#{repo.fetch(:github_release)}/releases/tags/v#{version.fetch(:wanted_version)}", exception: true
         end
-        github_release = JSON.parse(release_json_path.read)
+        github_release = JSON.parse(release_json_path.read(encoding: "utf-8"))
 
         checksums_release = github_release.fetch("assets").detect do |asset|
           asset.fetch("name").match?(/(checksums|shasums)\.txt/i)
@@ -220,7 +220,7 @@ class Outdated < Thor
           system "curl", "-f", "-L", "-o", checksums_path.to_s, checksums_release, exception: true
         end
 
-        checksums_path.read.split("\n").each do |line|
+        checksums_path.read(encoding: "utf-8").split("\n").each do |line|
           if !repo[:filename_matcher] || line.match?(repo.fetch(:filename_matcher))
             parts = line.split(/\s+/)
             if line.match?(/linux.*(amd64|x86_64|x64)/i)

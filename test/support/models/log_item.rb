@@ -55,26 +55,30 @@ class LogItem
   end
 
   def self.clean_indices!
-    # Refresh all data, so the search results contain all the data for this
-    # index.
-    self.refresh_indices!
+    retries = 0
+    begin
+      # Refresh all data, so the search results contain all the data for this
+      # index.
+      self.refresh_indices!
 
-    # Since ElasticSearch 2 removed the delete by query functionality, search
-    # for all the records and build up a series of delete commands for each
-    # individual record.
-    #
-    # While not the most efficient way to bulk delete things, we don't want to
-    # completely drop the index, since that might remove mappings that only get
-    # created on API Umbrella startup.
-    self.client.delete_by_query({
-      :index => "_all",
-      :refresh => true,
-      :body => {
-        :query => {
-          :match_all => {},
+      # Delete all data (but not by dropping indices, since that would remove
+      # mappings that only get created once at startup).
+      self.client.delete_by_query({
+        :index => "_all",
+        :refresh => true,
+        :body => {
+          :query => {
+            :match_all => {},
+          },
         },
-      },
-    })
+      })
+    rescue OpenSearch::Transport::Transport::Errors::Conflict => e
+      # Handle possible race condition on deletes, which could lead to "version
+      # conflict" errors on rare occasions:
+      # https://stackoverflow.com/a/79591362/222487
+      retry if (retries += 1) < 5
+      raise e
+    end
   end
 
   def serializable_hash

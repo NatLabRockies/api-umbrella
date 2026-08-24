@@ -160,6 +160,7 @@ tasks:
       - ./build/work/stamp/build-deps/pnpm
       - ./src/api-umbrella/admin-ui/package.json
       - ./src/api-umbrella/admin-ui/pnpm-lock.yaml
+      - ./src/api-umbrella/admin-ui/pnpm-workspace.yaml
       - ./tasks/app-deps/admin-ui/pnpm
       - ./tasks/helpers.sh
     generates:
@@ -174,6 +175,7 @@ tasks:
       - ./build/work/stamp/build-deps/pnpm
       - ./src/api-umbrella/example-website/package.json
       - ./src/api-umbrella/example-website/pnpm-lock.yaml
+      - ./src/api-umbrella/example-website/pnpm-workspace.yaml
       - ./tasks/app-deps/example-website/pnpm
       - ./tasks/helpers.sh
     generates:
@@ -203,6 +205,7 @@ tasks:
       - ./build/work/stamp/build-deps/pnpm
       - ./src/api-umbrella/web-app/package.json
       - ./src/api-umbrella/web-app/pnpm-lock.yaml
+      - ./src/api-umbrella/web-app/pnpm-workspace.yaml
       - ./tasks/app-deps/web-app/pnpm
       - ./tasks/helpers.sh
     generates:

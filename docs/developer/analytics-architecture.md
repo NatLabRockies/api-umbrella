@@ -37,3 +37,21 @@ The analytic APIs in the web application directly query Elasticsearch:
 ```
 [api-umbrella-web-app] => [Elasticsearch]
 ```
+
+## Agent loop foundation
+
+API Umbrella now also includes a small database-backed "agent loop" foundation for modeling a closed feedback cycle around API users. This feature is intentionally separate from raw request analytics so lifecycle evidence, grading, and reputation changes are not mixed into the operational request log stream.
+
+The first increment stores:
+
+- targets assigned to an API user agent
+- lifecycle events for assignment, work, evidence, grading, responsibility changes, and re-evaluation
+- derived per-target state such as current grade, responsibility tier, reputation score, asset value, and iteration count
+
+The web application exposes admin-only APIs for:
+
+- listing targets
+- recording lifecycle events for a target
+- querying standings aggregated by API user
+
+This provides a structured event model alongside the existing request analytics pipeline, while keeping the two data flows separate.

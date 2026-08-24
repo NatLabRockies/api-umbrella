@@ -10,3 +10,6 @@ markup:
       unsafe: true
   highlight:
     style: github
+security:
+  allowContent:
+    - ".*"

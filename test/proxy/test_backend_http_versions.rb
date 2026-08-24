@@ -55,6 +55,12 @@ class Test::Proxy::TestBackendHttpVersions < Minitest::Test
     assert_match("HTTP/1.1 200 OK", response.response_headers)
     data = MultiJson.load(response.body)
     assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
+
+    response = Typhoeus.get("https://127.0.0.1:9081/#{unique_test_class_id}/http/", http_opts)
+    assert_response_code(200, response)
+    assert_match("HTTP/1.1 200 OK", response.response_headers)
+    data = MultiJson.load(response.body)
+    assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
   end
 
   def test_httpv1_1_client
@@ -66,6 +72,12 @@ class Test::Proxy::TestBackendHttpVersions < Minitest::Test
     assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
 
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/https/", http_opts)
+    assert_response_code(200, response)
+    assert_match("HTTP/1.1 200 OK", response.response_headers)
+    data = MultiJson.load(response.body)
+    assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
+
+    response = Typhoeus.get("https://127.0.0.1:9081/#{unique_test_class_id}/https/", http_opts)
     assert_response_code(200, response)
     assert_match("HTTP/1.1 200 OK", response.response_headers)
     data = MultiJson.load(response.body)
@@ -85,6 +97,12 @@ class Test::Proxy::TestBackendHttpVersions < Minitest::Test
     assert_match("HTTP/1.1 200", response.response_headers)
     data = MultiJson.load(response.body)
     assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
+
+    response = Typhoeus.get("https://127.0.0.1:9081/#{unique_test_class_id}/https/", http_opts)
+    assert_response_code(200, response)
+    assert_match("HTTP/1.1 200", response.response_headers)
+    data = MultiJson.load(response.body)
+    assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
   end
 
   def test_httpv2_tls_client
@@ -100,6 +118,12 @@ class Test::Proxy::TestBackendHttpVersions < Minitest::Test
     assert_match("HTTP/1.1 200", response.response_headers)
     data = MultiJson.load(response.body)
     assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
+
+    response = Typhoeus.get("https://127.0.0.1:9081/#{unique_test_class_id}/https/", http_opts)
+    assert_response_code(200, response)
+    assert_match("HTTP/1.1 200", response.response_headers)
+    data = MultiJson.load(response.body)
+    assert_equal("HTTP/1.1", data.fetch("http.request.proto"))
   end
 
   def test_httpv2_prior_knowledge_client
@@ -110,7 +134,18 @@ class Test::Proxy::TestBackendHttpVersions < Minitest::Test
     data = MultiJson.load(response.body)
     assert_equal("HTTP/2.0", data.fetch("http.request.proto"))
 
+    # The curl `--http2-prior-knowledge` flag doesn't make sense over http,
+    # since http2 requires https.
+    #
+    # This previously returned a response in openresty 1.27.1.2, but the
+    # upgrade to 1.29.2.3 changed this behavior. I'm not sure what specific
+    # version changed this, but I think the new behavior actually makese more
+    # sense.
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/https/", http_opts)
+    assert_response_code(0, response)
+    assert_equal(:got_nothing, response.return_code)
+
+    response = Typhoeus.get("https://127.0.0.1:9081/#{unique_test_class_id}/https/", http_opts)
     assert_response_code(200, response)
     assert_match("HTTP/1.1 200", response.response_headers)
     data = MultiJson.load(response.body)

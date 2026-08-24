@@ -6,14 +6,14 @@ source = {
 }
 
 dependencies = {
-  "argparse ~> 0.7.1",
+  "argparse ~> 0.7.2",
   "bcrypt ~> 2.3",
-  "dkjson ~> 2.8",
+  "dkjson ~> 2.10",
   "inspect ~> 3.1.3",
-  "lapis ~> 1.16.0",
+  "lapis ~> 1.18.0",
   "libcidr-ffi ~> 1.0.0",
-  "lua-resty-http ~> 0.17.2",
-  "lua-resty-mail ~> 1.1.0",
+  "lua-resty-http ~> 0.18.0",
+  "lua-resty-mail ~> 1.2.0",
   "lua-resty-mlcache ~> 2.7.0",
   "lua-resty-nettle ~> 2.1",
   "lua-resty-openidc ~> 1.7.6",
@@ -24,10 +24,10 @@ dependencies = {
   "luajit-zstd ~> 0.2.3",
   "lualdap ~> 1.4.0",
   "luaposix ~> 36.3",
-  "luautf8 ~> 0.2.0",
+  "luautf8 ~> 0.2.1",
   "lustache ~> 1.3.1",
   "lyaml ~> 6.2.8",
-  "penlight ~> 1.14.0",
+  "penlight ~> 1.15.0",
   "psl ~> 0.3",
   "shell-games ~> 1.1.0",
 }

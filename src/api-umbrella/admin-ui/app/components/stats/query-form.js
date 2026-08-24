@@ -330,6 +330,7 @@ export default class QueryForm extends Component {
             'over_rate_limit': 'over_rate_limit',
             'internal_server_error': 'internal_server_error',
             'https_required': 'https_required',
+            'scheduled_brownout': 'scheduled_brownout',
           },
         },
         {

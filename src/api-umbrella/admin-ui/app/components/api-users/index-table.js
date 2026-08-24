@@ -58,7 +58,7 @@ export default class IndexTable extends Component {
           type: 'date',
           title: 'Created',
           defaultContent: '-',
-          render: DataTablesHelpers.renderTime,
+          render: DataTablesHelpers.renderTime(this.session.data.authenticated.analytics_timezone),
         },
         {
           data: 'registration_source',

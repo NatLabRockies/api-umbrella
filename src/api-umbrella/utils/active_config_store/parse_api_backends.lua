@@ -12,7 +12,7 @@ local function parse_api(api)
     api["id"] = stable_object_hash(api)
   end
 
-  cache_computed_api_backend(api)
+  cache_computed_api_backend(config, api)
   cache_computed_api_backend_sub_settings(config, api["sub_settings"], deep_merge_overwrite_arrays(deepcopy(config["default_api_backend_settings"]), api["settings"]))
   cache_computed_api_backend_settings(config, api["settings"], config["default_api_backend_settings"])
 end

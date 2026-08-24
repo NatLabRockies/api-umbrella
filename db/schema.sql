@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -67,7 +68,7 @@ CREATE FUNCTION api_umbrella.analytics_cache_extract_unique_user_ids() RETURNS t
     AS $$
       BEGIN
         IF (jsonb_typeof(NEW.data->'aggregations'->'unique_user_ids'->'buckets') = 'array') THEN
-          NEW.unique_user_ids := (SELECT array_agg(DISTINCT bucket->>'key')::uuid[] FROM jsonb_array_elements(NEW.data->'aggregations'->'unique_user_ids'->'buckets') AS bucket);
+          NEW.unique_user_ids := (SELECT array_agg(DISTINCT bucket->'key'->>'user_id')::uuid[] FROM jsonb_array_elements(NEW.data->'aggregations'->'unique_user_ids'->'buckets') AS bucket);
         END IF;
 
         RETURN NEW;
@@ -765,6 +766,9 @@ CREATE TABLE api_umbrella.analytics_cache (
     created_at timestamp with time zone DEFAULT transaction_timestamp() NOT NULL,
     updated_at timestamp with time zone DEFAULT transaction_timestamp() NOT NULL,
     unique_user_ids uuid[],
+    data_date character varying GENERATED ALWAYS AS (((((((data -> 'aggregations'::text) -> 'hits_over_time'::text) -> 'buckets'::text) -> 0) ->> 'key_as_string'::text))::character varying) STORED,
+    hit_count bigint GENERATED ALWAYS AS (((((((data -> 'aggregations'::text) -> 'hits_over_time'::text) -> 'buckets'::text) -> 0) ->> 'doc_count'::text))::bigint) STORED,
+    response_time_average bigint GENERATED ALWAYS AS (round(((((data -> 'aggregations'::text) -> 'response_time_average'::text) ->> 'value'::text))::numeric)) STORED,
     CONSTRAINT analytics_cache_enforce_single_date_bucket CHECK ((NOT (jsonb_array_length((((data -> 'aggregations'::text) -> 'hits_over_time'::text) -> 'buckets'::text)) > 1)))
 );
 
@@ -913,14 +917,14 @@ CREATE TABLE api_umbrella.api_backend_settings (
 --
 
 CREATE TABLE api_umbrella.api_backend_settings_required_roles (
-    api_backend_settings_id uuid NOT NULL,
+    api_backend_settings_id uuid CONSTRAINT api_backend_settings_required__api_backend_settings_id_not_null NOT NULL,
     api_role_id character varying(255) NOT NULL,
     created_at timestamp with time zone NOT NULL,
     created_by_id uuid NOT NULL,
-    created_by_username character varying(255) NOT NULL,
+    created_by_username character varying(255) CONSTRAINT api_backend_settings_required_role_created_by_username_not_null NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     updated_by_id uuid NOT NULL,
-    updated_by_username character varying(255) NOT NULL
+    updated_by_username character varying(255) CONSTRAINT api_backend_settings_required_role_updated_by_username_not_null NOT NULL
 );
 
 
@@ -1979,6 +1983,13 @@ CREATE INDEX api_users_created_at_idx ON api_umbrella.api_users USING btree (cre
 
 
 --
+-- Name: api_users_email_created_at_idx; Type: INDEX; Schema: api_umbrella; Owner: -
+--
+
+CREATE INDEX api_users_email_created_at_idx ON api_umbrella.api_users USING btree (email, created_at);
+
+
+--
 -- Name: api_users_roles_api_user_id_api_role_id_idx; Type: INDEX; Schema: api_umbrella; Owner: -
 --
 
@@ -2801,6 +2812,7 @@ ALTER TABLE ONLY api_umbrella.rate_limits
 -- PostgreSQL database dump complete
 --
 
+
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1498350289');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1554823736');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1560722058');
@@ -2820,3 +2832,6 @@ INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1701483732');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1721347955');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1738353016');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1753472899');
+INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1769633747');
+INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1769732670');
+INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1775265493');

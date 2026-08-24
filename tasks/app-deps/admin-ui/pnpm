@@ -15,6 +15,7 @@ cd _persist
 # directory).
 cp "$SOURCE_DIR/src/api-umbrella/admin-ui/package.json" ./
 cp "$SOURCE_DIR/src/api-umbrella/admin-ui/pnpm-lock.yaml" ./
+cp "$SOURCE_DIR/src/api-umbrella/admin-ui/pnpm-workspace.yaml" ./
 PATH="$DEV_PATH" pnpm install --frozen-lockfile
 
 # Remove some unnecessary and large files that are shipped in a couple of the

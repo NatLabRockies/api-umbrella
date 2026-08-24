@@ -77,7 +77,7 @@ class Test::Proxy::FormattedErrors::TestDataVariables < Minitest::Test
     data = MultiJson.load(response.body)
     assert_equal("http://127.0.0.1:9080", data["base_url"])
     assert_equal("http://127.0.0.1:9080", data["signup_url"])
-    assert_equal("http://127.0.0.1:9080/contact/", data["contact_url"])
+    assert_equal("http://127.0.0.1:9080", data["contact_url"])
   end
 
   def test_legacy_camel_case
@@ -86,21 +86,21 @@ class Test::Proxy::FormattedErrors::TestDataVariables < Minitest::Test
     data = MultiJson.load(response.body)
     assert_equal("http://127.0.0.1:9080", data["baseUrl"])
     assert_equal("http://127.0.0.1:9080", data["signupUrl"])
-    assert_equal("http://127.0.0.1:9080/contact/", data["contactUrl"])
+    assert_equal("http://127.0.0.1:9080", data["contactUrl"])
   end
 
   def test_variables_inside_other_variables
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/hello", keyless_http_options)
     assert_json_error(response)
     data = MultiJson.load(response.body)
-    assert_equal("base_url: http://127.0.0.1:9080 signup_url: http://127.0.0.1:9080 contact_url: http://127.0.0.1:9080/contact/", data["embedded"])
+    assert_equal("base_url: http://127.0.0.1:9080 signup_url: http://127.0.0.1:9080 contact_url: http://127.0.0.1:9080", data["embedded"])
   end
 
   def test_legacy_camel_case_variables_inside_other_variables
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/hello", keyless_http_options)
     assert_json_error(response)
     data = MultiJson.load(response.body)
-    assert_equal("baseUrl: http://127.0.0.1:9080 signupUrl: http://127.0.0.1:9080 contactUrl: http://127.0.0.1:9080/contact/", data["embedded_legacy"])
+    assert_equal("baseUrl: http://127.0.0.1:9080 signupUrl: http://127.0.0.1:9080 contactUrl: http://127.0.0.1:9080", data["embedded_legacy"])
   end
 
   def test_escapes_json_values

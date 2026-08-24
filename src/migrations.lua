@@ -1551,4 +1551,45 @@ return {
     db.query(grants_sql)
     db.query("COMMIT")
   end,
+
+  [1769633747] = function()
+    db.query("BEGIN")
+
+    -- Add an extra column to store the unique user IDs in a fashion more
+    -- optimized for querying. But since this strategy only works if each row
+    -- represents a single date bucket, add extra constraints to ensure we
+    -- don't accidentally mess up this assumption in the future.
+    db.query("ALTER TABLE analytics_cache ADD COLUMN data_date varchar GENERATED ALWAYS AS ((data->'aggregations'->'hits_over_time'->'buckets'->0->>'key_as_string')::varchar) STORED")
+    db.query("ALTER TABLE analytics_cache ADD COLUMN hit_count bigint GENERATED ALWAYS AS ((data->'aggregations'->'hits_over_time'->'buckets'->0->>'doc_count')::bigint) STORED")
+    db.query("ALTER TABLE analytics_cache ADD COLUMN response_time_average bigint GENERATED ALWAYS AS (round((data->'aggregations'->'response_time_average'->>'value')::numeric)) STORED")
+
+    db.query(grants_sql)
+    db.query("COMMIT")
+  end,
+
+  [1769732670] = function()
+    db.query("BEGIN")
+
+    db.query([[
+      CREATE OR REPLACE FUNCTION analytics_cache_extract_unique_user_ids()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        IF (jsonb_typeof(NEW.data->'aggregations'->'unique_user_ids'->'buckets') = 'array') THEN
+          NEW.unique_user_ids := (SELECT array_agg(DISTINCT bucket->'key'->>'user_id')::uuid[] FROM jsonb_array_elements(NEW.data->'aggregations'->'unique_user_ids'->'buckets') AS bucket);
+        END IF;
+
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    ]])
+
+    db.query(grants_sql)
+    db.query("COMMIT")
+  end,
+
+  [1775265493] = function()
+    db.query("CREATE INDEX CONCURRENTLY api_users_email_created_at_idx ON api_umbrella.api_users USING btree (email, created_at ASC)")
+
+    db.query(grants_sql)
+  end,
 }

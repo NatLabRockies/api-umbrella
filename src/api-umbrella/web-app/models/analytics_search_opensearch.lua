@@ -1,5 +1,6 @@
 local AnalyticsCache = require "api-umbrella.web-app.models.analytics_cache"
 local add_error = require("api-umbrella.web-app.utils.model_ext").add_error
+local append_array = require "api-umbrella.utils.append_array"
 local cjson = require "cjson.safe"
 local config = require("api-umbrella.utils.load_config")()
 local deepcopy = require("pl.tablex").deepcopy
@@ -401,11 +402,18 @@ end
 
 function _M:aggregate_by_unique_user_ids()
   self.body["aggregations"]["unique_user_ids"] = {
-    terms = {
-      field = "user_id",
+    composite = {
       size = config["opensearch"]["max_buckets"] - 5,
-      shard_size = config["opensearch"]["max_buckets"] * 4,
-    },
+      sources = {
+        {
+          user_id = {
+            terms = {
+              field = "user_id",
+            },
+          },
+        },
+      },
+    }
   }
 end
 
@@ -850,12 +858,58 @@ local function cache_interval_results_process_batch(self, cache_ids, batch)
     local expires_at = batch_elem["expires_at"]
 
     if not exist["cache_exists"] then
-      -- Perform the real OpenSearch query for uncached queries and cache
-      -- the result.
-      local results = self:fetch_results({
-        override_header = id_data["header"],
-        override_body = id_data["body"],
-      })
+      -- Perform the real OpenSearch query for uncached queries, accounting for
+      -- pagination on the `unique_user_ids` composite query.
+      local results
+      local page_body = deepcopy(id_data["body"])
+      while true do
+        local page_results = self:fetch_results({
+          override_header = id_data["header"],
+          override_body = page_body,
+        })
+        if not page_results then
+          break
+        end
+
+        -- Set the first page of results.
+        if not results then
+          results = page_results
+        end
+
+        -- If aggregating on the `composite` bucket for unique user IDs, make
+        -- more requests to fetch all of the user IDs without running into the
+        -- `search.max_buckets` limit on the server by paginating through the
+        -- aggregation results.
+        if results["aggregations"] and results["aggregations"]["unique_user_ids"] and results["aggregations"]["unique_user_ids"]["buckets"] and page_body["aggregations"] and page_body["aggregations"]["unique_user_ids"] and page_body["aggregations"]["unique_user_ids"]["composite"] then
+          -- If this was a paginated result, then merge the subsequent pages of
+          -- user IDs onto the original result. This allows us to store a
+          -- single cached response that looks as though all of the user IDs
+          -- were fetched at once (instead of having all of these multiple
+          -- requests).
+          if page_body["aggregations"]["unique_user_ids"]["composite"]["after"] and page_results["aggregations"] and page_results["aggregations"]["unique_user_ids"] and page_results["aggregations"]["unique_user_ids"]["buckets"] then
+            append_array(results["aggregations"]["unique_user_ids"]["buckets"], page_results["aggregations"]["unique_user_ids"]["buckets"])
+          end
+
+          -- If there are still more paginated user IDs to fetch, then make
+          -- another request to fetch the remaining until none are left.
+          if page_results["aggregations"]["unique_user_ids"]["after_key"] then
+            -- When fetching the other pages of results, remove any other
+            -- aggregations (like hits histogram) and just perform the one
+            -- paginated `unique_user_ids` composite query, with the new
+            -- `after` field set.
+            page_body["aggregations"] = {
+              unique_user_ids = page_body["aggregations"]["unique_user_ids"],
+            }
+            page_body["aggregations"]["unique_user_ids"]["composite"]["after"] = page_results["aggregations"]["unique_user_ids"]["after_key"]
+          else
+            break
+          end
+        else
+          break
+        end
+      end
+
+      -- Cache the results.
       if results then
         table.insert(cache_ids, exist["id"])
         AnalyticsCache:upsert(id_data, results, expires_at)

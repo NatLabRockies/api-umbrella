@@ -25,6 +25,7 @@ local known_domains = require "api-umbrella.web-app.utils.known_domains"
 local parse_post_for_pseudo_ie_cors = require "api-umbrella.web-app.utils.parse_post_for_pseudo_ie_cors"
 local require_admin = require "api-umbrella.web-app.utils.require_admin"
 local respond_to = require "api-umbrella.web-app.utils.respond_to"
+local scoring_pipeline = require "api-umbrella.web-app.utils.scoring_pipeline"
 local startswith = require("pl.stringx").startswith
 local t = require("api-umbrella.web-app.utils.gettext").gettext
 local validation_ext = require "api-umbrella.web-app.utils.validation_ext"
@@ -67,10 +68,6 @@ local function get_options(self)
     options["verify_email"] = true
   elseif options["verify_email"] ~= nil then
     options["verify_email"] = (tostring(options["verify_email"]) == "true")
-  end
-
-  if is_empty(options["contact_url"]) then
-    options["contact_url"] = "https://" .. config["web"]["default_host"] .. "/contact/"
   end
 
   if is_empty(options["site_name"]) then
@@ -227,7 +224,15 @@ local function recaptcha_passes(self, user_params)
       return false, "reCAPTCHA v3 disallowed domain: " .. (user_params["registration_recaptcha_v3_hostname"] or "")
     elseif not user_params["registration_recaptcha_v3_score"] then
       return false, "reCAPTCHA v3 missing score"
-    elseif user_params["registration_recaptcha_v3_score"] < config["web"]["recaptcha_v3_required_score"] then
+    end
+
+    local score_result = scoring_pipeline.evaluate({
+      score = user_params["registration_recaptcha_v3_score"],
+      target_score = config["web"]["recaptcha_v3_required_score"],
+    })
+    if not score_result then
+      return false, "reCAPTCHA v3 missing score"
+    elseif not score_result["passed"] then
       return false, "reCAPTCHA v3 below required score: " .. (user_params["registration_recaptcha_v3_score"] or "")
     end
   end

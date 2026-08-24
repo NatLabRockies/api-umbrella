@@ -50,15 +50,15 @@ RUN make deps && make clean:dev
 COPY tasks/build-deps /app/tasks/build-deps
 RUN make build-deps && make clean:dev
 
-COPY src/api-umbrella/example-website/package.json src/api-umbrella/example-website/pnpm-lock.yaml /app/src/api-umbrella/example-website/
+COPY src/api-umbrella/example-website/package.json src/api-umbrella/example-website/pnpm-lock.yaml src/api-umbrella/example-website/pnpm-workspace.yaml /app/src/api-umbrella/example-website/
 COPY tasks/app-deps/example-website/pnpm /app/tasks/app-deps/example-website/
 RUN make app-deps:example-website:pnpm && make clean:dev
 
-COPY src/api-umbrella/admin-ui/package.json src/api-umbrella/admin-ui/pnpm-lock.yaml /app/src/api-umbrella/admin-ui/
+COPY src/api-umbrella/admin-ui/package.json src/api-umbrella/admin-ui/pnpm-lock.yaml src/api-umbrella/admin-ui/pnpm-workspace.yaml /app/src/api-umbrella/admin-ui/
 COPY tasks/app-deps/admin-ui/pnpm /app/tasks/app-deps/admin-ui/
 RUN make app-deps:admin-ui:pnpm && make clean:dev
 
-COPY src/api-umbrella/web-app/package.json src/api-umbrella/web-app/pnpm-lock.yaml /app/src/api-umbrella/web-app/
+COPY src/api-umbrella/web-app/package.json src/api-umbrella/web-app/pnpm-lock.yaml src/api-umbrella/web-app/pnpm-workspace.yaml /app/src/api-umbrella/web-app/
 COPY tasks/app-deps/web-app/pnpm /app/tasks/app-deps/web-app/
 RUN make app-deps:web-app:pnpm && make clean:dev
 
@@ -170,12 +170,14 @@ FROM public.ecr.aws/docker/library/debian:bookworm AS runtime
 COPY --from=install /build/install-destdir /
 COPY build/package/scripts/after-install /tmp/install/build/package/scripts/after-install
 COPY --from=build /app/build/package_dependencies.sh /tmp/install/build/package_dependencies.sh
+COPY --from=build /app/tasks/helpers.sh /tmp/install/tasks/helpers.sh
 COPY --from=build /app/tasks/helpers/detect_os_release.sh /tmp/install/tasks/helpers/detect_os_release.sh
+COPY --from=build /app/tasks/install-system-build-dependencies /tmp/install/tasks/install-system-build-dependencies
 RUN set -x && \
-  apt-get update && \
-  bash -c 'source /tmp/install/build/package_dependencies.sh && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install "${core_runtime_dependencies[@]}"' && \
+  cd /tmp/install && \
+  INSTALL_CORE_RUNTIME_DEPENDENCIES=true /tmp/install/tasks/install-system-build-dependencies && \
   /tmp/install/build/package/scripts/after-install 1 && \
-  rm -rf /tmp/install /var/lib/apt/lists/*
+  rm -rf /var/lib/apt/lists/* /var/lib/dpkg/*-old /var/cache/* /var/log/*
 
 EXPOSE 80 443
 

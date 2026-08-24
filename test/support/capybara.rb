@@ -160,7 +160,7 @@ module Minitest
         # Inspect the gathered logs and fail if there are any error level logs.
         error_logs = $selenium_logs.filter { |log| log.level == "error" } # rubocop:disable Style/GlobalVars
         # Fail tests if JavaScript errors were generated during the tests.
-        assert_equal([], error_logs) # rubocop:disable Minitest/AssertionInLifecycleHook
+        assert_equal([], error_logs)
 
         # Reset logs
         $selenium_logs = [] # rubocop:disable Style/GlobalVars

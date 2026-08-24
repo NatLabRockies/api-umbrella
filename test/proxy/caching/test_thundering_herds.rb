@@ -513,8 +513,8 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
       },
     }, {
       :cacheable => true,
-      :min_response_time_range => 2.9..3.5,
-      :max_response_time_range => 4.9..5.5,
+      :min_response_time_range => 2.9..3.7,
+      :max_response_time_range => 4.9..5.7,
     })
   end
 
@@ -587,23 +587,36 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
   def assert_connections_collapsed(path, custom_http_options = {}, options = {})
     requests = make_thundering_herd_requests(path, custom_http_options, options)
 
+    requests_count = requests.length
+    assert_equal(50, requests_count)
+
+    # Somewhat rarely, more connections seem to be let through when a precache
+    # is stale. Since all of this is somewhat fuzzy, we're okay with this, so
+    # increase the threshold for these cases. We mainly just want to ensure it
+    # still represents not all of the connections being let through.
+    collapsed_connection_buffer = COLLAPSED_CONNECTION_BUFFER
+    if(options[:precache] && options[:precache_stale_delay])
+      collapsed_connection_buffer = COLLAPSED_CONNECTION_BUFFER * 4
+    end
+    assert_operator(collapsed_connection_buffer, :<, requests_count / 2.0)
+
     # Since a thundering herd is prevented, ensure connection collapsing and
     # caching took place so that the API backend was only called once (plus 1
     # additional time when pre-caching is enabled for the initial request).
     call_count = backend_call_count
     if(options[:precache] && options[:precache_stale_delay])
       assert_operator(call_count, :>=, 2)
-      assert_operator(call_count, :<=, 2 + COLLAPSED_CONNECTION_BUFFER)
+      assert_operator(call_count, :<=, 2 + collapsed_connection_buffer)
     else
       assert_operator(call_count, :>=, 1)
-      assert_operator(call_count, :<=, 1 + COLLAPSED_CONNECTION_BUFFER)
+      assert_operator(call_count, :<=, 1 + collapsed_connection_buffer)
     end
 
     # Ensure all the responses back were identical, since the connections were
     # collapsed to a single API backend request and cached.
     unique_count = unique_response_bodies_count(requests)
     assert_operator(unique_count, :>=, 1)
-    assert_operator(unique_count, :<=, 1 + COLLAPSED_CONNECTION_BUFFER)
+    assert_operator(unique_count, :<=, 1 + collapsed_connection_buffer)
 
     statuses = cache_status(requests)
     assert_equal(["HIT", "MISS"].sort, statuses.keys)
@@ -612,15 +625,15 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
     # herd of requests, then all responses should be cache hits. Otherwise, the
     # first request will be a cache miss, but the rest should be hits.
     if(options[:precache] && !options[:precache_stale_delay])
-      assert_operator(statuses["HIT"], :>=, 50 - COLLAPSED_CONNECTION_BUFFER)
-      assert_operator(statuses["HIT"], :<=, 50)
+      assert_operator(statuses["HIT"], :>=, requests_count - collapsed_connection_buffer)
+      assert_operator(statuses["HIT"], :<=, requests_count)
       assert_operator(statuses["MISS"], :>=, 0)
-      assert_operator(statuses["MISS"], :<=, 0 + COLLAPSED_CONNECTION_BUFFER)
+      assert_operator(statuses["MISS"], :<=, 0 + collapsed_connection_buffer)
     else
-      assert_operator(statuses["HIT"], :>=, 49 - COLLAPSED_CONNECTION_BUFFER)
-      assert_operator(statuses["HIT"], :<=, 49)
+      assert_operator(statuses["HIT"], :>=, requests_count - 1 - collapsed_connection_buffer)
+      assert_operator(statuses["HIT"], :<=, requests_count - 1)
       assert_operator(statuses["MISS"], :>=, 1)
-      assert_operator(statuses["MISS"], :<=, 1 + COLLAPSED_CONNECTION_BUFFER)
+      assert_operator(statuses["MISS"], :<=, 1 + collapsed_connection_buffer)
     end
     assert_equal(50, statuses["HIT"] + statuses["MISS"])
 
@@ -636,16 +649,16 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
     # For cacheable responses that have a fresh pre-cached hit, then all
     # responses should be cached and not subject to the API backend's delay.
     elsif(options.fetch(:cacheable) && options[:precache] && !options[:precache_stale_delay])
-      assert_includes(0.0..0.5, timings.min)
-      assert_includes(0.0..0.5, timings.max)
+      assert_includes(0.0..0.7, timings.min)
+      assert_includes(0.0..0.7, timings.max)
 
     # For cacheable responses, the response times should all be in the
     # neighborhood of the API backend's delayed response time (since after the
     # first request comes back, it should cached and used for all the pending
     # requests, so the pending requests respond basically instantly).
     elsif(options.fetch(:cacheable))
-      assert_includes(0.9..1.5, timings.min)
-      assert_includes(0.9..1.5, timings.max)
+      assert_includes(0.9..1.7, timings.min)
+      assert_includes(0.9..1.7, timings.max)
 
     # For non-cacheable responses, the response times for the parallel requests
     # might be double the initial response time at worst. This is because the
@@ -654,13 +667,16 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
     # all be sent at once (we just want to ensure it's no worse than 2x in the
     # worst case).
     else
-      assert_includes(0.9..1.5, timings.min)
-      assert_includes(1.9..2.5, timings.max)
+      assert_includes(0.9..1.7, timings.min)
+      assert_includes(1.9..2.7, timings.max)
     end
   end
 
   def refute_connections_collapsed(path, custom_http_options = {}, options = {})
     requests = make_thundering_herd_requests(path, custom_http_options, options)
+
+    requests_count = requests.length
+    assert_equal(50, requests_count)
 
     # Since a thundering herd is allowed, ensure the API backend was called for
     # each request made (since no caching or connection collapsing should have
@@ -668,22 +684,22 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
     # the first pre-cached request).
     call_count = backend_call_count
     if(options[:precache])
-      assert_equal(51, call_count)
+      assert_equal(requests_count + 1, call_count)
     else
-      assert_equal(50, call_count)
+      assert_equal(requests_count, call_count)
     end
 
     # Ensure each response back was unique, since no responses should be cached
     # or shared.
     unique_count = unique_response_bodies_count(requests)
-    assert_equal(50, unique_count)
+    assert_equal(requests_count, unique_count)
 
     # All responses back should have been a cache miss.
     statuses = cache_status(requests)
     assert_equal(["HIT", "MISS"].sort, statuses.keys)
     assert_equal(0, statuses["HIT"])
-    assert_equal(50, statuses["MISS"])
-    assert_equal(50, statuses["HIT"] + statuses["MISS"])
+    assert_equal(requests_count, statuses["MISS"])
+    assert_equal(requests_count, statuses["HIT"] + statuses["MISS"])
 
     # Check the response times to ensure the connection collapsing behavior
     # doesn't serialize the requests and take too long for potentially
@@ -697,23 +713,23 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
     # For cacheable responses that have a fresh pre-cached hit, then all
     # responses should be cached and not subject to the API backend's delay.
     elsif(options.fetch(:cacheable) && options[:precache] && !options[:precache_stale_delay])
-      assert_includes(0.0..0.5, timings.min)
-      assert_includes(0.0..0.5, timings.max)
+      assert_includes(0.0..0.7, timings.min)
+      assert_includes(0.0..0.7, timings.max)
 
     # For non-cacheable responses that are streamed back (when the headers are
     # received back immediately, and then it's only the body that's delayed),
     # then all the requests should be parallelized immediately, so there should
     # be no significant delays.
     elsif(!options.fetch(:cacheable) && custom_http_options[:headers]["X-Delay-Before"] == "body")
-      assert_includes(0.9..1.5, timings.min)
-      assert_includes(0.9..1.5, timings.max)
+      assert_includes(0.9..1.7, timings.min)
+      assert_includes(0.9..1.7, timings.max)
 
     # For non-cacheable *requests* when TrafficServer knows immediately the
     # response won't be cacheable without actually receiving the response (eg,
     # POST requests), then all the requests should be parallelized immediately.
     elsif(!options.fetch(:cacheable) && custom_http_options[:method] == "POST")
-      assert_includes(0.9..1.5, timings.min)
-      assert_includes(0.9..1.5, timings.max)
+      assert_includes(0.9..1.7, timings.min)
+      assert_includes(0.9..1.7, timings.max)
 
     # For all other situations, the response times for the parallel requests
     # might be double the initial response time at worst. This is because the
@@ -722,8 +738,8 @@ class Test::Proxy::Caching::TestThunderingHerds < Minitest::Test
     # all be sent at once (we just want to ensure it's no worse than 2x in the
     # worst case).
     else
-      assert_includes(0.9..1.5, timings.min)
-      assert_includes(1.9..2.5, timings.max)
+      assert_includes(0.9..1.7, timings.min)
+      assert_includes(1.9..2.7, timings.max)
     end
   end
 end

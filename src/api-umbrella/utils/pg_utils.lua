@@ -173,6 +173,17 @@ function _M.setup_session_vars(pg, application_name)
   })
 end
 
+function _M.setup_connection(pg, application_name, force_first_time_setup)
+  _M.setup_type_casting(pg)
+
+  -- The first time this socket is used (but not when reusing keepalive
+  -- sockets), setup any session variables on the connection.
+  if pg.sock:getreusedtimes() == 0 or force_first_time_setup then
+    _M.setup_socket_timeouts(pg)
+    _M.setup_session_vars(pg, application_name)
+  end
+end
+
 function _M.connect()
   -- Try connecting a few times in case PostgreSQL is being restarted or
   -- starting up.
@@ -196,14 +207,7 @@ function _M.connect()
     return nil, err
   end
 
-  _M.setup_type_casting(pg)
-
-  -- The first time this socket is used (but not when reusing keepalive
-  -- sockets), setup any session variables on the connection.
-  if pg.sock:getreusedtimes() == 0 then
-    _M.setup_socket_timeouts(pg)
-    _M.setup_session_vars(pg, "api-umbrella")
-  end
+  _M.setup_connection(pg, "api-umbrella")
 
   return pg
 end

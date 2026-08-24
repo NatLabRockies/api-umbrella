@@ -4,8 +4,8 @@ lua_resty_openssl_aux_module_version="0.3.0"
 lua_resty_openssl_aux_module_hash="535cda86ca5f326479fb9870288ca8f6ecd94e579374e6686d8fe508872dd4ce"
 ngx_http_geoip2_module_version="3.4"
 ngx_http_geoip2_module_hash="ad72fc23348d715a330994984531fab9b3606e160483236737f9a4a6957d9452"
-openresty_version="1.27.1.2"
-openresty_hash="74f076f7e364b2a99a6c5f9bb531c27610c78985abe956b442b192a2295f7548"
+openresty_version="1.31.1.1"
+openresty_hash="65b78baadd3f0984055de89bf13f4a1932e5bfe9c31932037a134ea2b1a0ce42"
 
 set -e -u -x
 source ./tasks/helpers.sh

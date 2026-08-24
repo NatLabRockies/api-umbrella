@@ -305,4 +305,34 @@ class Test::AdminUi::TestStatsLogs < Minitest::Capybara::Test
       "is not null",
     ]
   end
+
+  def test_table_displays_time_in_local_timezone
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-01-16T06:06:28.816Z").utc, :request_method => "OPTIONS")
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-01-16T08:23:31.273Z").utc, :request_method => "OPTIONS")
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-01-16T19:02:43.902Z").utc, :request_method => "OPTIONS")
+    LogItem.refresh_indices!
+
+    admin_login
+    visit "/admin/#/stats/logs?search=&start_at=2015-01-12&end_at=2015-01-18&interval=day"
+    refute_selector(".busy-blocker")
+
+    assert_equal("2015-01-16 12:02:43 PM MST", find("#results_table table tbody tr:nth-child(1) td:first-child").text)
+    assert_equal("2015-01-16 1:23:31 AM MST", find("#results_table table tbody tr:nth-child(2) td:first-child").text)
+    assert_equal("2015-01-15 11:06:28 PM MST", find("#results_table table tbody tr:nth-child(3) td:first-child").text)
+  end
+
+  def test_table_displays_time_in_local_timezone_during_dst
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-07-16T06:06:28.816Z").utc, :request_method => "OPTIONS")
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-07-16T08:23:31.273Z").utc, :request_method => "OPTIONS")
+    FactoryBot.create(:log_item, :request_at => Time.parse("2015-07-16T19:02:43.902Z").utc, :request_method => "OPTIONS")
+    LogItem.refresh_indices!
+
+    admin_login
+    visit "/admin/#/stats/logs?search=&start_at=2015-07-12&end_at=2015-07-18&interval=day"
+    refute_selector(".busy-blocker")
+
+    assert_equal("2015-07-16 1:02:43 PM MDT", find("#results_table table tbody tr:nth-child(1) td:first-child").text)
+    assert_equal("2015-07-16 2:23:31 AM MDT", find("#results_table table tbody tr:nth-child(2) td:first-child").text)
+    assert_equal("2015-07-16 12:06:28 AM MDT", find("#results_table table tbody tr:nth-child(3) td:first-child").text)
+  end
 end

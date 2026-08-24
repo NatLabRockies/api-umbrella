@@ -1,0 +1,3 @@
+minimumReleaseAge: 10080 # 7 days
+allowBuilds:
+  "@parcel/watcher": false

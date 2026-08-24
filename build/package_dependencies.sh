@@ -171,7 +171,7 @@ elif [[ "$ID_NORMALIZED" == "debian" ]]; then
     libzstd-dev
     logrotate
     openssl
-    postgresql-client
+    postgresql-client-18
     runit
     zlib1g
 

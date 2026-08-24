@@ -83,7 +83,7 @@ web:
       user_name: api_umbrella
       password: dev_password
   contact_form_email: default-test-contact-email@example.com
-  analytics_v0_summary_start_time: "2013-07-01T00:00:00.000-06:00"
+  analytics_v0_summary_start_time: "2013-06-01T00:00:00.000-06:00"
   analytics_v0_summary_end_time: "2013-08-31T23:59:59.999-06:00"
 router:
   trusted_proxies:

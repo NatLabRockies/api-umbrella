@@ -9,7 +9,7 @@ dependencies = {
   "lua >= 5.1",
   "luacheck ~> 1.2.0",
   "luaposix ~> 36.3",
-  "penlight ~> 1.14.0",
+  "penlight ~> 1.15.0",
   "shell-games ~> 1.1.0",
 }
 

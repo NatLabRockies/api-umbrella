@@ -65,7 +65,7 @@ export default class IndexTable extends Component {
           name: 'Last Signed In',
           title: t('Last Signed In'),
           defaultContent: '-',
-          render: DataTablesHelpers.renderTime,
+          render: DataTablesHelpers.renderTime(this.session.data.authenticated.analytics_timezone),
         },
         {
           data: 'created_at',
@@ -73,7 +73,7 @@ export default class IndexTable extends Component {
           name: 'Created',
           title: t('Created'),
           defaultContent: '-',
-          render: DataTablesHelpers.renderTime,
+          render: DataTablesHelpers.renderTime(this.session.data.authenticated.analytics_timezone),
         },
       ],
     });

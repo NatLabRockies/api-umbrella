@@ -96,9 +96,9 @@ class Test::Apis::Admin::Stats::TestUsers < Minitest::Test
       @user1.last_name,
       @user1.website,
       @user1.registration_source,
-      @user1.created_at.utc.strftime("%Y-%m-%d %H:%M:%S"),
+      @user1.created_at.utc.iso8601,
       "2",
-      "2015-01-16 00:00:00",
+      "2015-01-16T00:00:00Z",
       @user1.use_description,
     ], csv[1])
     assert_equal([
@@ -107,9 +107,9 @@ class Test::Apis::Admin::Stats::TestUsers < Minitest::Test
       @user2.last_name,
       @user2.website,
       @user2.registration_source,
-      @user2.created_at.utc.strftime("%Y-%m-%d %H:%M:%S"),
+      @user2.created_at.utc.iso8601,
       "1",
-      "2015-01-17 00:00:00",
+      "2015-01-17T00:00:00Z",
       @user2.use_description,
     ], csv[2])
   end

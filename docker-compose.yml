@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       target: test
       cache_from:
-        - ${DOCKER_IMAGE_CACHE_FROM:-ghcr.io/nrel/api-umbrella:dev-env-main}
+        - ${DOCKER_IMAGE_CACHE_FROM:-ghcr.io/natlabrockies/api-umbrella:dev-env-main}
     entrypoint: /app/docker/dev/docker-entrypoint
     command: /app/docker/dev/docker-start
     volumes:
@@ -30,7 +30,7 @@ services:
     environment:
       POSTGRES_PASSWORD: dev_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     ports:
       - "14011:5432"
   opensearch:

@@ -1,0 +1,4 @@
+version: 3
+min_age:
+  value: 7
+  always: true

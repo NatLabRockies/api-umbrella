@@ -8,7 +8,9 @@ source ./tasks/helpers/detect_os_release.sh
 source "$SOURCE_DIR/build/package_dependencies.sh"
 
 install_dependencies=("${all_build_dependencies[@]}")
-if [ "${INSTALL_TEST_DEPENDENCIES:-}" == "true" ]; then
+if [ "${INSTALL_CORE_RUNTIME_DEPENDENCIES:-}" == "true" ]; then
+  install_dependencies=("${core_runtime_dependencies[@]}")
+elif [ "${INSTALL_TEST_DEPENDENCIES:-}" == "true" ]; then
   install_dependencies=("${all_dependencies[@]}")
 fi
 
@@ -33,6 +35,15 @@ elif [[ "$ID_NORMALIZED" == "debian" ]]; then
     else
       echo "deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch-7 main" > /etc/apt/sources.list.d/api-umbrella-llvm.list
     fi
+  fi
+
+  if [[ "$ID" == "debian" ]]; then
+    # shellcheck disable=SC1091
+    distro=$(. /etc/os-release && echo "$VERSION_CODENAME")
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install curl ca-certificates
+    curl -fsSL -o /usr/share/keyrings/pgdg.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    echo "deb [signed-by=/usr/share/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt/ ${distro}-pgdg main" > /etc/apt/sources.list.d/pgdg.list
   fi
 
   apt-get update
