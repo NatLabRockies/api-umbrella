@@ -154,8 +154,8 @@ local function get_canonical_query_string(uri_args)
   local canonical = {}
   for name, value in pairs(uri_args_table) do
     if type(value) == "table" then
-      for multi_name, multi_value in pairs(value) do
-        table.insert(canonical, escape_uri_component(multi_name) .. "=" .. escape_uri_component(multi_value))
+      for _, multi_value in ipairs(value) do
+        table.insert(canonical, escape_uri_component(name) .. "=" .. escape_uri_component(multi_value))
       end
     else
       table.insert(canonical, escape_uri_component(name) .. "=" .. escape_uri_component(value))

@@ -16,6 +16,7 @@ return function(ngx_ctx)
     end
 
     if not is_empty(api_key) then
+      ngx_ctx.api_key_method = method
       break
     end
   end

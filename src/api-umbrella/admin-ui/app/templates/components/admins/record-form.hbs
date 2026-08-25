@@ -38,7 +38,7 @@
 
       {{#if this.model.authenticationToken}}
         {{#if this.session.data.authenticated.local_auth_enabled}}
-          {{#if this.currentAdmin.permissions.admin_manage}}
+          {{#if (or this.currentAdmin.permissions.admin_manage this.isOwnProfile)}}
             <fieldset class="form-horizontal condensed">
               <legend>{{t "Change Your Password"}}</legend>
 
@@ -71,7 +71,7 @@
 
       <div class="row">
         <div class="col-sm-6">
-          {{#if this.currentAdmin.permissions.admin_manage}}
+          {{#if (or this.currentAdmin.permissions.admin_manage this.isOwnProfile)}}
             <button type="submit" class="btn btn-lg btn-primary save-button"><span class="btn-label">Save</span><span class="btn-loading-label"><FaIcon @icon="sync-alt" @spin={{true}} />Saving...</span></button>
           {{/if}}
         </div>

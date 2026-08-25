@@ -87,16 +87,14 @@ class Test::AdminUi::TestAdmins < Minitest::Capybara::Test
     assert_text(admin.username)
     refute_field("Notes")
     refute_text("Notes")
-    # TODO: Admins should be able to set their own password, even if they lack
-    # the admin_manage role.
-    refute_text("Change Your Password")
-    refute_field("Current Password")
-    refute_field("New Password")
+    assert_text("Change Your Password")
+    assert_field("Current Password")
+    assert_field("New Password")
     refute_text("Permissions")
     assert_text("Admin API Access")
     assert_text("Admin API Token")
     assert(admin.authentication_token)
     assert_text(admin.authentication_token)
-    refute_button("Save")
+    assert_button("Save")
   end
 end

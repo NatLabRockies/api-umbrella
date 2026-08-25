@@ -3,6 +3,7 @@ local get_user = require("api-umbrella.proxy.stores.api_users_store").get
 return function(ngx_ctx, settings)
   -- Retrieve the API key found in the resolve_api_key middleware.
   local api_key = ngx_ctx.api_key
+  local api_key_method = ngx_ctx.api_key_method
   if not api_key then
     if settings and settings["disable_api_key"] then
       return nil
@@ -14,6 +15,10 @@ return function(ngx_ctx, settings)
   -- Look for the api key in the user database.
   local user = get_user(api_key)
   if not user then
+    if settings and settings["disable_api_key"] and api_key_method == "basic_auth_username" then
+      return nil
+    end
+
     return nil, "api_key_invalid"
   end
 

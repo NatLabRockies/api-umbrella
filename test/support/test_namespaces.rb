@@ -25,6 +25,8 @@ module Test
 
       module Admins; end
 
+      module AgentLoop; end
+
       module Analytics; end
 
       module ApiScopes; end

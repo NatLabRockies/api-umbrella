@@ -58,8 +58,6 @@ class Test::Proxy::RequestRewriting::TestStripsApiKeysWhenOptional < Minitest::T
   # the username is a key which then isn't valid). I don't think this is the
   # behavior we want, so need to figure out how to address this.
   def test_retains_basic_auth_if_api_key_passed_by_other_means
-    skip("Passing HTTP basic auth when api keys are optional does not currently function as it should.")
-
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/api-keys-optional/info/", keyless_http_options.deep_merge({
       :userpwd => "foo:",
     }))
