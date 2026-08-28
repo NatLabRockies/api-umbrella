@@ -48,6 +48,8 @@ import "path"
     worker_connections: uint | *8192
     listen_so_keepalive: string | *"on"
     listen_backlog?: uint
+    lingering_close: string | *"on"
+    lingering_timeout: uint | *5
     error_log_level: string | *"notice"
     access_log_filename: string | *"access.log"
     access_log_options: string | null | *"buffer=256k flush=10s"
@@ -437,8 +439,6 @@ import "path"
   }
 
   fluent_bit: {
-    #on_off_bool: "on" | "off"
-
     host: string | *"127.0.0.1"
     port: uint16 | *14014
     service: {
@@ -449,15 +449,16 @@ import "path"
     }
     aws_access_key_id?: string
     aws_secret_access_key?: string
+    metrics_interval: uint16 | *60
     outputs: {
       opensearch: {
         enabled: bool | *true
-        aws_auth: #on_off_bool | *"off"
+        aws_auth: bool | *false
         aws_region?: string
         aws_service_name: string | *"es"
         retry_limit: uint | *30
         storage_total_limit_size: string | *"128M"
-        trace_error: #on_off_bool | *"on"
+        trace_error: bool | *true
         buffer_size: string | *"64KB"
       }
 
@@ -478,6 +479,34 @@ import "path"
         preserve_data_ordering: bool | *true
         retry_limit: uint | *5
       }
+
+      opentelemetry_metrics: {
+        enabled: bool | *false
+        host?: string
+        port: uint16 | *80
+        tls: bool | *false
+        metrics_uri: string | *"/v1/metrics"
+        compress: string | *"gzip"
+        add_label?: [...string]
+        aws_auth: bool | *false
+        aws_region?: string
+        aws_service: string | *"monitoring"
+      }
+
+      prometheus_metrics: {
+        enabled: bool | *false
+        host?: string
+        port: uint16 | *80
+        tls: bool | *false
+        uri?: string
+        compression: string | *"snappy"
+        header?: string
+        add_label?: [...string]
+        aws_auth: bool | *false
+        aws_region?: string
+        aws_service: string | *"aps"
+      }
+
     }
   }
 

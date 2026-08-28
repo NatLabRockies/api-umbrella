@@ -1,7 +1,7 @@
 ###
 # Build
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS build
+FROM public.ecr.aws/docker/library/debian:trixie AS build
 
 ARG TARGETARCH
 
@@ -95,7 +95,7 @@ RUN make && make clean:dev
 ###
 # Test
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS test
+FROM public.ecr.aws/docker/library/debian:trixie AS test
 
 ARG TARGETARCH
 
@@ -148,7 +148,7 @@ ENV \
 ###
 # Install
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS install
+FROM public.ecr.aws/docker/library/debian:trixie AS install
 
 RUN apt-get update && \
   apt-get -y install git rsync && \
@@ -165,7 +165,7 @@ RUN DESTDIR="/build/install-destdir" PREFIX=/opt/api-umbrella ./tasks/install
 ###
 # Runtime
 ###
-FROM public.ecr.aws/docker/library/debian:bookworm AS runtime
+FROM public.ecr.aws/docker/library/debian:trixie AS runtime
 
 COPY --from=install /build/install-destdir /
 COPY build/package/scripts/after-install /tmp/install/build/package/scripts/after-install
@@ -186,7 +186,7 @@ CMD ["api-umbrella", "run"]
 ###
 # Build - envoy-config-wrapper
 ###
-FROM rust:1-slim-bookworm AS envoy-config-wrapper-build
+FROM rust:1-slim-trixie AS envoy-config-wrapper-build
 
 # Use the musl target for static binaries that will work in the distroless
 # image.
@@ -200,8 +200,12 @@ RUN cargo build --release --target "$(arch)-unknown-linux-musl"
 ###
 # Runtime - Egress Only
 # https://github.com/envoyproxy/envoy/blob/release/v1.27/ci/Dockerfile-envoy#L60-L69
+# Built on top of distroless fluent-bit container so the image can also run
+# fluent-bit as sidecar.
 ###
-FROM gcr.io/distroless/base-nossl-debian12:nonroot AS runtime-egress
+# Version should be kept in sync with `tasks/deps/fluent-bit` version.
+FROM busybox:musl AS busybox
+FROM fluent/fluent-bit:5.1.0 AS runtime-egress
 
 # Create the needed directories as the non-root user, and then switch back to
 # the defalt workdir.
@@ -214,7 +218,23 @@ WORKDIR /home/nonroot
 COPY --from=envoy-config-wrapper-build --chown=0:0 --chmod=755 ./target/*/release/envoy-config-wrapper /usr/local/bin/
 COPY --from=build --chown=0:0 --chmod=755 /app/build/work/stage/opt/api-umbrella/embedded/bin/envoy /usr/local/bin/
 
+# Add sh, which seems to be necessary for CloudFoundry when specifying a custom
+# `command` attribute (as we do for the fluentbit sidecar).
+COPY --from=busybox /bin/sh /bin/sh
+
 EXPOSE 14001
 
 ENTRYPOINT ["/usr/local/bin/envoy-config-wrapper"]
-CMD ["-c", "/etc/envoy/envoy.yaml", "--use-dynamic-base-id", "--base-id-path", "/var/run/envoy/base-id"]
+CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml", "--use-dynamic-base-id", "--base-id-path", "/var/run/envoy/base-id"]
+
+###
+# Runtime - otelcol Only
+###
+FROM public.ecr.aws/aws-observability/aws-otel-collector:v0.49.0 AS runtime-otelcol
+
+# Add sh, which seems to be necessary for CloudFoundry when specifying a custom
+# `command` attribute.
+COPY --from=busybox /bin/sh /bin/sh
+
+# Add env for specifying environment variables on custom `command`.
+COPY --from=busybox /bin/env /bin/env

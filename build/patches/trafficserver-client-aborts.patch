@@ -1,0 +1,19 @@
+diff --git a/src/proxy/http/HttpSM.cc b/src/proxy/http/HttpSM.cc
+index 1ffa2d8b5b1..4c9316c3e98 100644
+--- a/src/proxy/http/HttpSM.cc
++++ b/src/proxy/http/HttpSM.cc
+@@ -910,9 +910,12 @@ HttpSM::state_watch_for_client_abort(int event, void *data)
+         if (netvc) {
+           netvc->do_io_shutdown(IO_SHUTDOWN_READ);
+         }
+-      } else if (t_state.txn_conf->cache_http &&
++      } else if (t_state.txn_conf->allow_half_open > 0 && t_state.txn_conf->cache_http &&
+                  (server_entry != nullptr && server_entry->vc_read_handler == &HttpSM::state_read_server_response_header)) {
+-        // if HttpSM is waiting response header from origin server, keep it for a while to run background fetch
++        // Half open connections are configured, but the transport does not support them (e.g. TLS or HTTP/2). If HttpSM is
++        // waiting response header from origin server, keep it for a while to run background fetch. Note that the operator
++        // disabling half open connections is handled below: the transaction is aborted rather than kept alive for a client
++        // that is no longer there.
+         _ua.get_txn()->do_io_shutdown(IO_SHUTDOWN_READWRITE);
+       } else {
+         _ua.get_txn()->do_io_close();gg

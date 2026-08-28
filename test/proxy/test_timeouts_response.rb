@@ -2,6 +2,7 @@ require_relative "../test_helper"
 
 class Test::Proxy::TestTimeoutsResponse < Minitest::Test
   include ApiUmbrellaTestHelpers::Setup
+  include Minitest::Hooks
 
   # While these tests can be parallelized, given the timing sensitivities of
   # them, we will not parallelize them to cut down on flaky tests due to the
@@ -42,15 +43,63 @@ class Test::Proxy::TestTimeoutsResponse < Minitest::Test
   end
 
   def test_response_sent_after_timeout
+    router_log_tail = LogTail.new("nginx/access.log")
+    trafficserver_log_tail = LogTail.new("trafficserver/access.log")
+    envoy_log_tail = LogTail.new("envoy/access.log")
+    api_backend_log_tail = LogTail.new("test-env-nginx/access.log")
+
     read_timeout = $config["nginx"]["proxy_read_timeout"]
     delay = read_timeout + 2
     assert_operator(delay, :>, read_timeout)
+    assert_operator(delay, :>, read_timeout + BUFFER_TIME_UPPER)
+    assert_operator(delay, :<, read_timeout + (BUFFER_TIME_UPPER * 2))
 
-    response = Typhoeus.get("http://127.0.0.1:9080/api/delay-sec/#{delay}", http_options)
+    response = Typhoeus.get("http://127.0.0.1:9080/api/delay-sec/#{delay}", http_options.deep_merge({
+      params: {
+        unique_test_id: unique_test_id,
+      },
+    }))
     assert_response_code(504, response)
     assert_match("Inactivity Timeout", response.body)
-    assert_operator(response.total_time, :>, read_timeout - BUFFER_TIME_LOWER)
-    assert_operator(response.total_time, :<=, read_timeout + BUFFER_TIME_UPPER)
+    client_time = response.total_time
+    assert_operator(client_time, :>, read_timeout - BUFFER_TIME_LOWER)
+    assert_operator(client_time, :<=, read_timeout + BUFFER_TIME_UPPER)
+
+    # Verify the request that timed out was aborted in all of the different
+    # server layers after the expected timeout time (to ensure the request
+    # didn't just timeout at one layer, but is still running at other layers).
+    router_log = MultiJson.load(router_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    router_time = router_log.fetch("duration").to_f
+    assert_operator(router_time, :>, read_timeout - BUFFER_TIME_LOWER)
+    assert_operator(router_time, :<=, read_timeout + BUFFER_TIME_UPPER)
+    assert_equal("504", router_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("504", router_log.fetch("up_status"))
+
+    trafficserver_log = MultiJson.load(trafficserver_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    trafficserver_time = trafficserver_log.fetch("duration").to_f / 1000
+    assert_operator(trafficserver_time, :>, read_timeout - BUFFER_TIME_LOWER)
+    assert_operator(trafficserver_time, :<=, read_timeout + BUFFER_TIME_UPPER)
+    assert_equal("504", trafficserver_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("000", trafficserver_log.fetch("up_status"))
+    assert_equal("FIN", trafficserver_log.fetch("client_finish"))
+    assert_equal("TIMEOUT", trafficserver_log.fetch("proxy_finish"))
+    assert_equal("-", trafficserver_log.fetch("req_err"))
+    assert_equal("-", trafficserver_log.fetch("resp_err"))
+
+    envoy_log = MultiJson.load(envoy_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    envoy_time = envoy_log.fetch("duration").to_f / 1000
+    assert_operator(envoy_time, :>, read_timeout - BUFFER_TIME_LOWER)
+    assert_operator(envoy_time, :<=, read_timeout + BUFFER_TIME_UPPER)
+    assert_equal(0, envoy_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("DC", envoy_log.fetch("resp_flags"))
+    assert_equal("downstream_remote_disconnect", envoy_log.fetch("resp_detail"))
+    assert_nil(envoy_log.fetch("up_fail"))
+
+    api_backend_log = MultiJson.load(api_backend_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    api_backend_time = api_backend_log.fetch("duration").to_f
+    assert_operator(api_backend_time, :>, read_timeout - BUFFER_TIME_LOWER)
+    assert_operator(api_backend_time, :<=, read_timeout + BUFFER_TIME_UPPER)
+    assert_equal("499", api_backend_log.fetch("http").fetch("response").fetch("status_code"))
   end
 
   def test_response_begins_within_read_timeout
@@ -129,5 +178,65 @@ class Test::Proxy::TestTimeoutsResponse < Minitest::Test
     info_requests.each do |request|
       assert_response_code(200, request.response)
     end
+  end
+
+  def test_client_aborted_requests_before_response_propagate_to_all_layers
+    router_log_tail = LogTail.new("nginx/access.log")
+    trafficserver_log_tail = LogTail.new("trafficserver/access.log")
+    envoy_log_tail = LogTail.new("envoy/access.log")
+    api_backend_log_tail = LogTail.new("test-env-nginx/access.log")
+
+    read_timeout = $config["nginx"]["proxy_read_timeout"]
+    delay = read_timeout + 10
+    assert_operator(delay, :>, read_timeout + BUFFER_TIME_UPPER)
+
+    client_timeout = 2
+    assert_operator(client_timeout, :<, read_timeout - BUFFER_TIME_LOWER - BUFFER_TIME_UPPER)
+
+    response = Typhoeus.get("http://127.0.0.1:9080/api/delay-sec/#{delay}", http_options.deep_merge({
+      timeout: client_timeout,
+      params: {
+        unique_test_id: unique_test_id,
+      },
+    }))
+    assert_response_code(0, response)
+    assert_equal(:operation_timedout, response.return_code)
+    assert_equal("", response.body)
+    client_time = response.total_time
+    assert_operator(client_time, :>, client_timeout - BUFFER_TIME_LOWER)
+    assert_operator(client_time, :<=, client_timeout + BUFFER_TIME_UPPER)
+
+    router_log = MultiJson.load(router_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    router_time = router_log.fetch("duration").to_f
+    assert_operator(router_time, :>, client_timeout - BUFFER_TIME_LOWER)
+    assert_operator(router_time, :<=, client_timeout + BUFFER_TIME_UPPER)
+    assert_equal("499", router_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("-", router_log.fetch("up_status"))
+
+    trafficserver_log = MultiJson.load(trafficserver_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    trafficserver_time = trafficserver_log.fetch("duration").to_f / 1000
+    assert_operator(trafficserver_time, :>, client_timeout - BUFFER_TIME_LOWER)
+    assert_operator(trafficserver_time, :<=, client_timeout + BUFFER_TIME_UPPER)
+    assert_equal("000", trafficserver_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("000", trafficserver_log.fetch("up_status"))
+    assert_equal("INTR", trafficserver_log.fetch("client_finish"))
+    assert_equal("FIN", trafficserver_log.fetch("proxy_finish"))
+    assert_equal("-", trafficserver_log.fetch("req_err"))
+    assert_equal("-", trafficserver_log.fetch("resp_err"))
+
+    envoy_log = MultiJson.load(envoy_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    envoy_time = envoy_log.fetch("duration").to_f / 1000
+    assert_operator(envoy_time, :>, client_timeout - BUFFER_TIME_LOWER)
+    assert_operator(envoy_time, :<=, client_timeout + BUFFER_TIME_UPPER)
+    assert_equal(0, envoy_log.fetch("http").fetch("response").fetch("status_code"))
+    assert_equal("DC", envoy_log.fetch("resp_flags"))
+    assert_equal("downstream_remote_disconnect", envoy_log.fetch("resp_detail"))
+    assert_nil(envoy_log.fetch("up_fail"))
+
+    api_backend_log = MultiJson.load(api_backend_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
+    api_backend_time = api_backend_log.fetch("duration").to_f
+    assert_operator(api_backend_time, :>, client_timeout - BUFFER_TIME_LOWER)
+    assert_operator(api_backend_time, :<=, client_timeout + BUFFER_TIME_UPPER)
+    assert_equal("499", api_backend_log.fetch("http").fetch("response").fetch("status_code"))
   end
 end

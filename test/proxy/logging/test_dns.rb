@@ -4,6 +4,7 @@ class Test::Proxy::Logging::TestDns < Minitest::Test
   include ApiUmbrellaTestHelpers::Setup
   include ApiUmbrellaTestHelpers::Dns
   include ApiUmbrellaTestHelpers::Logging
+  include Minitest::Hooks
 
   def setup
     super

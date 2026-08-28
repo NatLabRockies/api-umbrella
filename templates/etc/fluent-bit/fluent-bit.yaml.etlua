@@ -16,19 +16,124 @@ service:
 
 pipeline:
   inputs:
-    - name: fluentbit_metrics
-      tag: internal_metrics
-      scrape_interval: 60
-      scrape_on_start: true
-
+    <% if config["_service_router_enabled?"] then %>
     - name: tcp
       tag: analytics.allowed
       listen: <%- json_encode(config["fluent_bit"]["host"]) %>
       port: <%- json_encode(config["fluent_bit"]["port"]) %>
       format: json
       storage.type: filesystem
+    <% end %>
+
+    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] or config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
+    - name: fluentbit_metrics
+      tag: metrics.fluentbit
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"]) %>
+      scrape_on_start: true
+
+    <% if config["_service_router_enabled?"] then %>
+    - name: health
+      tag: health.router
+      host: 127.0.0.1
+      port: <%- json_encode(config["http_port"]) %>
+      interval_sec: 1
+      alert: true
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: name
+            value: router
+
+    - name: health
+      tag: health.api_server
+      host: 127.0.0.1
+      port: <%- json_encode(config["api_server"]["port"]) %>
+      interval_sec: 1
+      alert: true
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: name
+            value: api_server
+
+    - name: health
+      tag: health.web_app
+      host: 127.0.0.1
+      port: <%- json_encode(config["web"]["port"]) %>
+      interval_sec: 1
+      alert: true
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: name
+            value: web_app
+
+    - name: health
+      tag: health.trafficserver
+      host: 127.0.0.1
+      port: <%- json_encode(config["trafficserver"]["port"]) %>
+      interval_sec: 1
+      alert: true
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: name
+            value: trafficserver
+
+    - name: prometheus_scrape
+      tag: metrics.router
+      host: 127.0.0.1
+      port: <%- json_encode(config["api_server"]["port"]) %>
+      metrics_path: /_nginx-status/format/prometheus
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
+
+    - name: prometheus_scrape
+      tag: metrics.trafficserver
+      host: 127.0.0.1
+      port: <%- json_encode(config["trafficserver"]["port"]) %>
+      metrics_path: /_trafficserver-stats/prometheus
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
+    <% end %>
+
+    <% if config["_service_egress_enabled?"] then %>
+    - name: health
+      tag: health.envoy
+      host: 127.0.0.1
+      port: <%- json_encode(config["envoy"]["port"]) %>
+      interval_sec: 1
+      alert: true
+      processors:
+        logs:
+          - name: content_modifier
+            action: insert
+            key: name
+            value: envoy
+
+    - name: prometheus_scrape
+      tag: metrics.envoy
+      host: 127.0.0.1
+      port: <%- json_encode(config["envoy"]["admin"]["port"]) %>
+      metrics_path: /stats?format=prometheus&usedonly
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
+    <% end %>
+
+    - name: node_exporter_metrics
+      tag: metrics.node
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
+      metrics: cpu,meminfo,diskstats,filesystem,uname,stat,time,loadavg,vmstat,netdev,netstat,sockstat,filefd
+
+    - name: process_exporter_metrics
+      tag: metrics.process
+      scrape_interval: <%- json_encode(config["fluent_bit"]["metrics_interval"] .. "s") %>
+      metrics: cpu,io,memory,state,context_switches,fd,start_time
+    <% end %>
 
   filters:
+    <% if config["_service_router_enabled?"] then %>
     - name: rewrite_tag
       match: analytics.allowed
       rule: "$gatekeeper_denied_code ^. analytics.denied false"
@@ -46,12 +151,29 @@ pipeline:
     - name: modify
       match: "analytics.*"
       remove: response_status_str
+    <% end %>
+
+    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] or config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
+    - name: log_to_metrics
+      match: "health.*"
+      tag: metrics.health
+      metric_mode: counter
+      metric_namespace: tcp_healthcheck
+      metric_name: errors_total
+      metric_description: Counts TCP healthcheck failures
+      label_field:
+        - name
+      flush_interval_sec: <%- json_encode(config["fluent_bit"]["metrics_interval"]) %>
+    <% end %>
 
   outputs:
+    <% if config["_service_router_enabled?"] then %>
     # Print what we would log to stdout for extra redundancy.
     - name: stdout
-      match: "*"
-      format: msgpack
+      match: "analytics.*"
+      format: json_lines
+      json_date_key: _log_timestamp
+      json_date_format: iso8601
 
     <% if config["fluent_bit"]["outputs"]["opensearch"]["enabled"] then %>
     # Send API analytics to OpenSearch analytics DB.
@@ -59,15 +181,19 @@ pipeline:
       match: "analytics.*"
       host: <%- json_encode(config["opensearch"]["_first_server"]["host"]) %>
       port: <%- json_encode(config["opensearch"]["_first_server"]["port"]) %>
-      tls: <%- config["opensearch"]["_first_server"]["_https?"] and "on" or "off" %>
+      tls: <%- json_encode(config["opensearch"]["_first_server"]["_https?"]) %>
       <% if config["opensearch"]["_first_server"]["user"] then %>
       http_user: <%- json_encode(config["opensearch"]["_first_server"]["user"]) %>
       <% end %>
       <% if config["opensearch"]["_first_server"]["password"] then %>
       http_passwd: <%- json_encode(config["opensearch"]["_first_server"]["password"]) %>"
       <% end %>
-      <% if config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] == "on" then %>
-      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"]) %>
+      <% if config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] then %>
+      # Specific to the opensearch output plugin, the `aws_auth` boolean has to
+      # be an explicit "on" or "off", unless these issues are fixed:
+      # https://github.com/fluent/fluent-bit/issues/10947
+      # https://github.com/fluent/fluent-bit/issues/10228
+      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_auth"] and "on" or "off") %>
       aws_region: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_region"]) %>
       aws_service_name: <%- json_encode(config["fluent_bit"]["outputs"]["opensearch"]["aws_service_name"]) %>
       <% end %>
@@ -125,4 +251,44 @@ pipeline:
       auto_retry_requests: <%- json_encode(config["fluent_bit"]["outputs"]["s3"]["auto_retry_requests"]) %>
       retry_limit: <%- json_encode(config["fluent_bit"]["outputs"]["s3"]["retry_limit"]) %>
       preserve_data_ordering: <%- json_encode(config["fluent_bit"]["outputs"]["s3"]["preserve_data_ordering"]) %>
+    <% end %>
+    <% end %>
+
+    <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["enabled"] then %>
+    - name: opentelemetry
+      match: "metrics.*"
+      host: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["host"]) %>
+      port: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["port"]) %>
+      tls: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["tls"]) %>
+      metrics_uri: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["metrics_uri"]) %>
+      compress: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["compress"]) %>
+      <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["add_label"] then %>
+      add_label: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["add_label"]) %>
+      <% end %>
+      <% if config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_auth"] then %>
+      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_auth"]) %>
+      aws_region: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_region"]) %>
+      aws_service: <%- json_encode(config["fluent_bit"]["outputs"]["opentelemetry_metrics"]["aws_service"]) %>
+      <% end %>
+    <% end %>
+
+    <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["enabled"] then %>
+    - name: prometheus_remote_write
+      match: "metrics.*"
+      host: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["host"]) %>
+      port: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["port"]) %>
+      tls: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["tls"]) %>
+      uri: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["uri"]) %>
+      compression: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["compression"]) %>
+      <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["header"] then %>
+      header: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["header"]) %>
+      <% end %>
+      <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["add_label"] then %>
+      add_label: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["add_label"]) %>
+      <% end %>
+      <% if config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_auth"] then %>
+      aws_auth: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_auth"]) %>
+      aws_region: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_region"]) %>
+      aws_service: <%- json_encode(config["fluent_bit"]["outputs"]["prometheus_metrics"]["aws_service"]) %>
+      <% end %>
     <% end %>

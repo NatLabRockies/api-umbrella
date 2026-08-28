@@ -115,7 +115,7 @@ class Minitest::Test
     # If tests are being run in parallel, disable database cleaner between test
     # runs, since parallel tests should not reset their state between runs
     # (doing so might interfere with the other parallel tests running).
-    if(self.class.test_order != :parallel && $config)
+    if(self.class.run_order != :parallel && $config)
       DatabaseDeleter.clean
     end
 

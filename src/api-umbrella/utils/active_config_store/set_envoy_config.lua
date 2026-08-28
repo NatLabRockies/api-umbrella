@@ -42,19 +42,35 @@ local base_access_log = {
   typed_config = {
     log_format = {
       json_format = {
-        time = "%START_TIME%",
-        ip = "%REQ(X-FORWARDED-FOR)%",
-        method = "%REQ(:METHOD)%",
-        scheme = "%REQ(:SCHEME)%",
-        uri = "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%",
-        proto = "%PROTOCOL%",
-        status = "%RESPONSE_CODE%",
-        user_agent = "%REQ(USER-AGENT)%",
-        id = "%REQ(X-API-UMBRELLA-REQUEST-ID?X-REQUEST-ID)%",
+        ["@timestamp"] = "%START_TIME%",
+        service = {
+          type = "envoy",
+          name = "access",
+        },
+        client = {
+          ip = "%REQ(X-FORWARDED-FOR)%",
+        },
+        url = {
+          domain = "%REQ(:AUTHORITY)%",
+          original = "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%",
+          scheme = "%REQ(:SCHEME)%",
+        },
+        http = {
+          request = {
+            bytes = "%BYTES_RECEIVED%",
+            id = "%REQ(X-API-UMBRELLA-REQUEST-ID?X-REQUEST-ID)%",
+            method = "%REQ(:METHOD)%",
+          },
+          response = {
+            status_code = "%RESPONSE_CODE%",
+            bytes = "%BYTES_SENT%",
+          },
+          version = "%PROTOCOL%",
+        },
+        user_agent = {
+          original = "%REQ(USER-AGENT)%",
+        },
         cache = "%REQ(X-CACHE)%",
-        host = "%REQ(:AUTHORITY)%",
-        resp_size = "%BYTES_SENT%",
-        req_size = "%BYTES_RECEIVED%",
         duration = "%DURATION%",
         req_dur = "%REQUEST_DURATION%",
         req_tx_dur = "%REQUEST_TX_DURATION%",
@@ -69,6 +85,19 @@ local base_access_log = {
         up_tls_ver = "%UPSTREAM_TLS_VERSION%",
         up_fail = "%UPSTREAM_TRANSPORT_FAILURE_REASON%",
         up_dur = "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%",
+
+        -- Cloud.gov formatting:
+        -- https://github.com/cloud-gov/opensearch-boshrelease/blob/752e16bf75c9e1cd7b04d356aa432d7a4cdf25ab/src/cf-logstash-filters/src/logstash-filters/snippets/app-logmessage-app.conf#L52-L91
+        request = {
+          bytes = "%BYTES_RECEIVED%",
+          client_ip = "%REQ(X-FORWARDED-FOR)%",
+          host = "%REQ(:AUTHORITY)%",
+          id = "%REQ(X-API-UMBRELLA-REQUEST-ID?X-REQUEST-ID)%",
+          method = "%REQ(:METHOD)%",
+          proto = "%PROTOCOL%",
+          uri = "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%",
+        },
+        status = "%RESPONSE_CODE%",
       },
       omit_empty_values = true,
     },
