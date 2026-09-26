@@ -1,6 +1,6 @@
 require_relative "../test_helper"
 
-class Test::Processes::TestTrafficserver < Minitest::Test
+class Test::Processes::TestNginx < Minitest::Test
   include ApiUmbrellaTestHelpers::Setup
   include ApiUmbrellaTestHelpers::Logging
 
@@ -9,9 +9,9 @@ class Test::Processes::TestTrafficserver < Minitest::Test
     setup_server
   end
 
-  def test_trafficserver_logging
+  def test_nginx_logging
     # Default file-based logging.
-    access_log_tail = LogTail.new("trafficserver/access.log")
+    access_log_tail = LogTail.new("nginx/access.log")
 
     response = Typhoeus.get("http://127.0.0.1:9080/api/hello?foo=bar", http_options)
 
@@ -22,20 +22,13 @@ class Test::Processes::TestTrafficserver < Minitest::Test
     assert_equal(response.headers["X-Api-Umbrella-Request-ID"], log_row.fetch("http").fetch("request").fetch("id"))
     assert_equal("200", log_row.fetch("up_status"))
 
-    log_glob = File.join($config["log_dir"], "trafficserver/*.{log,out,old}")
-    log_paths = Dir.glob(log_glob)
-    log_filenames = log_paths.map { |path| File.basename(path) }
-    assert_includes(log_filenames, "access.log")
-    assert_includes(log_filenames, "diags.log")
-    FileUtils.rm_f(log_paths)
-
     # Check stdout/stderr based logging.
     override_config({
       "log" => {
         "destination" => "console",
       },
     }) do
-      current_log_tail = LogTail.new("trafficserver/current")
+      current_log_tail = LogTail.new("nginx/current")
 
       response = Typhoeus.get("http://127.0.0.1:9080/api/hello?foo=bar", http_options)
 
@@ -52,23 +45,6 @@ class Test::Processes::TestTrafficserver < Minitest::Test
       assert_equal("200", log_row.fetch("http").fetch("response").fetch("status_code"))
       assert_equal(response.headers["X-Api-Umbrella-Request-ID"], log_row.fetch("http").fetch("request").fetch("id"))
       assert_equal("200", log_row.fetch("up_status"))
-
-      log_paths = Dir.glob(log_glob)
-      # Ignore crash log files, since the restart to set this setting may have
-      # triggered an empty crash log file generation (even though there was no
-      # actual crash).
-      log_paths.reject! { |path| File.basename(path).start_with?("crash-") }
-      assert_equal([], log_paths)
     end
-  end
-
-  def test_runs_crashlog
-    output, status = run_shell("ps", "-e", "-o", "cmd")
-    if status != 0
-      raise "ps failed (status: #{status}): #{output}"
-    end
-
-    assert_match("traffic_server", output)
-    assert_match("traffic_crashlog", output)
   end
 end

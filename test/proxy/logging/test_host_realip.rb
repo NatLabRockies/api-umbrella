@@ -3,6 +3,7 @@ require_relative "../../test_helper"
 class Test::Proxy::Logging::TestHostRealip < Minitest::Test
   include ApiUmbrellaTestHelpers::Setup
   include ApiUmbrellaTestHelpers::Logging
+  include Minitest::Hooks
 
   def setup
     super
@@ -37,6 +38,11 @@ class Test::Proxy::Logging::TestHostRealip < Minitest::Test
         },
       ])
     end
+  end
+
+  def after_all
+    super
+    override_config_reset
   end
 
   def test_default_ignores_custom_headers

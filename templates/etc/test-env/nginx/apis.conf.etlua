@@ -5,6 +5,7 @@ server {
   listen [::]:9444;
   listen 127.0.0.1:9441;
 
+  set $log_service "nginx-test-env-apis";
   set $x_api_umbrella_request_id $http_x_api_umbrella_request_id;
   lua_use_default_type off;
   default_type "";

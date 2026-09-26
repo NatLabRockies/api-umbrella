@@ -18,7 +18,13 @@ fn main() {
             .expect("Error writing '/etc/envoy/envoy.yaml' file");
     }
 
+    let config_yaml = env::var("FLUENT_BIT_CONFIG_YAML");
+    if config_yaml.is_ok() {
+        fs::write("/fluent-bit/etc/fluent-bit.yaml", config_yaml.unwrap())
+            .expect("Error writing '/fluent-bit/etc/fluent-bit.yaml' file");
+    }
+
     let args: Vec<_> = env::args_os().skip(1).collect();
-    let err = Command::new("/usr/local/bin/envoy").args(&args).exec();
+    let err = Command::new(&args[0]).args(&args[1..]).exec();
     println!("Error: {}", err);
 }

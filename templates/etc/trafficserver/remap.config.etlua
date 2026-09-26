@@ -1,7 +1,7 @@
 # A fake endpoint that just returns a 200 OK response. We'll use this to check
 # if Trafficserver is up and responding (since Envoy may not be up if that's
 # hosted separately).
-map http://api-umbrella-trafficserver-health.internal/_trafficserver-health/ http://127.0.0.1 @plugin=generator.so
+map http://api-umbrella-trafficserver-health.internal/_trafficserver-health http://127.0.0.1 @plugin=statichit.so @pparam=--file-path=<%- config["etc_dir"] %>/trafficserver/healthcheck.txt
 
 # Route all requests to Envoy for proxying to underlying API backends.
 map / <%- config["envoy"]["scheme"] %>://<%- config["envoy"]["host"] %>:<%- config["envoy"]["port"] %>

@@ -8,7 +8,7 @@ local jobs_dict = ngx.shared.jobs
 local opensearch_query = opensearch.query
 local ngx_var = ngx.var
 
-local function status_response(quick)
+local function status_response(quick, ignore_trafficserver)
   local response = {
     status = "red",
     details = {
@@ -20,18 +20,23 @@ local function status_response(quick)
   -- Check to see if the APIs have been loaded.
   if active_config_exists() then
     response["details"]["apis_config"] = "green"
+  else
+    ngx.log(ngx.ERR, "no active config exists")
   end
 
   local httpc = http.new()
   httpc:set_timeout(3000)
 
-  local res, err = httpc:request_uri("http://127.0.0.1:" .. config["trafficserver"]["port"] .. "/_trafficserver-health/nocache/1", {
+  local res, err = httpc:request_uri("http://127.0.0.1:" .. config["trafficserver"]["port"] .. "/_trafficserver-health", {
     headers = {
       ["Host"] = "api-umbrella-trafficserver-health.internal",
     },
   })
   if err then
-    ngx.log(ngx.ERR, "failed to fetch web app: ", err)
+    ngx.log(ngx.ERR, "failed to fetch trafficserver health: ", err)
+    if ignore_trafficserver then
+      response["details"]["cache_server"] = "yellow"
+    end
   elseif res.status == 200 then
     response["details"]["cache_server"] = "green"
   end
@@ -39,6 +44,8 @@ local function status_response(quick)
   if quick then
     if response["details"]["apis_config"] == "green" and response["details"]["cache_server"] == "green" then
       response["status"] = "green"
+    elseif response["details"]["apis_config"] == "green" and response["details"]["cache_server"] == "yellow" then
+      response["status"] = "yellow"
     end
 
     return response
@@ -97,8 +104,9 @@ end
 local response
 local wait_for_status = ngx_var.arg_wait_for_status
 local quick = ngx_var.arg_quick == "true"
+local ignore_trafficserver = ngx_var.arg_ignore_trafficserver == "true"
 if not wait_for_status then
-  response = status_response(quick)
+  response = status_response(quick, ignore_trafficserver)
 else
   -- Validate the wait_for_status param.
   if wait_for_status ~= "green" and wait_for_status ~= "yellow" and wait_for_status ~= "red" then
@@ -148,9 +156,11 @@ else
 end
 
 -- Return an error HTTP status code if the status is red.
+local json_response = json_encode(response)
 if response["status"] == "red" then
+  ngx.log(ngx.ERR, "Unhealthy health check: ", json_response)
   ngx.status = ngx.HTTP_SERVICE_UNAVAILABLE
 end
 
 ngx.header["Content-Type"] = "application/json"
-ngx.say(json_encode(response))
+ngx.say(json_response)

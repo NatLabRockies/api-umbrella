@@ -99,16 +99,16 @@ class Test::Proxy::Envoy::TestHttpProxy < Minitest::Test
       # like it can take a while for this CONNECT request to be flushed to the
       # logs (probably since it's a persistent tunnel).
       api_umbrella_process.perp_signal("fluent-bit", "hup")
-      log_output = log_tail.read_until(%r{"user_agent":"Fluent-Bit"})
-      log = MultiJson.load(log_output.scan(%r{^.*"user_agent":"Fluent-Bit".*$}).last)
+      log_output = log_tail.read_until(%r{"original":"Fluent-Bit"})
+      log = MultiJson.load(log_output.scan(%r{^.*"original":"Fluent-Bit".*$}).last)
       assert_nil(log["uri"])
-      assert_equal("opensearch:9200", log.fetch("host"))
-      assert_equal("http", log.fetch("scheme"))
-      assert_equal("CONNECT", log.fetch("method"))
-      assert_equal(200, log.fetch("status"))
+      assert_equal("opensearch:9200", log.fetch("url").fetch("domain"))
+      assert_equal("http", log.fetch("url").fetch("scheme"))
+      assert_equal("CONNECT", log.fetch("http").fetch("request").fetch("method"))
+      assert_equal(200, log.fetch("http").fetch("response").fetch("status_code"))
       assert_match(/\A[0-9a-f.:]+:9200\z/, log.fetch("up_addr"))
       assert_nil(log["up_tls_ver"])
-      assert_equal("Fluent-Bit", log.fetch("user_agent"))
+      assert_equal("Fluent-Bit", log.fetch("user_agent").fetch("original"))
 
       response = Typhoeus.get("https://127.0.0.1:9081/admin/stats/logs.json", http_options.deep_merge(admin_session).deep_merge({
         :params => {
@@ -138,14 +138,14 @@ class Test::Proxy::Envoy::TestHttpProxy < Minitest::Test
 
       log_output = log_tail.read_until(%r{"uri":"/_msearch"})
       log = MultiJson.load(log_output.scan(%r{^.*"uri":"/_msearch".*$}).last)
-      assert_equal("/_msearch", log.fetch("uri"))
-      assert_equal("opensearch:9200", log.fetch("host"))
-      assert_equal("http", log.fetch("scheme"))
-      assert_equal("POST", log.fetch("method"))
-      assert_equal(200, log.fetch("status"))
+      assert_equal("/_msearch", log.fetch("url").fetch("original"))
+      assert_equal("opensearch:9200", log.fetch("url").fetch("domain"))
+      assert_equal("http", log.fetch("url").fetch("scheme"))
+      assert_equal("POST", log.fetch("http").fetch("request").fetch("method"))
+      assert_equal(200, log.fetch("http").fetch("response").fetch("status_code"))
       assert_match(/\A[0-9a-f.:]+:9200\z/, log.fetch("up_addr"))
       assert_nil(log["up_tls_ver"])
-      assert_match("lua-resty-http", log.fetch("user_agent"))
+      assert_match("lua-resty-http", log.fetch("user_agent").fetch("original"))
     end
   end
 
@@ -188,13 +188,13 @@ class Test::Proxy::Envoy::TestHttpProxy < Minitest::Test
       log_output = log_tail.read_until(%r{"method":"CONNECT"})
       log = MultiJson.load(log_output.scan(%r{^.*"method":"CONNECT".*$}).last)
       assert_nil(log["uri"])
-      assert_equal("download.maxmind.com:443", log.fetch("host"))
-      assert_equal("http", log.fetch("scheme"))
-      assert_equal("CONNECT", log.fetch("method"))
-      assert_equal(200, log.fetch("status"))
+      assert_equal("download.maxmind.com:443", log.fetch("url").fetch("domain"))
+      assert_equal("http", log.fetch("url").fetch("scheme"))
+      assert_equal("CONNECT", log.fetch("http").fetch("request").fetch("method"))
+      assert_equal(200, log.fetch("http").fetch("response").fetch("status_code"))
       assert_match(/\A[0-9a-f.:]+:443\z/, log.fetch("up_addr"))
       assert_nil(log["up_tls_ver"])
-      assert_match("curl", log.fetch("user_agent"))
+      assert_match("curl", log.fetch("user_agent").fetch("original"))
       assert_equal("downstream_remote_disconnect", log.fetch("resp_detail"))
     end
   end

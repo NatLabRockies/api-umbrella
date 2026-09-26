@@ -17,7 +17,7 @@ class Test::Proxy::KeepAlive::TestClientSide < Minitest::Test
 
     # Ensure that curl's debug output contains the indicator of re-using a
     # keepalive connection.
-    assert_match("Re-using existing connection", response.debug_info.text.join(""))
+    assert_match("Re-using existing http: connection", response.debug_info.text.join(""))
   end
 
   def test_timeout_is_configurable
@@ -35,7 +35,7 @@ class Test::Proxy::KeepAlive::TestClientSide < Minitest::Test
 
       # Since keepalive is disabled, ensure that curl's debug output does not
       # contain the indicator of re-using a keepalive connection.
-      refute_match("Re-using existing connection", response.debug_info.text.join(""))
+      refute_match("Re-using existing http: connection", response.debug_info.text.join(""))
     end
   end
 end

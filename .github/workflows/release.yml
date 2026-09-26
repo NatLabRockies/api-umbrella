@@ -53,6 +53,14 @@ jobs:
           tags: |
             type=semver,prefix=egress-,pattern={{version}}
 
+      - name: Runtime otelcol container metadata
+        id: runtime_otelcol_meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,prefix=otelcol-,pattern={{version}}
+
       - name: Build and push runtime
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
@@ -72,5 +80,16 @@ jobs:
           push: true
           tags: ${{ steps.runtime_egress_meta.outputs.tags }}
           labels: ${{ steps.runtime_egress_meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:build-cache-runtime-recent,mode=max
+          provenance: false
+
+      - name: Build and push runtime-otelcol
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          target: runtime-otelcol
+          pull: true
+          push: true
+          tags: ${{ steps.runtime_otelcol_meta.outputs.tags }}
+          labels: ${{ steps.runtime_otelcol_meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:build-cache-runtime-recent,mode=max
           provenance: false

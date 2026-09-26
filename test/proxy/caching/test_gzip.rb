@@ -45,11 +45,10 @@ class Test::Proxy::Caching::TestGzip < Minitest::Test
   # bandwidth is more efficient than unzipping each request on the fly for each
   # non-gzip client.
 
-  def test_backend_does_not_gzip_vary_accept_encoding_shares_cache_when_first_gzip_then_not
-    # The cache can be shared in this case, since despite Vary:
-    # Accept-Encoding, the response isn't actually gzipped (so no
-    # Content-Encoding).
-    assert_cacheable("/api/cacheable-vary-accept-encoding/", {
+  def test_backend_does_not_gzip_vary_accept_encoding_separates_cache_when_first_gzip_then_not
+    # The cache could technically be shared in this case, and was in Traffic
+    # Server prior to 10.2, but no longer is.
+    refute_cacheable("/api/cacheable-vary-accept-encoding/", {
       :accept_encoding => "gzip",
     }, {
       :accept_encoding => nil,
@@ -88,11 +87,11 @@ class Test::Proxy::Caching::TestGzip < Minitest::Test
     })
   end
 
-  def test_backend_force_gzips_itself_shares_cache_when_first_not_then_gzip
-    # The cache can be shared in this case, since gzipping is forced on the
-    # backend, so the second requesting a gzipped response actually matches the
+  def test_backend_force_gzips_itself_separates_cache_when_first_not_then_gzip
+    # The cache could technically be shared in this case, and was in Traffic
+    # Server prior to 10.2, but no longer is.
     # first response.
-    assert_cacheable("/api/cacheable-pre-gzip/?force=true", {
+    refute_cacheable("/api/cacheable-pre-gzip/?force=true", {
       :accept_encoding => nil,
     }, {
       :accept_encoding => "gzip",

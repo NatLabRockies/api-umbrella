@@ -78,7 +78,7 @@ class Test::Proxy::RequestRewriting::TestStripsApiKeys < Minitest::Test
   def test_strips_api_key_from_invalid_encoded_query
     response = Typhoeus.get("http://127.0.0.1:9080/api/info/?test=foo%26%20bar&url=%ED%A1%BC&api_key=#{self.api_key}", keyless_http_options)
     assert_response_code(200, response)
-    data = MultiJson.load(response.body)
+    data = JSON.parse(response.body)
     assert_equal({ "url" => "\xED\xA1\xBC", "test" => "foo& bar" }, data["url"]["query"])
   end
 

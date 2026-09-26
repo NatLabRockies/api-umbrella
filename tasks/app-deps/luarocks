@@ -19,8 +19,8 @@ luarocks_install "./api-umbrella-git-1.rockspec" "git-1" "${extra_args[@]}"
 
 # lrexlib-pcre2
 (
-  lrexlib_pcre2_version="2.9.3-1"
-  lrexlib_pcre2_hash="d6edca97076f737639502f9d10bc01f5f33eaecdccab96496b2bc0b224fcc19f"
+  lrexlib_pcre2_version="2.9.4-1"
+  lrexlib_pcre2_hash="85156588dd70480dc02b99d6fdc1a4cbf8b8b0a9f9a3febf524e3b193094756b"
 
   mkdir -p ./lrexlib-pcre2
   cd ./lrexlib-pcre2
