@@ -68,7 +68,7 @@ CREATE FUNCTION api_umbrella.analytics_cache_extract_unique_user_ids() RETURNS t
     AS $$
       BEGIN
         IF (jsonb_typeof(NEW.data->'aggregations'->'unique_user_ids'->'buckets') = 'array') THEN
-          NEW.unique_user_ids := (SELECT array_agg(DISTINCT bucket->'key'->>'user_id')::uuid[] FROM jsonb_array_elements(NEW.data->'aggregations'->'unique_user_ids'->'buckets') AS bucket);
+          NEW.unique_user_ids := (SELECT array_agg(DISTINCT bucket->'key'->>'user_id')::uuid[] FROM jsonb_array_elements(NEW.data->'aggregations'->'unique_user_ids'->'buckets') AS bucket WHERE pg_input_is_valid(bucket->'key'->>'user_id', 'uuid'));
         END IF;
 
         RETURN NEW;
@@ -2835,3 +2835,4 @@ INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1753472899');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1769633747');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1769732670');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1775265493');
+INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1790430978');
