@@ -41,6 +41,32 @@ return function()
   -- variable.
   local vcap_services_data = json_decode(vcap_services)
 
+  -- Set SES credentails from service if available.
+  if vcap_services_data["aws-ses"] and vcap_services_data["aws-ses"][1] and vcap_services_data["aws-ses"][1]["credentials"] then
+    local credentials = vcap_services_data["aws-ses"][1]["credentials"]
+    deep_merge_overwrite_arrays(config, json_nulls_to_yaml_nulls({
+      web = {
+        mailer = {
+          smtp_settings = {
+            address = credentials["smtp_server"],
+            ssl_host = credentials["smtp_server"],
+            port = 465,
+            user_name = credentials["smtp_user"],
+            password = credentials["smtp_password"],
+          },
+        },
+      },
+      envoy = {
+        smtp_proxy = {
+          endpoint = {
+            host = credentials["smtp_server"],
+            port = 465,
+          },
+        },
+      },
+    }))
+  end
+
   -- Find our secret configuration (via a user provided service), and merge that
   -- on top of the existing API Umbrella config.
   local found_config_service = false
