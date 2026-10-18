@@ -1,7 +1,7 @@
 ###
 # Build
 ###
-FROM public.ecr.aws/docker/library/debian:trixie AS build
+FROM docker.io/library/debian:trixie AS build
 
 ARG TARGETARCH
 
@@ -95,7 +95,7 @@ RUN make && make clean:dev
 ###
 # Test
 ###
-FROM public.ecr.aws/docker/library/debian:trixie AS test
+FROM docker.io/library/debian:trixie AS test
 
 ARG TARGETARCH
 
@@ -148,7 +148,7 @@ ENV \
 ###
 # Install
 ###
-FROM public.ecr.aws/docker/library/debian:trixie AS install
+FROM docker.io/library/debian:trixie AS install
 
 RUN apt-get update && \
   apt-get -y install git rsync && \
@@ -165,7 +165,7 @@ RUN DESTDIR="/build/install-destdir" PREFIX=/opt/api-umbrella ./tasks/install
 ###
 # Runtime
 ###
-FROM public.ecr.aws/docker/library/debian:trixie AS runtime
+FROM docker.io/library/debian:trixie AS runtime
 
 COPY --from=install /build/install-destdir /
 COPY build/package/scripts/after-install /tmp/install/build/package/scripts/after-install
@@ -230,7 +230,7 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy/envoy.yaml", "--use-dynamic-base-
 ###
 # Runtime - otelcol Only
 ###
-FROM public.ecr.aws/aws-observability/aws-otel-collector:v0.49.0 AS runtime-otelcol
+FROM docker.io/amazon/aws-otel-collector:v0.49.0 AS runtime-otelcol
 
 # Add sh, which seems to be necessary for CloudFoundry when specifying a custom
 # `command` attribute.
