@@ -49,8 +49,12 @@ return function()
         mailer = {
           smtp_settings = {
             address = credentials["smtp_server"],
-            ssl_host = credentials["smtp_server"],
             port = 465,
+            ssl = true,
+            ssl_verify = true,
+            ssl_host = credentials["smtp_server"],
+            domain = credentials["domain"],
+            authentication = "login",
             user_name = credentials["smtp_user"],
             password = credentials["smtp_password"],
           },
