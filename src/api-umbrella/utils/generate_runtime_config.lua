@@ -542,7 +542,7 @@ local function set_cached_random_tokens(config)
       if not config["static_site"]["api_key"] then
         deep_defaults(cached, {
           static_site = {
-            api_key = random_token(40),
+            api_key = random_token(40, true),
           },
         })
       end
