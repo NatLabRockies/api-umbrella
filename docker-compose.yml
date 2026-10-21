@@ -10,6 +10,9 @@ services:
     command: /app/docker/dev/docker-start
     volumes:
       - .:/app
+      - admin_ui_node_modules_cache:/app/src/api-umbrella/admin-ui/node_modules
+      - example_website_node_modules_cache:/app/src/api-umbrella/example-website/node_modules
+      - web_app_node_modules_cache:/app/src/api-umbrella/web-app/node_modules
       - build_cache:/build
     environment:
       HTTP_PORT: 8200
@@ -50,6 +53,9 @@ services:
     ports:
       - "14002:9200"
 volumes:
+  admin_ui_node_modules_cache:
   build_cache:
-  postgres_data:
+  example_website_node_modules_cache:
   opensearch_data:
+  postgres_data:
+  web_app_node_modules_cache:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-trafficserver_version="10.2.0"
-trafficserver_hash="afdd02ea6b37dc344e24e985727add89e26d0bbce4ac7f91f2c51134c8219484d6739d9b5c7c4c177f913cd0a9f756cbc0c89bcb06ee21bc159c32046e38379e"
+trafficserver_version="10.2.1"
+trafficserver_hash="dbb532fa5714540524853ddeb709871de3f7ab5b363b13fbb16ccb23863fd379e691f3689bb7279aaff6dd5250bf5bfe9a37fc7c748276d57485104414919822"
 
 set -e -u -x
 source ./tasks/helpers.sh
@@ -12,12 +12,6 @@ download "https://archive.apache.org/dist/trafficserver/trafficserver-$trafficse
 extract_download "trafficserver-$trafficserver_version.tar.bz2"
 
 cd "trafficserver-$trafficserver_version"
-
-# Propagate client aborts throughout the other proxy layers and to the upstream
-# server:
-# https://github.com/apache/trafficserver/issues/13549
-# Patch from https://github.com/apache/trafficserver/pull/13560
-patch -p1 < "$SOURCE_DIR/build/patches/trafficserver-client-aborts.patch"
 
 cmake -B build \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX_EMBEDDED" \

@@ -18,8 +18,8 @@ gem "minitest-hooks", "~> 1.5.4"
 gem "minitest-retry", "~> 0.3.0"
 
 # Ruby lint/style checker
-gem "rubocop", "~> 1.88", :require => false
-gem "rubocop-minitest", "~> 0.40.0", :require => false
+gem "rubocop", "~> 1.92", :require => false
+gem "rubocop-minitest", "~> 0.41.0", :require => false
 
 # Running background processes
 gem "childprocess"
@@ -32,8 +32,8 @@ gem "multi_json", "~> 1.21"
 gem "oj", "~> 3.17"
 
 # Database libraries
-gem "activerecord", "~> 8.1.3", :require => "active_record"
-gem "pg", "~> 1.6.2"
+gem "activerecord", "~> 8.1.4", :require => "active_record"
+gem "pg", "~> 1.7.0"
 gem "opensearch-ruby", "~> 3.4.0"
 gem "faraday-typhoeus", "~> 2.0.0"
 gem "active_attr", "~> 0.17.2"
@@ -49,7 +49,7 @@ gem "addressable", "~> 2.9.0"
 
 # Browser/JavaScript integration tests
 gem "capybara", "~> 3.32"
-gem "selenium-webdriver", "~> 4.46"
+gem "selenium-webdriver", "~> 4.51"
 
 # Take screenshots on capybara test failures
 gem "capybara-screenshot", "~> 1.0.27"
@@ -61,7 +61,7 @@ gem "capybara-shadowdom", "~> 0.3.0"
 gem "nokogiri", "~> 1.19"
 
 # Useful additions
-gem "activesupport", "~> 8.1.3"
+gem "activesupport", "~> 8.1.4"
 
 # Generating fake strings and data.
 gem "faker", "~> 3.8"
@@ -88,4 +88,4 @@ gem "awesome_print", "~> 1.9.2"
 gem "ice_nine", "~> 0.11.2"
 
 # Testing SMTP directly.
-gem "net-smtp", "~> 0.5.0"
+gem "net-smtp", "~> 0.5.2"
