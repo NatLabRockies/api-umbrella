@@ -27,6 +27,6 @@ rsync -a \
 node_modules_dir="$WORK_DIR/tasks/app-deps/web-app/pnpm/_persist/node_modules"
 rsync -a --delete --delete-excluded "${node_modules_dir}/" ./node_modules/
 
-PATH="$DEV_PATH" ./node_modules/.bin/webpack
+PATH="$DEV_PATH" pnpm exec webpack
 
 stamp

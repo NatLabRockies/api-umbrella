@@ -29,7 +29,7 @@ rsync -a --delete --delete-excluded "${node_modules_dir}/" ./node_modules/
 mkdir -p ../_persist
 # Set JOBS=1 to fix parallel issues in CI environment:
 # https://github.com/emberjs/ember.js/issues/15641#issuecomment-328496408
-PATH="$DEV_PATH" JOBS=1 ./node_modules/.bin/ember build \
+PATH="$DEV_PATH" JOBS=1 pnpm exec ember build \
   --environment=production \
   --output-path=../_persist/dist
 
