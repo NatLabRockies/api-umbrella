@@ -93,7 +93,7 @@ class Test::Proxy::TestTimeoutsResponse < Minitest::Test
     assert_equal(0, envoy_log.fetch("http").fetch("response").fetch("status_code"))
     assert_equal("DC", envoy_log.fetch("resp_flags"))
     assert_equal("downstream_remote_disconnect", envoy_log.fetch("resp_detail"))
-    assert_nil(envoy_log.fetch("up_fail"))
+    assert_nil(envoy_log["up_fail"])
 
     api_backend_log = MultiJson.load(api_backend_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
     api_backend_time = api_backend_log.fetch("duration").to_f
@@ -231,7 +231,7 @@ class Test::Proxy::TestTimeoutsResponse < Minitest::Test
     assert_equal(0, envoy_log.fetch("http").fetch("response").fetch("status_code"))
     assert_equal("DC", envoy_log.fetch("resp_flags"))
     assert_equal("downstream_remote_disconnect", envoy_log.fetch("resp_detail"))
-    assert_nil(envoy_log.fetch("up_fail"))
+    assert_nil(envoy_log["up_fail"])
 
     api_backend_log = MultiJson.load(api_backend_log_tail.read_until(unique_test_id, timeout: 30).match(/^.*#{unique_test_id}.*$/)[0])
     api_backend_time = api_backend_log.fetch("duration").to_f
