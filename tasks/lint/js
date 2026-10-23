@@ -19,5 +19,5 @@ set -x
 
 (
   cd "$SOURCE_DIR/src/api-umbrella/web-app"
-  PATH="$DEV_PATH" ./node_modules/.bin/eslint .
+  PATH="$DEV_PATH" pnpm exec eslint .
 )

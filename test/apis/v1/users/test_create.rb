@@ -32,16 +32,19 @@ class Test::Apis::V1::Users::TestCreate < Minitest::Test
     attributes = FactoryBot.attributes_for(:api_user)
     refute(attributes["api_key"])
 
-    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users.json", http_options.deep_merge(admin_token).deep_merge({
-      :headers => { "Content-Type" => "application/x-www-form-urlencoded" },
-      :body => { :user => attributes },
-    }))
-    assert_response_code(201, response)
+    10.times do
+      response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users.json", http_options.deep_merge(admin_token).deep_merge({
+        :headers => { "Content-Type" => "application/x-www-form-urlencoded" },
+        :body => { :user => attributes },
+      }))
+      assert_response_code(201, response)
 
-    data = MultiJson.load(response.body)
-    assert(data["user"]["api_key"])
-    assert_equal(40, data["user"]["api_key"].length)
-    assert_match(/\A[0-9A-Za-z]+\z/, data["user"]["api_key"])
+      data = MultiJson.load(response.body)
+      assert(data["user"]["api_key"])
+      assert_equal(40, data["user"]["api_key"].length)
+      # Verify "safe" alphabet.
+      assert_match(/\A[6789BCDFGHJKLMNPQRTWbcdfghjkmnpqrtwz]+\z/, data["user"]["api_key"])
+    end
   end
 
   def test_no_user_attributes_error

@@ -37,7 +37,7 @@ module ApiUmbrellaTestHelpers
     end
 
     def assert_match_iso8601(obj, msg = nil)
-      assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, obj, msg)
+      assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z\z/, obj, msg)
     end
 
     def assert_match_uuid(obj, msg = nil)

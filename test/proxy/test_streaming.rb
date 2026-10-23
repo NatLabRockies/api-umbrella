@@ -30,7 +30,7 @@ class Test::Proxy::TestStreaming < Minitest::Test
     easy = make_streaming_body_request([
       {
         :data => "foo",
-        :sleep => 2,
+        :sleep => 0,
       },
       {
         :data => "bar",
@@ -40,14 +40,19 @@ class Test::Proxy::TestStreaming < Minitest::Test
         :data => "baz",
         :sleep => 2,
       },
+      {
+        :data => "qux",
+        :sleep => 2,
+      },
     ])
 
     assert_equal(200, easy.response_code)
     data = MultiJson.load(easy.response_body)
-    assert_equal(["foo", "bar", "baz"], data.fetch("chunks"))
-    assert_equal(3, data.fetch("chunk_time_gaps").length)
-    assert_in_delta(2, data.fetch("chunk_time_gaps")[0], 0.3)
+    assert_equal(["foo", "bar", "baz", "qux"], data.fetch("chunks"))
+    assert_equal(4, data.fetch("chunk_time_gaps").length)
+    assert_in_delta(0, data.fetch("chunk_time_gaps")[0], 0.3)
     assert_in_delta(2, data.fetch("chunk_time_gaps")[1], 0.3)
     assert_in_delta(2, data.fetch("chunk_time_gaps")[2], 0.3)
+    assert_in_delta(2, data.fetch("chunk_time_gaps")[3], 0.3)
   end
 end
