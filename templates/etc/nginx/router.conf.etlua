@@ -249,6 +249,12 @@ http {
         }
       <% end %>
 
+      <% if host["robots_txt"] then %>
+        location = /robots.txt {
+          return 200 <%- json_encode_without_xss_escaping(host["robots_txt"]) %>;
+        }
+      <% end %>
+
       <% if config["_test_env?"] then %>
         location = /_nginx_status {
           add_header Content-Type application/json;

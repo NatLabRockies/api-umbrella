@@ -594,6 +594,7 @@ import "path"
     ssl_cert?: string
     ssl_cert_key?: string
     rewrites?: [...string]
+    robots_txt?: string
 
     #scheduled_brownout: {
       path_regex: string
