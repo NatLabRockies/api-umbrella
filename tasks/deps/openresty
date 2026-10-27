@@ -6,8 +6,8 @@ nginx_module_vts_version="0.2.7"
 nginx_module_vts_hash="0003bfa57da2106367fdc3f87760910c046e7df5545db73c880fc2b80350b14c"
 ngx_http_geoip2_module_version="3.4"
 ngx_http_geoip2_module_hash="ad72fc23348d715a330994984531fab9b3606e160483236737f9a4a6957d9452"
-openresty_version="1.31.1.1"
-openresty_hash="65b78baadd3f0984055de89bf13f4a1932e5bfe9c31932037a134ea2b1a0ce42"
+openresty_version="1.31.8.1"
+openresty_hash="b569c63b420f80a4ac8466f2deffe73ed93ab760026532e039c3658409a997f4"
 
 set -e -u -x
 source ./tasks/helpers.sh
