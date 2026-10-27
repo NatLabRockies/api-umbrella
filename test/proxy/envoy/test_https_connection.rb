@@ -36,10 +36,10 @@ class Test::Proxy::Envoy::TestHttpsConnection < Minitest::Test
       assert_response_code(200, response)
 
       # Validate that the underlying Envoy server is running over HTTPS and not HTTP
-      response = Typhoeus.get("https://127.0.0.1:#{$config.fetch("envoy").fetch("port")}/", http_options)
-      assert_response_code(404, response)
       response = Typhoeus.get("http://127.0.0.1:#{$config.fetch("envoy").fetch("port")}/", http_options)
       assert_response_code(0, response)
+      response = Typhoeus.get("https://127.0.0.1:#{$config.fetch("envoy").fetch("port")}/", http_options)
+      assert_response_code(404, response)
     end
   end
 

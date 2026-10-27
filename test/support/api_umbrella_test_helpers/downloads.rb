@@ -7,7 +7,7 @@ module ApiUmbrellaTestHelpers
     def setup
       super
 
-      if(self.class.test_order == :parallel)
+      if(self.class.run_order == :parallel)
         raise "`ApiUmbrellaTestHelpers::Downloads` cannot be called with `parallelize_me!` in the same class. Since downloads are tracked globally, it cannot be used with parallel tests."
       end
 

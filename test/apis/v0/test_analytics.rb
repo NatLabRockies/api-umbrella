@@ -540,7 +540,7 @@ class Test::Apis::V0::TestAnalytics < Minitest::Test
           "total" => 3,
         },
         "average_response_times" => {
-          "average" => 371,
+          "average" => 338,
           "monthly" => [
             ["2013-06", 100],
             ["2013-07", nil],
@@ -584,7 +584,7 @@ class Test::Apis::V0::TestAnalytics < Minitest::Test
         },
         "hits" => {
           "monthly" => [
-            ["2013-06", 3],
+            ["2013-06", 4],
             ["2013-07", 0],
             ["2013-08", 4],
           ],
@@ -623,7 +623,7 @@ class Test::Apis::V0::TestAnalytics < Minitest::Test
               ["2013-08-31", 4],
             ],
           },
-          "total" => 7,
+          "total" => 8,
         },
       },
       "api_backend_count" => 4,

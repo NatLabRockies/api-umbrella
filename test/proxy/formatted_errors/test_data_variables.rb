@@ -114,17 +114,17 @@ class Test::Proxy::FormattedErrors::TestDataVariables < Minitest::Test
   def test_escapes_xml_values
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/hello.xml", keyless_http_options)
     assert_xml_error(response)
-    doc = REXML::Document.new(response.body)
+    doc = Nokogiri::XML(response.body)
     assert(@@escape_test_value)
-    assert_equal(@@escape_test_value, doc.elements["/response/error/escape-test"].text)
+    assert_equal(@@escape_test_value, doc.xpath("/response/error/escape-test").text)
   end
 
   def test_escapes_html_values
     response = Typhoeus.get("http://127.0.0.1:9080/#{unique_test_class_id}/hello.html", keyless_http_options)
     assert_html_error(response)
-    doc = REXML::Document.new(response.body)
+    doc = Nokogiri::HTML(response.body)
     assert(@@escape_test_value)
-    assert_equal(@@escape_test_value, doc.elements["/html/body/p"].text)
+    assert_equal(@@escape_test_value, doc.xpath("/html/body/p").text)
   end
 
   def test_escapes_csv_values

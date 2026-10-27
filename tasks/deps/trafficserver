@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-trafficserver_version="10.1.3"
-trafficserver_hash="6f5dd78a237a785b94263a76e7de4cc39213c563587982f75d0121b1935ed90400cdf14a29b6cba35f9582b4825879b231bd2b7e7b1d2d14c8e4cb8925733ea8"
+trafficserver_version="10.2.1"
+trafficserver_hash="dbb532fa5714540524853ddeb709871de3f7ab5b363b13fbb16ccb23863fd379e691f3689bb7279aaff6dd5250bf5bfe9a37fc7c748276d57485104414919822"
 
 set -e -u -x
 source ./tasks/helpers.sh
@@ -12,10 +12,6 @@ download "https://archive.apache.org/dist/trafficserver/trafficserver-$trafficse
 extract_download "trafficserver-$trafficserver_version.tar.bz2"
 
 cd "trafficserver-$trafficserver_version"
-
-# Since we log directly to stderr/stdout, backport this patch:
-# https://github.com/apache/trafficserver/pull/12407
-patch -p1 < "$SOURCE_DIR/build/patches/trafficserver-stderr-logging.patch"
 
 cmake -B build \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX_EMBEDDED" \

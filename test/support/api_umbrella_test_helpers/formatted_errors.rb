@@ -12,8 +12,8 @@ module ApiUmbrellaTestHelpers
     def assert_xml_error(response, content_type = "application/xml", error_code = "API_KEY_MISSING")
       assert_response_code(403, response)
       assert_equal(content_type, response.headers["content-type"])
-      doc = REXML::Document.new(response.body)
-      assert_equal(error_code, doc.elements["/response/error/code"].text)
+      doc = Nokogiri::XML(response.body)
+      assert_equal(error_code, doc.xpath("/response/error/code").text)
     end
 
     def assert_csv_error(response, error_code = "API_KEY_MISSING")
@@ -27,8 +27,8 @@ module ApiUmbrellaTestHelpers
     def assert_html_error(response, error_code = "API_KEY_MISSING")
       assert_response_code(403, response)
       assert_equal("text/html", response.headers["content-type"])
-      doc = REXML::Document.new(response.body)
-      assert_equal(error_code, doc.elements["/html/body/h1"].text)
+      doc = Nokogiri::HTML(response.body)
+      assert_equal(error_code, doc.xpath("/html/body/h1").text)
     end
   end
 end

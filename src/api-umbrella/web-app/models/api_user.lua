@@ -254,7 +254,7 @@ ApiUser = model_ext.new_class("api_users", {
   end,
 
   before_validate_on_create = function(_, values)
-    local api_key = random_token(40)
+    local api_key = random_token(40, true)
     values["api_key_hash"] = hmac(api_key)
     local encrypted, iv = encryptor.encrypt(api_key, values["id"])
     values["api_key_encrypted"] = encrypted

@@ -13,7 +13,7 @@ local function reload_perp(perp_base)
 end
 
 local function reload_trafficserver()
-  local _, err = shell_blocking_capture_combined({ "env", "TS_RUNROOT=" .. path_join(config["etc_dir"], "trafficserver/runroot.yaml"), "traffic_ctl", "config", "reload" })
+  local _, err = shell_blocking_capture_combined({ "env", "TS_RUNROOT=" .. path_join(config["etc_dir"], "trafficserver/runroot.yaml"), "traffic_ctl", "config", "reload", "--monitor", "--initial-wait", "0.1", "--refresh-int", "0.1" })
   if err then
     print("Failed to reload trafficserver\n" .. err)
     os.exit(1)
