@@ -33,7 +33,6 @@ function _M.contact_params(self)
   return params
 end
 
-
 return function(app)
   app:match("/api-umbrella/v1/contact(.:format)", respond_to({ POST = capture_errors_json_full(wrapped_json_params(_M.create, "contact")) }))
 end

@@ -72,7 +72,6 @@ return function()
       end
     end
 
-
     local migrations_result, migrations_err = pg_utils.query("SELECT name FROM api_umbrella.lapis_migrations ORDER BY name")
     if migrations_err then
       print(migrations_err)

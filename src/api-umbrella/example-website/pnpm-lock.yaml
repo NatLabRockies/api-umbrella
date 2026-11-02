@@ -20,6 +20,12 @@ importers:
       form-serialize:
         specifier: ^0.7.2
         version: 0.7.2
+      franxx:
+        specifier: ^2.0.1
+        version: 2.0.1(history@5.3.0)
+      history:
+        specifier: ^5.3.0
+        version: 5.3.0
       promise-polyfill:
         specifier: ^8.3.0
         version: 8.3.0
@@ -47,6 +53,10 @@ importers:
         version: 0.0.15(prettier@3.9.10)
 
 packages:
+
+  '@babel/runtime@7.29.10':
+    resolution: {integrity: sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==}
+    engines: {node: '>=6.9.0'}
 
   '@eslint-community/eslint-utils@4.10.1':
     resolution: {integrity: sha512-cuadcxVFE8sDK6iWJbs8Sn0av2Nrh2QSGQhVlBW9AaAHqHwjWsZHT8LJ4hFGPh7ASBV2deFdM7H/DPjulmh8rg==}
@@ -419,6 +429,11 @@ packages:
   form-serialize@0.7.2:
     resolution: {integrity: sha512-ohEA4Crzd/+hSREjGf4kSsy73WhAtQ7H+blGEz2DVd+JCi0TV5nZBSn9PaPlvrl9m29fa6xclAfpRkqZ57b1bw==}
 
+  franxx@2.0.1:
+    resolution: {integrity: sha512-X2Ffs8SlZD4clCfHtSJpHGX+EEn52fEQ/9oBb0YPDzyUZ75SW854ym6IvEbMRx6n+jEhysIfVnc+SPT+nNFcog==}
+    peerDependencies:
+      history: ^5.2.0
+
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
@@ -497,6 +512,9 @@ packages:
   hasown@2.0.4:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
+
+  history@5.3.0:
+    resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
@@ -971,6 +989,8 @@ packages:
     engines: {node: '>=10'}
 
 snapshots:
+
+  '@babel/runtime@7.29.10': {}
 
   '@eslint-community/eslint-utils@4.10.1(eslint@8.57.1(supports-color@7.2.0))':
     dependencies:
@@ -1473,6 +1493,10 @@ snapshots:
 
   form-serialize@0.7.2: {}
 
+  franxx@2.0.1(history@5.3.0):
+    dependencies:
+      history: 5.3.0
+
   fs.realpath@1.0.0: {}
 
   function-bind@1.1.2: {}
@@ -1564,6 +1588,10 @@ snapshots:
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
+
+  history@5.3.0:
+    dependencies:
+      '@babel/runtime': 7.29.10
 
   ignore@5.3.2: {}
 

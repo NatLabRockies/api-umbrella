@@ -3,6 +3,12 @@ import * as params from "@params";
 import A11yDialog from "a11y-dialog";
 import escapeHtml from "escape-html";
 import serialize from "form-serialize";
+import { createHashHistory } from "history";
+import { createRouter } from 'franxx'
+
+const router = createRouter({
+  history: createHashHistory(),
+});
 
 const styleEl = document.createElement("link");
 styleEl.rel = "stylesheet";
@@ -122,7 +128,7 @@ if (options.showLastNameInput) {
   signupFormTemplate += `
     <div class="form-group last-name-form-group">
       <label class="form-label" for="user_last_name">Last Name <abbr title="required" class="required">*</abbr></label>
-      <input class="form-control" id="user_last_name" aria-describedby="user_last_name_feedback"  name="user[last_name]" size="50" type="text" required />
+      <input class="form-control" id="user_last_name" aria-describedby="user_last_name_feedback" name="user[last_name]" size="50" type="text" required />
       <div id="user_last_name_feedback" class="invalid-feedback">Fill out this field.</div>
     </div>
   `;
@@ -180,8 +186,10 @@ signupFormTemplate += `
     <input type="hidden" name="user[registration_source]" value="${escapeHtml(
       options.registrationSource,
     )}" />
-    <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Signup</button>
+    <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Sign up</button>
   </div>
+
+  <p class="mt-4 mb-0">To disable or revoke an existing key, <a href="#/deactivate-api-key">begin API key deactivation</a>.</p>
 `;
 
 if (recaptchaV2Enabled || recaptchaV3Enabled) {
@@ -190,15 +198,35 @@ if (recaptchaV2Enabled || recaptchaV3Enabled) {
 
 signupFormTemplate += `</form>`;
 
-const modalTemplate = `
-  <div id="alert_modal" class="dialog-container" aria-describedby="alert_modal_message" aria-hidden="true">
+const formModalTemplate = `
+  <div id="api_umbrella_form_modal" class="dialog-container" aria-labelledby="api_umbrella_form_modal_title" aria-hidden="true">
     <div class="modal-backdrop show" data-a11y-dialog-hide></div>
     <div role="document" class="modal show d-block">
-      <div class="modal-dialog">
-        <div class="modal-content" autofocus>
-          <div class="modal-body">
-            <button type="button" class="btn-close float-end" aria-label="Close" data-a11y-dialog-hide></button>
-            <div id="alert_modal_message"></div>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow">
+          <div class="modal-header">
+            <h1 class="h4 mb-0 modal-title" id="api_umbrella_form_modal_title"></h1>
+            <button type="button" class="btn-close" aria-label="Close" data-a11y-dialog-hide></button>
+          </div>
+          <div class="modal-body" id="api_umbrella_form_modal_body">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+const alertModalTemplate = `
+  <div id="api_umbrella_alert_modal" class="dialog-container" aria-labelledby="api_umbrella_alert_modal_title" aria-hidden="true">
+    <div class="modal-backdrop show" data-a11y-dialog-hide></div>
+    <div role="document" class="modal show d-block">
+      <div class="modal-dialog mt-5">
+        <div class="modal-content shadow">
+          <div class="modal-header">
+            <h1 class="h4 mb-0 modal-title" id="api_umbrella_alert_modal_title">Error</h1>
+            <button type="button" class="btn-close" aria-label="Close" data-a11y-dialog-hide></button>
+          </div>
+          <div class="modal-body" id="api_umbrella_alert_modal_body">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-a11y-dialog-hide>OK</button>
@@ -207,6 +235,30 @@ const modalTemplate = `
       </div>
     </div>
   </div>
+`;
+
+const requestDeactivationFormTemplate = `
+  <p>To disable or revoke an existing API key, email confirmation is required.</p>
+
+  <form id="api_umbrella_request_deactivation_form" novalidate>
+    <div class="form-group api-key-form-group">
+      <label class="form-label" for="user_api_key">API Key <abbr title="required" class="required">*</abbr></label>
+      <input class="form-control" id="user_api_key" aria-describedby="user_api_key user_api_key" name="user[api_key]" size="50" type="text" minlength="40" maxlength="40" required />
+      <div class="form-text" id="user_api_key">Provide the full API key you want to deactivate.</div>
+      <div id="user_api_key" class="invalid-feedback">Enter a full API key.</div>
+    </div>
+
+    <div class="form-group email-form-group">
+      <label class="form-label" for="user_email">Email <abbr title="required" class="required">*</abbr></label>
+      <input class="form-control" id="user_email" aria-describedby="user_email_hint user_email_feedback" name="user[email]" size="50" type="email" required />
+      <div class="form-text" id="user_email_hint">Provide the email address used to sign up for the API key with.</div>
+      <div id="user_email_feedback" class="invalid-feedback">Enter an email address.</div>
+    </div>
+
+    <div class="submit">
+      <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Send confirmation email</button>
+    </div>
+  </form>
 `;
 
 const containerEl = document.querySelector(options.containerSelector);
@@ -262,7 +314,7 @@ const bodyContainerShadowRootEl = bodyContainerEl.attachShadow({
 });
 const bodyContainerStyleRootEl = document.createElement("div");
 bodyContainerStyleRootEl.className = "app-style-root";
-bodyContainerStyleRootEl.innerHTML = modalTemplate;
+bodyContainerStyleRootEl.innerHTML = formModalTemplate + alertModalTemplate;
 bodyContainerStyleRootEl.style.setProperty(
   "--api-umbrella-rem-relative-base",
   remRelativeBaseSize,
@@ -280,30 +332,116 @@ insertLink(bodyContainerShadowRootEl, {
   href: params.stylesheetPath,
 });
 
-const modalEl = bodyContainerShadowRootEl.getElementById("alert_modal");
-const modalMessageEl = modalEl.querySelector("#alert_modal_message");
-const modal = new A11yDialog(modalEl);
+const formModalEl = bodyContainerShadowRootEl.getElementById("api_umbrella_form_modal");
+const formModalBodyEl = formModalEl.querySelector("#api_umbrella_form_modal_body");
+const formModal = new A11yDialog(formModalEl);
+formModal.on('hide', (event) => {
+  if (router.currentLocation.pathname !== '/') {
+    router.push('/');
+  }
+});
+
+const alertModalEl = bodyContainerShadowRootEl.getElementById("api_umbrella_alert_modal");
+const alertModalBodyEl = alertModalEl.querySelector("#api_umbrella_alert_modal_body");
+const alertModal = new A11yDialog(alertModalEl);
+
+// Setup close handlers for a11y-dialog when inside the shadow DOM (since their
+// default document listeners won't work).
+formModalEl.querySelectorAll("[data-a11y-dialog-hide]").forEach((closer) => {
+  closer.addEventListener("click", formModal.hide);
+});
+alertModalEl.querySelectorAll("[data-a11y-dialog-hide]").forEach((closer) => {
+  closer.addEventListener("click", alertModal.hide);
+});
 
 const formEl = containerShadowRootEl.querySelector("form");
 const submitButtonEl = formEl.querySelector("button[type=submit]");
 
-function disableSubmitButton() {
-  if (!submitButtonEl.disabled) {
-    submitButtonEl.dataset.origInnerHTML = submitButtonEl.innerHTML;
-    submitButtonEl.disabled = true;
-    submitButtonEl.innerText = "Loading...";
+function disableSubmitButton(buttonEl) {
+  if (!buttonEl.disabled) {
+    buttonEl.dataset.origInnerHTML = submitButtonEl.innerHTML;
+    buttonEl.disabled = true;
+    buttonEl.innerText = "Loading...";
   }
 }
 
-function enableSubmitButton() {
+function enableSubmitButton(buttonEl) {
   if (submitButtonEl.disabled) {
-    submitButtonEl.disabled = false;
-    submitButtonEl.innerHTML = submitButtonEl.dataset.origInnerHTML;
-    delete submitButtonEl.dataset.origInnerHTML;
+    buttonEl.disabled = false;
+    buttonEl.innerHTML = submitButtonEl.dataset.origInnerHTML;
+    delete buttonEl.dataset.origInnerHTML;
   }
 }
 
-function submitFetch() {
+function submitFetch(submitOptions) {
+  return fetch(submitOptions.url, {
+    method: (submitOptions.data) ? "POST" : "GET",
+    headers: {
+      "Content-Type": (submitOptions.data) ? "application/json" : undefined,
+      "X-Api-Key": options.apiKey,
+    },
+    body: (submitOptions.data) ? JSON.stringify(submitOptions.data) : undefined,
+    // Ensure admin credentials aren't sent in for signed in admins.
+    credentials: "omit",
+  })
+    .then((response) => {
+      const contentType = response.headers.get("Content-Type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Response is not JSON");
+      }
+
+      return response.json().then((data) => ({
+        response,
+        data,
+      }));
+    })
+    .then(({ response, data }) => {
+      if (!response.ok) {
+        // eslint-disable-next-line no-throw-literal
+        throw { responseData: data };
+      }
+
+      submitOptions.onSuccess(data);
+    })
+    .catch((error) => {
+      const messages = [];
+      let messageStr = "";
+      try {
+        if (error?.responseData?.errors) {
+          for (let i = 0; i < error.responseData.errors.length; i += 1) {
+            const err = error.responseData.errors[i];
+            if (err.full_message || err.message) {
+              messages.push(escapeHtml(err.full_message || err.message));
+            }
+          }
+        }
+
+        if (error?.responseData?.error?.message) {
+          messages.push(escapeHtml(error.responseData.error.message));
+        }
+
+        if (messages.length > 0) {
+          messageStr = `<ul><li>${messages.join("</li><li>")}</li></ul>`;
+        } else {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+
+      alertModalBodyEl.innerHTML = `
+        ${submitOptions.errorIntro}
+        ${messageStr}
+        ${submitOptions.errorOutro}
+      `;
+      alertModal.show();
+    })
+    .finally(enableSubmitButton.bind(null, submitButtonEl));
+}
+
+function apiKeyRegistrationFetch() {
   const formData = {
     ...serialize(formEl, { hash: true }),
     options: {
@@ -329,33 +467,10 @@ function submitFetch() {
     formData["g-recaptcha-response-v3"] = recaptchaV3Response;
   }
 
-  return fetch(`${options.apiUrlRoot}/v1/users.json`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": options.apiKey,
-    },
-    body: JSON.stringify(formData),
-    // Ensure admin credentials aren't sent in for signed in admins.
-    credentials: "omit",
-  })
-    .then((response) => {
-      const contentType = response.headers.get("Content-Type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Response is not JSON");
-      }
-
-      return response.json().then((data) => ({
-        response,
-        data,
-      }));
-    })
-    .then(({ response, data }) => {
-      if (!response.ok) {
-        // eslint-disable-next-line no-throw-literal
-        throw { responseData: data };
-      }
-
+  return submitFetch({
+    url: `${options.apiUrlRoot}/v1/users.json`,
+    data: formData,
+    onSuccess: (data) => {
       const { user } = data;
 
       let confirmationTemplate = "";
@@ -363,8 +478,8 @@ function submitFetch() {
         confirmationTemplate += `
           <p>Your API key for <strong>${escapeHtml(
             user.email,
-          )}</strong> has been e-mailed to you. You can use your API key to begin making web service requests immediately.</p>
-          <p>If you don't receive your API Key via e-mail within a few minutes, please <a href="${escapeHtml(
+          )}</strong> has been emailed to you. You can use your API key to begin making web service requests immediately.</p>
+          <p>If you don't receive your API Key via email within a few minutes, please <a href="${escapeHtml(
             data.options.contact_url,
           )}">contact us</a>.</p>
         `;
@@ -391,42 +506,69 @@ function submitFetch() {
       `;
 
       containerStyleRootEl.innerHTML = confirmationTemplate;
+      containerStyleRootEl.tabIndex = -1;
+      containerStyleRootEl.focus();
       containerStyleRootEl.scrollIntoView();
-    })
-    .catch((error) => {
-      const messages = [];
-      let messageStr = "";
-      try {
-        if (error?.responseData?.errors) {
-          for (let i = 0; i < error.responseData.errors.length; i += 1) {
-            const err = error.responseData.errors[i];
-            if (err.full_message || err.message) {
-              messages.push(escapeHtml(err.full_message || err.message));
-            }
-          }
-        }
+    },
+    errorIntro: `<p>API key signup unexpectedly failed.</p>`,
+    errorOutro: `
+      <p class="mb-0">
+        Please try again or <a href="${escapeHtml(
+          options.issuesUrl,
+        )}">file an issue</a> for assistance.
+      </p>
+    `,
+  });
+}
 
-        if (error?.responseData?.error?.message) {
-          messages.push(escapeHtml(error.responseData.error.message));
-        }
+function requestDeactivationFetch(formEl) {
+  const formData = {
+    ...serialize(formEl, { hash: true }),
+    options: {
+      submitted_from_url: window.location.href,
+    },
+  };
 
-        if (messages.length > 0) {
-          messageStr = `<br><ul><li>${messages.join("</li><li>")}</li></ul>`;
-        } else {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        }
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
+  return submitFetch({
+    url: `${options.apiUrlRoot}/v1/users/request-deactivation.json`,
+    data: formData,
+    onSuccess: () => {
+      let confirmationTemplate = `
+        <p>Instructions for deactivating your API key have been emailed to <strong>${escapeHtml(formData.user.email)}</strong>.;
 
-      modalMessageEl.innerHTML = `API key signup unexpectedly failed.${messageStr}<br>Please try again or <a href="${escapeHtml(
-        options.issuesUrl,
-      )}">file an issue</a> for assistance.`;
-      modal.show();
-    })
-    .finally(enableSubmitButton);
+        <p>If you don't receive instructions via e-mail within a few minutes, please check your junk mail.
+      `;
+
+      formModalBodyEl.innerHTML = confirmationTemplate;
+    },
+    errorIntro: '',
+    errorOutro: 'Please resolve the errors and try again.',
+  });
+}
+
+function confirmDeactivationFetch(formEl) {
+  const formData = {
+    ...serialize(formEl, { hash: true }),
+    options: {
+      submitted_from_url: window.location.href,
+    },
+  };
+
+  return submitFetch({
+    url: `${options.apiUrlRoot}/v1/users/confirm-deactivation.json`,
+    data: formData,
+    onSuccess: () => {
+      let confirmationTemplate = `
+        <p>Instructions for deactivating your API key have been emailed to <strong>${escapeHtml(formData.user.email)}</strong>.;
+
+        <p>If you don't receive instructions via e-mail within a few minutes, please check your junk mail.
+      `;
+
+      formModalBodyEl.innerHTML = confirmationTemplate;
+    },
+    errorIntro: '',
+    errorOutro: 'Please resolve the errors and try again.',
+  });
 }
 
 function recaptchaCallback() {
@@ -442,7 +584,7 @@ function recaptchaCallback() {
         recaptchaV2SubmitButtonTimeout = null;
       }
 
-      disableSubmitButton();
+      disableSubmitButton(submitButtonEl);
     }
   }
 
@@ -454,7 +596,7 @@ function recaptchaCallback() {
     ((recaptchaV2Enabled && recaptchaV2Response) || !recaptchaV2Enabled) &&
     ((recaptchaV3Enabled && recaptchaV3Response) || !recaptchaV3Enabled)
   ) {
-    submitFetch();
+    apiKeyRegistrationFetch();
   }
 }
 
@@ -502,13 +644,15 @@ if (recaptchaV2Enabled || recaptchaV3Enabled) {
   });
 }
 
-formEl.addEventListener("submit", (event) => {
+function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
   event.preventDefault();
-  disableSubmitButton();
+  disableSubmitButton(submitButtonEl);
 
   if (!formEl.checkValidity()) {
     formEl.classList.add("was-validated");
-    enableSubmitButton();
+    // Focus on the first invalid input.
+    formEl.reportValidity();
+    enableSubmitButton(submitButtonEl);
     return false;
   }
 
@@ -533,7 +677,7 @@ formEl.addEventListener("submit", (event) => {
         //
         // https://stackoverflow.com/a/44984658
         // https://stackoverflow.com/a/47949586
-        recaptchaV2SubmitButtonTimeout = setTimeout(enableSubmitButton, 3000);
+        recaptchaV2SubmitButtonTimeout = setTimeout(enableSubmitButton, 3000, submitButtonEl);
 
         recaptchaV2Response = null;
         window.grecaptcha
@@ -588,11 +732,78 @@ formEl.addEventListener("submit", (event) => {
       alert(
         "Unexpected error occurred while validating CAPTCHA. Please try again or contact us for assistance",
       );
-      enableSubmitButton();
+      enableSubmitButton(submitButtonEl);
     }
   } else {
-    submitFetch();
+    submitAction();
   }
 
   return undefined;
+};
+
+formEl.addEventListener("submit", (event) => {
+  handleSubmit(event, formEl, true, apiKeyRegistrationFetch);
 });
+
+router.add('/deactivate-api-key', ({ params, query }) => {
+  formModalEl.querySelector('h1').innerHTML = 'Deactivate an API Key';
+  formModalBodyEl.innerHTML = requestDeactivationFormTemplate;
+  formModal.show();
+
+  const formEl = formModalBodyEl.querySelector("form");
+  const submitButtonEl = formEl.querySelector("button[type=submit]");
+
+  formEl.addEventListener("submit", (event) => {
+    handleSubmit(event, formEl, false, requestDeactivationFetch.bind(null, formEl));
+  });
+})
+
+router.add('/confirm-deactivation', ({ params, query }) => {
+  formModalEl.querySelector('h1').innerHTML = 'Deactivate an API Key';
+  formModalBodyEl.innerHTML = '<p>Loading...</p>';
+  formModal.show();
+
+  const url = new URL(`${options.apiUrlRoot}/v1/users/confirm-deactivation.json`);
+  url.search = new URLSearchParams({ token: query.token }).toString();
+  submitFetch({
+    url: url,
+    onSuccess: (data) => {
+      formModalBodyEl.innerHTML = `
+        <p><strong>The API key is still active.</strong> To complete the deactivation process, review the details below and confirm your request.</p>
+
+        <ul>
+          <li><strong>API Key:</strong> <code>...${escapeHtml(data.user.api_key_suffix)}</code></li>
+          <li><strong>Key Created:</strong> ${escapeHtml(data.user.created_at)}</li>
+        </ul>
+
+        <p>Are you sure you want to deactivate this key? Once deactivated, requests using this API key will fail.</p>
+
+        <form id="api_umbrella_confirm_deactivation_form" novalidate>
+          <input type="hidden" name="user[deactivation_token]" value="${escapeHtml(query.token)}" />
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Deactivate this API key</button>
+          </div>
+        </form>
+      `;
+
+      const formEl = formModalBodyEl.querySelector("form");
+      const submitButtonEl = formEl.querySelector("button[type=submit]");
+
+      formEl.addEventListener("submit", (event) => {
+        handleSubmit(event, formEl, false, confirmDeactivationFetch.bind(null, formEl));
+      });
+    },
+    errorIntro: '',
+    errorOutro: 'Please resolve the errors and try again.',
+  });
+})
+
+
+router.add('*', () => {
+  if (formModal.shown) {
+    formModal.hide();
+  }
+})
+
+router.run()

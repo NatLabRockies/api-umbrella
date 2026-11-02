@@ -42,6 +42,7 @@ class ApiUser < ApplicationRecord
       :auth_data => self.id,
     }))
     self.api_key_prefix = value[0, 16]
+    self.api_key_suffix = value[-6..]
   end
 
   def api_key

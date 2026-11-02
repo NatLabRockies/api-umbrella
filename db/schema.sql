@@ -1102,7 +1102,10 @@ CREATE TABLE api_umbrella.api_users (
     registration_recaptcha_v2_hostname character varying(255),
     registration_recaptcha_v3_hostname character varying(255),
     registration_options jsonb,
-    registration_input_options jsonb
+    registration_input_options jsonb,
+    api_key_suffix character varying(6) NOT NULL,
+    deactivation_token_hash character varying(64),
+    deactivation_sent_at timestamp with time zone
 );
 
 
@@ -1983,6 +1986,13 @@ CREATE INDEX api_users_created_at_idx ON api_umbrella.api_users USING btree (cre
 
 
 --
+-- Name: api_users_deactivation_token_hash_idx; Type: INDEX; Schema: api_umbrella; Owner: -
+--
+
+CREATE UNIQUE INDEX api_users_deactivation_token_hash_idx ON api_umbrella.api_users USING btree (deactivation_token_hash);
+
+
+--
 -- Name: api_users_email_created_at_idx; Type: INDEX; Schema: api_umbrella; Owner: -
 --
 
@@ -2836,3 +2846,5 @@ INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1769633747');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1769732670');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1775265493');
 INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1790430978');
+INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1793458036');
+INSERT INTO api_umbrella.lapis_migrations (name) VALUES ('1793458037');
