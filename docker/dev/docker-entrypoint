@@ -27,15 +27,6 @@ mkdir -p /build/test/tmp/run
 mkdir -p /app/test/tmp
 ln -snf /build/test/tmp/run /app/test/tmp/run
 
-mkdir -p /app/build/work/tasks/app-deps/admin-ui/pnpm/_persist/node_modules
-ln -snf /app/build/work/tasks/app-deps/admin-ui/pnpm/_persist/node_modules /app/src/api-umbrella/admin-ui/node_modules
-
-mkdir -p /app/build/work/tasks/app-deps/example-website/pnpm/_persist/node_modules
-ln -snf /app/build/work/tasks/app-deps/example-website/pnpm/_persist/node_modules /app/src/api-umbrella/example-website/node_modules
-
-mkdir -p /app/build/work/tasks/app-deps/web-app/pnpm/_persist/node_modules
-ln -snf /app/build/work/tasks/app-deps/web-app/pnpm/_persist/node_modules /app/src/api-umbrella/web-app/node_modules
-
 mkdir -p /app/build/work/tasks/test-deps/bundle/_persist/.bundle
 ln -snf /app/build/work/tasks/test-deps/bundle/_persist/.bundle /app/.bundle
 
@@ -43,6 +34,6 @@ mkdir -p /app/src/api-umbrella/admin-ui/tmp
 chmod 1777 /app/src/api-umbrella/admin-ui/tmp
 
 mkdir -p ~/.config/pnpm
-printf "update-notifier=false\nstore-dir=%s/store\n" "$PNPM_HOME" > ~/.config/pnpm/rc
+printf "updateNotifier: false\nstoreDir: %s/store\n" "$PNPM_HOME" > ~/.config/pnpm/config.yaml
 
 exec "$@"

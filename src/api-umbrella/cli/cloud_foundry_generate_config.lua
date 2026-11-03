@@ -1,6 +1,7 @@
 local cjson = require "cjson"
 local deep_merge_overwrite_arrays = require "api-umbrella.utils.deep_merge_overwrite_arrays"
 local lyaml = require "lyaml"
+local split = require("ngx.re").split
 local writefile = require("pl.utils").writefile
 
 local json_decode = cjson.decode
@@ -40,6 +41,46 @@ return function()
   -- Fetch Cloud Foundry service information from the VCAP_SERVICES environment
   -- variable.
   local vcap_services_data = json_decode(vcap_services)
+
+  -- Set SES credentails from service if available.
+  if vcap_services_data["aws-ses"] and vcap_services_data["aws-ses"][1] and vcap_services_data["aws-ses"][1]["credentials"] then
+    local credentials = vcap_services_data["aws-ses"][1]["credentials"]
+
+    local configuration_set
+    if credentials["configuration_set_arn"] then
+      local parts = split(credentials["configuration_set_arn"], "/")
+      configuration_set = parts[2]
+    end
+
+    deep_merge_overwrite_arrays(config, json_nulls_to_yaml_nulls({
+      web = {
+        mailer = {
+          smtp_settings = {
+            address = credentials["smtp_server"],
+            port = 465,
+            ssl = true,
+            ssl_verify = true,
+            ssl_host = credentials["smtp_server"],
+            domain = credentials["domain"],
+            authentication = "login",
+            user_name = credentials["smtp_user"],
+            password = credentials["smtp_password"],
+          },
+          headers = {
+            ["X-SES-CONFIGURATION-SET"] = configuration_set,
+          },
+        },
+      },
+      envoy = {
+        smtp_proxy = {
+          endpoint = {
+            host = credentials["smtp_server"],
+            port = 465,
+          },
+        },
+      },
+    }))
+  end
 
   -- Find our secret configuration (via a user provided service), and merge that
   -- on top of the existing API Umbrella config.

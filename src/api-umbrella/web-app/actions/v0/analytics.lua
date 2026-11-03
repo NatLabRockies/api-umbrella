@@ -183,11 +183,6 @@ local function generate_production_apis_summary(start_time, end_time, recent_sta
   data["api_backend_count"] = int64_to_json_number(counts[1]["api_backend_count"])
   data["api_backend_url_match_count"] = int64_to_json_number(counts[1]["api_backend_url_match_count"])
 
-  local all_filters = {
-    condition = "OR",
-    rules = {},
-  }
-
   local organizations = pg_utils.query([[
     SELECT api_backends.organization_name,
       COUNT(DISTINCT api_backends.id) AS api_backend_count,
@@ -224,7 +219,6 @@ local function generate_production_apis_summary(start_time, end_time, recent_sta
         },
       }
       table.insert(filters["rules"], rule)
-      table.insert(all_filters["rules"], rule)
     end
 
     ngx.log(ngx.NOTICE, 'Fetching analytics for organization "' .. organization["organization_name"] .. '"')
@@ -241,7 +235,7 @@ local function generate_production_apis_summary(start_time, end_time, recent_sta
   end
 
   ngx.log(ngx.NOTICE, "Fetching analytics for all organizations")
-  local all_data, all_data_err = generate_organization_summary("all", start_time, end_time, recent_start_time, all_filters)
+  local all_data, all_data_err = generate_organization_summary("all", start_time, end_time, recent_start_time)
   if all_data_err then
     ngx.log(ngx.ERR, "Analytics for all organization failed: ", all_data_err)
     any_err = true

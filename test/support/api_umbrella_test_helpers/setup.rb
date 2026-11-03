@@ -313,7 +313,7 @@ module ApiUmbrellaTestHelpers
 
     def override_config_set(config, options = {})
       self.config_set_lock.synchronize do
-        if(self.class.test_order == :parallel)
+        if(self.class.run_order == :parallel)
           raise "`override_config_set` cannot be called with `parallelize_me!` in the same class. Since overriding config affects the global state, it cannot be used with parallel tests."
         end
 
@@ -464,7 +464,7 @@ module ApiUmbrellaTestHelpers
     end
 
     def unique_test_id
-      @unique_test_id ||= to_unique_id(self.location)
+      @unique_test_id ||= to_unique_id("#{self.class.name}##{self.name}")
     end
 
     def unique_test_subdomain

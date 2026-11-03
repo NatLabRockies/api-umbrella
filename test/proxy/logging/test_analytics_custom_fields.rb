@@ -164,7 +164,7 @@ class Test::Proxy::Logging::TestAnalyticsCustomFields < Minitest::Test
     }))
     assert_response_code(200, response2)
     assert_equal("HIT", response2.headers.fetch("X-Cache"))
-    assert_equal("http/1.1 api-umbrella (ApacheTrafficServer [cHs f ])", response2.headers.fetch("Via"))
+    assert_equal("http/1.1 api-umbrella (ApacheTrafficServer [cRs f ])", response2.headers.fetch("Via"))
     assert(response2.headers.fetch("X-Api-Umbrella-Request-ID"))
     refute_equal(response1.headers.fetch("X-Api-Umbrella-Request-ID"), response2.headers.fetch("X-Api-Umbrella-Request-ID"))
     assert_nil(response2.headers["X-Api-Umbrella-Analytics-Custom1"])
@@ -175,7 +175,7 @@ class Test::Proxy::Logging::TestAnalyticsCustomFields < Minitest::Test
     assert_nil(record2["response_custom2"])
     assert_nil(record2["response_custom3"])
     assert_equal("HIT", record2.fetch("response_cache"))
-    assert_equal("cHs f ", record2.fetch("response_cache_flags"))
+    assert_equal("cRs f ", record2.fetch("response_cache_flags"))
     assert_equal(response2.headers.fetch("X-Api-Umbrella-Request-ID"), result2.fetch(:hit).fetch("_id"))
   end
 end

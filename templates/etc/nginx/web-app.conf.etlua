@@ -17,7 +17,8 @@ env API_UMBRELLA_RUNTIME_CONFIG;
 pcre_jit on;
 
 http {
-  access_log <%- config["log_dir"] %>/nginx-web-app/<%- config["nginx"]["access_log_filename"] %> combined;
+  include ./log_format.conf;
+  access_log <%- config["log_dir"] %>/nginx-web-app/<%- config["nginx"]["access_log_filename"] %> custom_json <%- config["nginx"]["access_log_options"] or "" %>;
 
   client_body_temp_path <%- config["tmp_dir"] %>/nginx-web-app-client_body_temp;
   proxy_temp_path <%- config["tmp_dir"] %>/nginx-web-app-proxy_temp;
@@ -73,6 +74,7 @@ http {
   server {
     listen <%- config["web"]["listen"]["host"] %>:<%- config["web"]["listen"]["port"] %> so_keepalive=<%- config["web"]["listen_so_keepalive"] %><% if config["web"]["listen_backlog"] then %> backlog=<%- config["web"]["listen_backlog"] %><% end %>;
 
+    set $log_service "nginx-web-app";
     set $x_api_umbrella_request_id $http_x_api_umbrella_request_id;
 
     # Security headers

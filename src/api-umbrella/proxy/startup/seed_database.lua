@@ -114,7 +114,7 @@ local function seed_api_keys()
     user["api_key"] = nil
     if not user["api_key_hash"] then
       if not api_key then
-        api_key = random_token(40)
+        api_key = random_token(40, true)
       end
       user["api_key_hash"] = hmac(api_key)
       local encrypted, iv = encryptor.encrypt(api_key, user["id"])
@@ -257,7 +257,7 @@ local function seed_initial_superusers()
       admin["id"] = uuid.generate_random()
     end
     if not admin["authentication_token_hash"] then
-      local authentication_token = random_token(40)
+      local authentication_token = random_token(40, true)
       admin["authentication_token_hash"] = hmac(authentication_token)
       local encrypted, iv = encryptor.encrypt(authentication_token, admin["id"])
       admin["authentication_token_encrypted"] = encrypted

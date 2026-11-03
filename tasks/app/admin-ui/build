@@ -14,19 +14,14 @@ rsync -a \
   --itemize-changes \
   --delete \
   --delete-excluded \
+  --filter="protect /node_modules/***" \
   --filter=":- $SOURCE_DIR/src/api-umbrella/admin-ui/.gitignore" \
   "$SOURCE_DIR/src/api-umbrella/admin-ui/" \
   ./
 
-# Symlink the local node_modules to the system-wide node directory.
-#
-# Note, we create a `.pnpm` directory inside (even if pnpm isn't being used,
-# since it won't hurt anything), since it seems to sidestep this issue of
-# install failing if node_modules is a symlink:
-# https://github.com/pnpm/pnpm/issues/7690
+# Copy the node_modules from the separate install task into local place.
 node_modules_dir="$WORK_DIR/tasks/app-deps/admin-ui/pnpm/_persist/node_modules"
-mkdir -p "${node_modules_dir}/.pnpm"
-ln -s "$node_modules_dir" ./node_modules
+rsync -a --delete --delete-excluded "${node_modules_dir}/" ./node_modules/
 
 # Install the "dist" result into the task's special _persist directory so that
 # these dependencies for the tasks/app/core task are still present if core
@@ -34,7 +29,7 @@ ln -s "$node_modules_dir" ./node_modules
 mkdir -p ../_persist
 # Set JOBS=1 to fix parallel issues in CI environment:
 # https://github.com/emberjs/ember.js/issues/15641#issuecomment-328496408
-PATH="$DEV_PATH" JOBS=1 ./node_modules/.bin/ember build \
+PATH="$DEV_PATH" JOBS=1 pnpm exec ember build \
   --environment=production \
   --output-path=../_persist/dist
 

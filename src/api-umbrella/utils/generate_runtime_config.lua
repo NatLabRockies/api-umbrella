@@ -334,9 +334,7 @@ local function set_computed_config(config)
           end
         end
 
-        if parsed["scheme"] == "https" then
-          parsed["_https?"] = true
-        end
+        parsed["_https?"] = parsed["scheme"] == "https"
 
         table.insert(config["opensearch"]["_servers"], parsed)
       end
@@ -544,7 +542,7 @@ local function set_cached_random_tokens(config)
       if not config["static_site"]["api_key"] then
         deep_defaults(cached, {
           static_site = {
-            api_key = random_token(40),
+            api_key = random_token(40, true),
           },
         })
       end

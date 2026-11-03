@@ -87,7 +87,7 @@ local function get_userinfo(httpc, token, options)
 end
 
 function _M.authorize(self, strategy_name, url, params)
-  local state = random_token(64)
+  local state = random_token(64, true)
   self:init_session_cookie()
   self.session_cookie:start()
   self.session_cookie.data["oauth2_state"] = state

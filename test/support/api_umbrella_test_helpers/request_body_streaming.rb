@@ -1,8 +1,8 @@
 module ApiUmbrellaTestHelpers
   module RequestBodyStreaming
-    def make_streaming_body_request(request_body_chunks)
+    def make_streaming_body_request(request_body_chunks, url: "http://127.0.0.1:9080/api/request-body-streaming/")
       easy = Ethon::Easy.new
-      easy.http_request("http://127.0.0.1:9080/api/request-body-streaming/", :put)
+      easy.http_request(url, :put)
       easy.headers = {
         "Transfer-Encoding" => "chunked",
         "X-Api-Key" => http_options.fetch(:headers).fetch("X-Api-Key"),

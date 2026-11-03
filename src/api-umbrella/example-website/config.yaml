@@ -1,5 +1,5 @@
 baseURL: /
-languageCode: en-us
+locale: en-us
 title: My New Hugo Site
 params:
   githubRepoUrl: https://github.com/NREL/api-umbrella

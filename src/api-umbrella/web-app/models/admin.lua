@@ -326,7 +326,7 @@ Admin = model_ext.new_class("admins", {
   end,
 
   set_reset_password_token = function(self, override_sent_at)
-    local token = random_token(24)
+    local token = random_token(24, true)
     local token_hash = hmac(token)
     model_ext.transaction_update("admins", {
       reset_password_token_hash = token_hash,
@@ -438,7 +438,7 @@ Admin = model_ext.new_class("admins", {
   end,
 
   before_validate_on_create = function(_, values)
-    local authentication_token = random_token(40)
+    local authentication_token = random_token(40, true)
     values["authentication_token_hash"] = hmac(authentication_token)
     local encrypted, iv = encryptor.encrypt(authentication_token, values["id"])
     values["authentication_token_encrypted"] = encrypted

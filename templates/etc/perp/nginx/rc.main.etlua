@@ -17,7 +17,7 @@ if [ "${1}" = "start" ]; then
       chown "$api_umbrella_user":"$api_umbrella_group" /dev/stdout
     fi
 
-    ln -sf /dev/stdout "<%- config['log_dir'] %>/nginx/access.log"
+    ln -sf /dev/stdout "<%- config['log_dir'] %>/nginx/<%- config['nginx']['access_log_filename'] %>"
   fi
 
   run_args=("-e" "rc.env" "-c" "<%- config['_src_root_dir'] %>")

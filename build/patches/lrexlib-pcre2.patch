@@ -1,18 +1,14 @@
---- a/lrexlib-pcre2-2.9.3-1.rockspec
-+++ b/lrexlib-pcre2-2.9.3-1.rockspec
-@@ -24,6 +24,7 @@
+--- a/lrexlib-pcre2-2.9.4-1.rockspec
++++ b/lrexlib-pcre2-2.9.4-1.rockspec
+@@ -5,9 +5,11 @@
+     rex_pcre2 = {
+       libraries = {
+         "pcre2-8",
++        "luajit-5.1",
        },
        libdirs = {
          "$(PCRE2_LIBDIR)",
 +        "$(STAGE_EMBEDDED_LIBDIR)",
        },
-       sources = {
-         "src/common.c",
-@@ -36,6 +37,7 @@
-       },
-       libraries = {
-         "pcre2-8",
-+        "luajit-5.1",
-       },
-     },
-   },
+       defines = {
+         "VERSION=\"2.9.4\"",

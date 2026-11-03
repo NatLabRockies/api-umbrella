@@ -55,8 +55,13 @@ class Test::Processes::TestFluentBit < Minitest::Test
     assert_response_code(200, response)
 
     log = log_tail.read_until(unique_test_id, timeout: 30)
-    assert_match(%r{analytics\.allowed.*"request_path"=>"/api/hello/#{unique_test_id}"}, log)
-    assert_match(/analytics\.allowed.*"request_id"=>"#{response.headers["X-Api-Umbrella-Request-ID"]}"/, log)
+    log_line = log.match(/^.*#{unique_test_id}.*$/)[0]
+    # Remove the timestamp prefix from the log line.
+    log_line = log_line.split(" ", 2).last
+    log_row = MultiJson.load(log_line)
+    assert_equal("/api/hello/#{unique_test_id}", log_row.fetch("request_path"))
+    assert_equal(response.headers["X-Api-Umbrella-Request-ID"], log_row.fetch("request_id"))
+    assert_match_iso8601(log_row.fetch("_log_timestamp"))
   end
 
   def test_opensearch_error_log
