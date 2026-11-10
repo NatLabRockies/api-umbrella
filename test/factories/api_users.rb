@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :api_user do
-    api_key { SecureRandom.hex(20) }
+    api_key { SecureRandom.alphanumeric(40) }
     first_name { "Ambrose" }
     last_name { "Burnside" }
     sequence(:email) { |n| "ambrose.burnside#{n}@example.com" }

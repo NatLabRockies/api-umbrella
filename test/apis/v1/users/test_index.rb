@@ -150,7 +150,7 @@ class Test::Apis::V1::Users::TestIndex < Minitest::Test
     user = data["data"].find { |u| u["id"] == api_user.id }
     refute_includes(user.keys, "api_key")
     refute_includes(user.keys, "api_key_hides_at")
-    assert_equal("#{api_user.api_key[0, 6]}...", user["api_key_preview"])
+    assert_equal("#{api_user.api_key[0, 4]}...#{api_user.api_key[-4..]}", user["api_key_preview"])
   end
 
   def test_search_first_name
@@ -305,7 +305,7 @@ class Test::Apis::V1::Users::TestIndex < Minitest::Test
       "website",
     ].sort, record_data.keys.sort)
     assert_kind_of(String, record_data.fetch("api_key_preview"))
-    assert_equal(9, record_data.fetch("api_key_preview").length)
+    assert_equal(11, record_data.fetch("api_key_preview").length)
     assert_match_iso8601(record_data.fetch("created_at"))
     assert_match_uuid(record_data.fetch("created_by"))
     assert_kind_of(Hash, record_data.fetch("creator"))

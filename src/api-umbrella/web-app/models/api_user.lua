@@ -205,6 +205,15 @@ ApiUser = model_ext.new_class("api_users", {
     return data
   end,
 
+  request_deactivation_json = function(self)
+    local data = {
+      api_key_suffix = json_null_default(self.api_key_suffix),
+      deactivation_sent_at = json_null_default(time.postgres_to_iso8601(self.deactivation_sent_at)),
+    }
+
+    return data
+  end,
+
   confirm_deactivation_json = function(self)
     local data = {
       api_key_suffix = json_null_default(self.api_key_suffix),
@@ -257,7 +266,7 @@ ApiUser = model_ext.new_class("api_users", {
   end,
 
   set_deactivation_token = function(self)
-    local token = random_token(24, true)
+    local token = random_token(30, true)
     local token_hash = hmac(token)
     model_ext.transaction_update("api_users", {
       deactivation_token_hash = token_hash,

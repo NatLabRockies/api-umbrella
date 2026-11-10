@@ -199,6 +199,9 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
     assert_admin_permitted_create(api_key, admin)
     assert_admin_permitted_update(api_key, admin)
     assert_no_destroy(api_key, admin)
+    assert_admin_permitted_request_deactivation(api_key, admin)
+    assert_admin_permitted_show_confirm_deactivation(api_key, admin)
+    assert_admin_permitted_confirm_deactivation(api_key, admin)
   end
 
   def assert_admin_permitted_create_only(api_key, admin)
@@ -207,6 +210,9 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
     assert_admin_permitted_create(api_key, admin)
     assert_admin_forbidden_update(api_key, admin)
     assert_no_destroy(api_key, admin)
+    assert_admin_permitted_request_deactivation(api_key, admin)
+    assert_admin_permitted_show_confirm_deactivation(api_key, admin)
+    assert_admin_permitted_confirm_deactivation(api_key, admin)
   end
 
   def assert_admin_permitted_view_only(api_key, admin)
@@ -215,6 +221,9 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
     assert_admin_forbidden_create(api_key, admin, :role_based_error => true)
     assert_admin_forbidden_update(api_key, admin, :role_based_error => true)
     assert_no_destroy(api_key, admin)
+    assert_admin_forbidden_request_deactivation(api_key, admin, :role_based_error => true)
+    assert_admin_forbidden_show_confirm_deactivation(api_key, admin, :role_based_error => true)
+    assert_admin_forbidden_confirm_deactivation(api_key, admin, :role_based_error => true)
   end
 
   def assert_admin_permitted_manage_only(api_key, admin)
@@ -223,6 +232,9 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
     assert_admin_permitted_create(api_key, admin)
     assert_admin_permitted_update(api_key, admin)
     assert_no_destroy(api_key, admin)
+    assert_admin_permitted_request_deactivation(api_key, admin)
+    assert_admin_permitted_show_confirm_deactivation(api_key, admin)
+    assert_admin_permitted_confirm_deactivation(api_key, admin)
   end
 
   def assert_admin_forbidden(api_key, admin)
@@ -231,6 +243,9 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
     assert_admin_forbidden_create(api_key, admin)
     assert_admin_forbidden_update(api_key, admin)
     assert_no_destroy(api_key, admin)
+    assert_admin_forbidden_request_deactivation(api_key, admin)
+    assert_admin_forbidden_show_confirm_deactivation(api_key, admin)
+    assert_admin_forbidden_confirm_deactivation(api_key, admin)
   end
 
   def assert_admin_permitted_index(api_key, admin)
@@ -385,6 +400,121 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
       assert_response_code(403, response)
     end
     assert_equal(0, active_count - initial_count)
+  end
+
+  def assert_admin_permitted_request_deactivation(api_key, admin)
+    record = FactoryBot.create(:api_user)
+
+    attributes = { api_key: record.api_key, email: record.email }
+    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users/request-deactivation.json", http_options(api_key, admin).deep_merge({
+      headers: { "Content-Type" => "application/json" },
+      body: MultiJson.dump(user: attributes),
+    }))
+
+    assert_response_code(201, response)
+    data = MultiJson.load(response.body)
+    assert(data.fetch("user").fetch("deactivation_sent_at"))
+    record.reload
+    assert(record.deactivation_token_hash)
+  end
+
+  def assert_admin_forbidden_request_deactivation(api_key, admin, role_based_error: false)
+    record = FactoryBot.create(:api_user)
+
+    attributes = { api_key: record.api_key, email: record.email }
+    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users/request-deactivation.json", http_options(api_key, admin).deep_merge({
+      headers: { "Content-Type" => "application/json" },
+      body: MultiJson.dump(user: attributes),
+    }))
+
+    if(role_based_error)
+      assert_response_code(403, response)
+      data = MultiJson.load(response.body)
+      assert_equal(["errors"], data.keys)
+    else
+      if(api_key)
+        assert_response_code(401, response)
+      else
+        assert_response_code(403, response)
+      end
+      data = MultiJson.load(response.body)
+      assert_equal(["error"], data.keys)
+    end
+    record.reload
+    assert_nil(record.deactivation_token_hash)
+  end
+
+  def assert_admin_permitted_show_confirm_deactivation(api_key, admin)
+    record = FactoryBot.create(:api_user, deactivation_token: SecureRandom.alphanumeric(30), deactivation_sent_at: Time.now)
+
+    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/users/confirm-deactivation.json", http_options(api_key, admin).deep_merge({
+      headers: { "Content-Type" => "application/json" },
+      params: { token: record.deactivation_token },
+    }))
+
+    assert_response_code(200, response)
+    data = MultiJson.load(response.body)
+    assert(data.fetch("user").fetch("api_key_suffix"))
+  end
+
+  def assert_admin_forbidden_show_confirm_deactivation(api_key, admin, role_based_error: false)
+    record = FactoryBot.create(:api_user, deactivation_token: SecureRandom.alphanumeric(30), deactivation_sent_at: Time.now)
+
+    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/users/confirm-deactivation.json", http_options(api_key, admin).deep_merge({
+      headers: { "Content-Type" => "application/json" },
+      params: { token: record.deactivation_token },
+    }))
+
+    if(role_based_error)
+      assert_response_code(403, response)
+      data = MultiJson.load(response.body)
+      assert_equal(["errors"], data.keys)
+    else
+      if(api_key)
+        assert_response_code(401, response)
+      else
+        assert_response_code(403, response)
+      end
+      data = MultiJson.load(response.body)
+      assert_equal(["error"], data.keys)
+    end
+  end
+
+  def assert_admin_permitted_confirm_deactivation(api_key, admin)
+    record = FactoryBot.create(:api_user, deactivation_token: SecureRandom.alphanumeric(30), deactivation_sent_at: Time.now)
+
+    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users/confirm-deactivation.json", http_options(api_key, admin).deep_merge({
+      headers: { "Content-Type" => "application/json" },
+      body: MultiJson.dump(user: { deactivation_token: record.deactivation_token }),
+    }))
+
+    assert_response_code(200, response)
+    data = MultiJson.load(response.body)
+    data = MultiJson.load(response.body)
+    assert(data.fetch("user").fetch("api_key_suffix"))
+  end
+
+  def assert_admin_forbidden_confirm_deactivation(api_key, admin, role_based_error: false)
+    record = FactoryBot.create(:api_user, deactivation_token: SecureRandom.alphanumeric(30), deactivation_sent_at: Time.now)
+
+    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users/confirm-deactivation.json", http_options(api_key, admin).deep_merge({
+      headers: { "Content-Type" => "application/json" },
+      body: MultiJson.dump(user: { deactivation_token: record.deactivation_token }),
+    }))
+
+    if(role_based_error)
+      assert_response_code(403, response)
+      data = MultiJson.load(response.body)
+      assert_equal(["errors"], data.keys)
+    else
+      if(api_key)
+        assert_response_code(401, response)
+      else
+        assert_response_code(403, response)
+      end
+      data = MultiJson.load(response.body)
+      assert_equal(["error"], data.keys)
+    end
   end
 
   def http_options(api_key, admin)

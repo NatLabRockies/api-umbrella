@@ -2,6 +2,7 @@ class ApiUser < ApplicationRecord
   has_one :settings, :class_name => "ApiUserSettings"
   has_and_belongs_to_many :roles, -> { order(:id) }, :class_name => "ApiRole", :join_table => "api_users_roles"
   attr_accessor :terms_and_conditions
+  attr_accessor :deactivation_token
 
   def id=(id)
     prev_id = self[:id]
@@ -55,7 +56,7 @@ class ApiUser < ApplicationRecord
   end
 
   def api_key_preview
-    "#{self.api_key_prefix[0, 6]}..."
+    "#{self.api_key_prefix[0, 4]}...#{self.api_key_suffix[-4..]}"
   end
 
   def serializable_hash(options = nil)
@@ -74,5 +75,10 @@ class ApiUser < ApplicationRecord
       },
     })
     super
+  end
+
+  def deactivation_token=(value)
+    self.deactivation_token_hash = OpenSSL::HMAC.hexdigest("sha256", $config["secret_key"], value)
+    @deactivation_token = value
   end
 end

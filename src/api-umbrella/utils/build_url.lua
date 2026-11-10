@@ -1,11 +1,12 @@
+local config = require("api-umbrella.utils.load_config")()
 local host_normalize = require "api-umbrella.utils.host_normalize"
 
 local ngx_var = ngx.var
 local re_match = ngx.re.match
 
 return function(path)
-  local host = ngx_var.http_x_forwarded_host or ngx_var.http_host or ngx_var.host
-  local proto = ngx_var.http_x_forwarded_proto or ngx_var.scheme
+  local host = config["web"]["default_host"] or ngx_var.server_name
+  local proto = config["web"]["default_scheme"] or ngx_var.scheme
 
   local port
   local matches, match_err = re_match(host, [[:(\d+)$]], "jo")
@@ -16,7 +17,15 @@ return function(path)
       ngx.log(ngx.ERR, "regex error: ", match_err)
     end
 
-    port = tonumber(ngx_var.http_x_forwarded_port or ngx_var.server_port)
+    if proto == "http" then
+      port = config["http_port"]
+    else
+      port = config["https_port"]
+    end
+
+    if not port then
+      port = tonumber(ngx_var.server_port)
+    end
   end
 
   local url = proto .. "://" .. host_normalize(host)

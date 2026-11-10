@@ -14,7 +14,7 @@ if template_text_err then
   ngx.log(ngx.ERR, "template compile error: ", template_text_err)
 end
 
-return function(api_user, url)
+return function(api_user, url, host)
   local data = {
     instruction = string.format(t("We received a request to deactivate your API key. To confirm you'd like to deactivate your API key (ending in \"%s\"), visit the link below and confirm your request:"), api_user.api_key_suffix),
     url = url,
@@ -28,9 +28,9 @@ return function(api_user, url)
 
   local ok, send_err = mailer:send({
     headers = config["web"]["mailer"]["headers"],
-    from = "noreply@" .. config["web"]["default_host"],
+    from = host .. " Keys <noreply@" .. config["web"]["default_host"] .. ">",
     to = { api_user.email },
-    subject = t("Confirm API key deactivation request"),
+    subject = string.format(t("Confirm %s API key deactivation request"), host),
     text = template_text(data),
   })
   if not ok then

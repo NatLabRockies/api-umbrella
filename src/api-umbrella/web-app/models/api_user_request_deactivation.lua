@@ -1,9 +1,9 @@
 local ApiUser = require "api-umbrella.web-app.models.api_user"
 local api_key_prefixer = require("api-umbrella.utils.api_key_prefixer").prefix
+local api_user_policy = require "api-umbrella.web-app.policies.api_user_policy"
 local api_user_request_deactivation_mailer = require "api-umbrella.web-app.mailers.api_user_request_deactivation"
 local build_url = require "api-umbrella.utils.build_url"
 local config = require("api-umbrella.utils.load_config")()
-local contact_policy = require "api-umbrella.web-app.policies.contact_policy"
 local hmac = require "api-umbrella.utils.hmac"
 local is_empty = require "api-umbrella.utils.is_empty"
 local model_ext = require "api-umbrella.web-app.utils.model_ext"
@@ -32,7 +32,7 @@ local function validate(data)
 end
 
 function _M.authorized_deliver(_, data, options)
-  -- contact_policy.authorize_create()
+  api_user_policy.authorize_create(ngx.ctx.current_admin, data)
 
   local errors = validate(data)
   if not is_empty(errors) then
@@ -78,15 +78,17 @@ function _M.authorized_deliver(_, data, options)
   })
   local url = url_build(parsed)
 
-  local ok, err = api_user_request_deactivation_mailer(api_user, url)
-  if not ok then
-    ngx.log(ngx.ERR, "mail error: ", err)
-    -- message_level = "danger"
-    -- message = t("An unexpected error occurred when sending the email.")
-    return false
-  else
-    return true
-  end
+  local ok, err = api_user_request_deactivation_mailer(api_user, url, parsed["host"])
+  -- if not ok then
+  --   ngx.log(ngx.ERR, "mail error: ", err)
+  --   -- message_level = "danger"
+  --   -- message = t("An unexpected error occurred when sending the email.")
+  --   return false
+  -- else
+  --   return true
+  -- end
+
+  return api_user
 end
 
 return _M

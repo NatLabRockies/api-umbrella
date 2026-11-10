@@ -481,7 +481,7 @@ function _M.api_user_params(self)
   return params
 end
 
-function _M.create_deactivation_params(self)
+function _M.request_deactivation_params(self)
   local params = {}
   if self.params and type(self.params["user"]) == "table" then
     local input = self.params["user"]
@@ -504,13 +504,13 @@ function _M.cors_preflight(self)
   return { status = 204, layout = false }
 end
 
-function _M.create_request_deactivation(self)
+function _M.request_deactivation(self)
   local options = deepcopy(self.params["options"]) or {}
   options["submitted_from_url"] = known_domains.sanitized_url(options["submitted_from_url"])
 
-  assert(ApiUserRequestDeactivation:authorized_deliver(_M.create_deactivation_params(self), options))
+  local api_user = ApiUserRequestDeactivation:authorized_deliver(_M.request_deactivation_params(self), options)
   local response = {
-    -- submitted = time.timestamp_to_iso8601(ngx.now()),
+    user = api_user:request_deactivation_json(),
   }
 
   self.res.status = 201
@@ -518,6 +518,8 @@ function _M.create_request_deactivation(self)
 end
 
 function _M.show_confirm_deactivation(self)
+  api_user_policy.authorize_create(ngx.ctx.current_admin, self.api_user:attributes())
+
   local response = {
     user = self.api_user:confirm_deactivation_json(),
   }
@@ -526,6 +528,8 @@ function _M.show_confirm_deactivation(self)
 end
 
 function _M.confirm_deactivation(self)
+  api_user_policy.authorize_create(ngx.ctx.current_admin, self.api_user:attributes())
+
   self.api_user:deactivate()
 
   local response = {
@@ -548,7 +552,7 @@ return function(app)
   end
 
   app:match("/api-umbrella/v1/users/request-deactivation(.:format)", respond_to({
-    POST = capture_errors_json_full(parse_post_for_pseudo_ie_cors(wrapped_json_params(_M.create_request_deactivation, "user"))),
+    POST = capture_errors_json_full(parse_post_for_pseudo_ie_cors(wrapped_json_params(_M.request_deactivation, "user"))),
     OPTIONS = capture_errors_json_full(_M.cors_preflight),
   }))
 
@@ -560,25 +564,11 @@ return function(app)
       end
       self.api_user = ApiUser:find_by_deactivation_token(token)
       if not self.api_user then
-        return coroutine.yield("error", {
-          {
-            code = "INVALID_INPUT",
-            field = "token",
-            field_label = "Deactivation token",
-            message = t("is invalid"),
-          },
-        })
+        return self.app.handle_404(self)
       end
 
       if self.api_user:is_deactivation_expired() then
-        return coroutine.yield("error", {
-          {
-            code = "INVALID_INPUT",
-            field = "token",
-            field_label = "Deactivation token",
-            message = t("has expired, please request a new one"),
-          },
-        })
+        return self.app.handle_404(self)
       end
     end, "user")),
     GET = capture_errors_json_full(_M.show_confirm_deactivation),
