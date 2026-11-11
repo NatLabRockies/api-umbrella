@@ -1637,7 +1637,7 @@ return {
     for _ = 1, 3 do
       db.query("UPDATE api_users SET email = lower(email) WHERE email != lower(email)")
 
-      local _, cursor_err = pg_utils.cursor("SELECT id, api_key_encrypted, api_key_encrypted_iv, api_key_prefix FROM api_users WHERE api_key_suffix IS NULL", nil, 1000, nil, function(results)
+      local _, cursor_err = pg_utils.cursor("SELECT id, api_key_encrypted, api_key_encrypted_iv, api_key_prefix FROM api_users WHERE api_key_suffix IS NULL ORDER BY created_at", nil, 1000, nil, function(results)
         local suffixes = {}
         for _, row in ipairs(results) do
           if row["api_key_encrypted"] and row["api_key_encrypted_iv"] then
@@ -1648,14 +1648,13 @@ return {
         end
 
         db.query("INSERT INTO pg_temp.suffixes (id, api_key_suffix) VALUES " .. table.concat(suffixes, ", "))
+        db.query("UPDATE api_users AS u SET api_key_suffix = s.api_key_suffix FROM pg_temp.suffixes AS s WHERE u.api_key_suffix IS NULL AND u.id = s.id")
+        db.query("TRUNCATE TABLE pg_temp.suffixes")
       end)
 
       if cursor_err then
         error(cursor_err)
       end
-
-      db.query("UPDATE api_users AS u SET api_key_suffix = s.api_key_suffix FROM pg_temp.suffixes AS s WHERE u.api_key_suffix IS NULL AND u.id = s.id")
-      db.query("TRUNCATE TABLE pg_temp.suffixes")
     end
 
     db.query("ALTER TABLE api_users ALTER COLUMN api_key_suffix SET NOT NULL")
