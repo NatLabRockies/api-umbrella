@@ -42,7 +42,7 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
     assert_match("deactivate your API key ending in \"#{api_user.api_key_suffix}\".", message.fetch("Text"))
     refute_match(api_user.deactivation_token_hash, message.fetch("Text"))
 
-    url_matcher = %r{^https://localhost:9081/signup/#/confirm-deactivation\?token=(\w+)$}
+    url_matcher = %r{^https://127.0.0.1:9081/signup/#/confirm-deactivation\?token=(\w+)$}
     assert_match(url_matcher, message.fetch("Text"))
 
     token = message.fetch("Text").match(url_matcher)[1]
@@ -52,9 +52,9 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
     assert_equal(OpenSSL::HMAC.hexdigest("sha256", $config["secret_key"], token), api_user.deactivation_token_hash)
 
-    assert_equal("Confirm localhost API key deactivation request", message.fetch("Subject"))
-    assert_equal("noreply@localhost", message.fetch("From").fetch("Address"))
-    assert_equal("localhost Keys", message.fetch("From").fetch("Name"))
+    assert_equal("Confirm 127.0.0.1 API key deactivation request", message.fetch("Subject"))
+    assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
+    assert_equal("127.0.0.1 Keys", message.fetch("From").fetch("Name"))
   end
 
   def test_api_key_not_found
@@ -284,11 +284,11 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
       assert_response_code(201, response)
 
       message = sent_email_contents.fetch("messages").first
-      refute_match("https://localhost:9081", message.fetch("Text"))
+      refute_match("https://127.0.0.1:9081", message.fetch("Text"))
       assert_match("https://#{unique_test_hostname}/other-signup?foo=bar#/confirm-deactivation?token=", message.fetch("Text"))
 
       assert_equal("Confirm #{unique_test_hostname} API key deactivation request", message.fetch("Subject"))
-      assert_equal("noreply@localhost", message.fetch("From").fetch("Address"))
+      assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
       assert_equal("#{unique_test_hostname} Keys", message.fetch("From").fetch("Name"))
     end
   end
@@ -301,11 +301,11 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
     message = sent_email_contents.fetch("messages").first
     refute_match(unique_test_hostname, message.fetch("Text"))
-    assert_match("https://localhost:9081", message.fetch("Text"))
+    assert_match("https://127.0.0.1:9081", message.fetch("Text"))
 
-    assert_equal("Confirm localhost API key deactivation request", message.fetch("Subject"))
-    assert_equal("noreply@localhost", message.fetch("From").fetch("Address"))
-    assert_equal("localhost Keys", message.fetch("From").fetch("Name"))
+    assert_equal("Confirm 127.0.0.1 API key deactivation request", message.fetch("Subject"))
+    assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
+    assert_equal("127.0.0.1 Keys", message.fetch("From").fetch("Name"))
   end
 
   def test_default_url_does_not_use_header_hosts
@@ -316,11 +316,11 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
     message = sent_email_contents.fetch("messages").first
     refute_match(unique_test_hostname, message.fetch("Text"))
-    assert_match("https://localhost:9081", message.fetch("Text"))
+    assert_match("https://127.0.0.1:9081", message.fetch("Text"))
 
-    assert_equal("Confirm localhost API key deactivation request", message.fetch("Subject"))
-    assert_equal("noreply@localhost", message.fetch("From").fetch("Address"))
-    assert_equal("localhost Keys", message.fetch("From").fetch("Name"))
+    assert_equal("Confirm 127.0.0.1 API key deactivation request", message.fetch("Subject"))
+    assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
+    assert_equal("127.0.0.1 Keys", message.fetch("From").fetch("Name"))
   end
 
   private

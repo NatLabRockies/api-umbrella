@@ -194,7 +194,7 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_equal("Your API key", message.fetch("Subject"))
 
     # From
-    assert_equal(["noreply@localhost"], message.fetch("headers").fetch("From"))
+    assert_equal(["noreply@127.0.0.1"], message.fetch("headers").fetch("From"))
 
     # Example API URL
     refute_match("Here's an example", message.fetch("HTML"))

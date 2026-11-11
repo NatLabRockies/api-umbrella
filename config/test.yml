@@ -52,6 +52,7 @@ web:
   port: 13012
   listen:
     port: 13012
+  default_host: "127.0.0.1"
   admin:
     auth_strategies:
       facebook:
