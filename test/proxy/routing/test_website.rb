@@ -17,7 +17,7 @@ class Test::Proxy::Routing::TestWebsite < Minitest::Test
 
     response = Typhoeus.get("https://127.0.0.1:9081/signup/", keyless_http_options)
     assert_response_code(200, response)
-    assert_match("API Key Signup", response.body)
+    assert_match("API Key Sign Up", response.body)
   end
 
   def test_https_redirect
