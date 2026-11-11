@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-unresolved
-import * as params from "@params";
+import * as buildParams from "@params";
 import A11yDialog from "a11y-dialog";
 import escapeHtml from "escape-html";
 import serialize from "form-serialize";
 import { createHashHistory } from "history";
-import { createRouter } from 'franxx'
+import { createRouter } from "franxx";
 
 const router = createRouter({
   history: createHashHistory(),
@@ -13,7 +13,7 @@ const router = createRouter({
 const styleEl = document.createElement("link");
 styleEl.rel = "stylesheet";
 styleEl.type = "text/css";
-styleEl.href = params.stylesheetPath;
+styleEl.href = buildParams.stylesheetPath;
 
 function insertLink(root, options) {
   const link = document.createElement("link");
@@ -32,7 +32,7 @@ function insertScript(root, options) {
   root.appendChild(script);
 }
 
-const webSiteRoot = params.webSiteRoot.replace(/\/$/, "");
+const webSiteRoot = buildParams.webSiteRoot.replace(/\/$/, "");
 
 const defaultOptions = {
   containerSelector: "#api_umbrella_signup",
@@ -186,7 +186,7 @@ signupFormTemplate += `
     <input type="hidden" name="user[registration_source]" value="${escapeHtml(
       options.registrationSource,
     )}" />
-    <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Sign up</button>
+    <button type="submit" class="btn btn-lg btn-primary">Sign up</button>
   </div>
 
   <p class="mt-4 mb-0">To disable or revoke an existing key, <a href="#/deactivate-api-key">begin API key deactivation</a>.</p>
@@ -209,6 +209,9 @@ const formModalTemplate = `
             <button type="button" class="btn-close" aria-label="Close" data-a11y-dialog-hide></button>
           </div>
           <div class="modal-body" id="api_umbrella_form_modal_body">
+          </div>
+          <div class="modal-footer" id="api_umbrella_form_modal_footer" hidden>
+            <button type="button" class="btn btn-primary" data-a11y-dialog-hide>OK</button>
           </div>
         </div>
       </div>
@@ -238,25 +241,25 @@ const alertModalTemplate = `
 `;
 
 const requestDeactivationFormTemplate = `
-  <p>To disable or revoke an existing API key, email confirmation is required.</p>
+  <p>Deactivation requires email verification. Enter the key details and we'll send an email confirmation to complete the request.</p>
 
   <form id="api_umbrella_request_deactivation_form" novalidate>
     <div class="form-group api-key-form-group">
       <label class="form-label" for="user_api_key">API Key <abbr title="required" class="required">*</abbr></label>
       <input class="form-control" id="user_api_key" aria-describedby="user_api_key user_api_key" name="user[api_key]" size="50" type="text" minlength="40" maxlength="40" required />
-      <div class="form-text" id="user_api_key">Provide the full API key you want to deactivate.</div>
+      <div class="form-text" id="user_api_key">Enter the full API key you want to deactivate.</div>
       <div id="user_api_key" class="invalid-feedback">Enter a full API key.</div>
     </div>
 
     <div class="form-group email-form-group">
       <label class="form-label" for="user_email">Email <abbr title="required" class="required">*</abbr></label>
       <input class="form-control" id="user_email" aria-describedby="user_email_hint user_email_feedback" name="user[email]" size="50" type="email" required />
-      <div class="form-text" id="user_email_hint">Provide the email address used to sign up for the API key with.</div>
+      <div class="form-text" id="user_email_hint">Enter the email you used to create this API key.</div>
       <div id="user_email_feedback" class="invalid-feedback">Enter an email address.</div>
     </div>
 
     <div class="submit">
-      <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Send confirmation email</button>
+      <button type="submit" class="btn btn-lg btn-primary">Send confirmation email</button>
     </div>
   </form>
 `;
@@ -324,25 +327,36 @@ document.body.appendChild(bodyContainerEl);
 
 insertLink(containerShadowRootEl, {
   rel: "stylesheet",
-  href: params.stylesheetPath,
+  href: buildParams.stylesheetPath,
 });
 
 insertLink(bodyContainerShadowRootEl, {
   rel: "stylesheet",
-  href: params.stylesheetPath,
+  href: buildParams.stylesheetPath,
 });
 
-const formModalEl = bodyContainerShadowRootEl.getElementById("api_umbrella_form_modal");
-const formModalBodyEl = formModalEl.querySelector("#api_umbrella_form_modal_body");
+const formModalEl = bodyContainerShadowRootEl.getElementById(
+  "api_umbrella_form_modal",
+);
+const formModalBodyEl = formModalEl.querySelector(
+  "#api_umbrella_form_modal_body",
+);
+const formModalFooterEl = formModalEl.querySelector(
+  "#api_umbrella_form_modal_footer",
+);
 const formModal = new A11yDialog(formModalEl);
-formModal.on('hide', (event) => {
-  if (router.currentLocation.pathname !== '/') {
-    router.push('/');
+formModal.on("hide", () => {
+  if (router.currentLocation.pathname !== "/") {
+    router.push("/");
   }
 });
 
-const alertModalEl = bodyContainerShadowRootEl.getElementById("api_umbrella_alert_modal");
-const alertModalBodyEl = alertModalEl.querySelector("#api_umbrella_alert_modal_body");
+const alertModalEl = bodyContainerShadowRootEl.getElementById(
+  "api_umbrella_alert_modal",
+);
+const alertModalBodyEl = alertModalEl.querySelector(
+  "#api_umbrella_alert_modal_body",
+);
 const alertModal = new A11yDialog(alertModalEl);
 
 // Setup close handlers for a11y-dialog when inside the shadow DOM (since their
@@ -354,54 +368,61 @@ alertModalEl.querySelectorAll("[data-a11y-dialog-hide]").forEach((closer) => {
   closer.addEventListener("click", alertModal.hide);
 });
 
-const formEl = containerShadowRootEl.querySelector("form");
-const submitButtonEl = formEl.querySelector("button[type=submit]");
+const signupFormEl = containerShadowRootEl.querySelector("form");
+const signupSubmitButtonEl = signupFormEl.querySelector("button[type=submit]");
 
 function disableSubmitButton(buttonEl) {
   if (!buttonEl.disabled) {
-    buttonEl.dataset.origInnerHTML = submitButtonEl.innerHTML;
+    // eslint-disable-next-line no-param-reassign
+    buttonEl.dataset.origInnerHTML = buttonEl.innerHTML;
+    // eslint-disable-next-line no-param-reassign
     buttonEl.disabled = true;
+    // eslint-disable-next-line no-param-reassign
     buttonEl.innerText = "Loading...";
   }
 }
 
 function enableSubmitButton(buttonEl) {
-  if (submitButtonEl.disabled) {
+  if (buttonEl.disabled) {
+    // eslint-disable-next-line no-param-reassign
     buttonEl.disabled = false;
-    buttonEl.innerHTML = submitButtonEl.dataset.origInnerHTML;
+    // eslint-disable-next-line no-param-reassign
+    buttonEl.innerHTML = buttonEl.dataset.origInnerHTML;
+    // eslint-disable-next-line no-param-reassign
     delete buttonEl.dataset.origInnerHTML;
   }
 }
 
 function submitFetch(submitOptions) {
   return fetch(submitOptions.url, {
-    method: (submitOptions.data) ? "POST" : "GET",
+    method: submitOptions.data ? "POST" : "GET",
     headers: {
-      "Content-Type": (submitOptions.data) ? "application/json" : undefined,
+      "Content-Type": submitOptions.data ? "application/json" : undefined,
       "X-Api-Key": options.apiKey,
     },
-    body: (submitOptions.data) ? JSON.stringify(submitOptions.data) : undefined,
+    body: submitOptions.data ? JSON.stringify(submitOptions.data) : undefined,
     // Ensure admin credentials aren't sent in for signed in admins.
     credentials: "omit",
   })
     .then((response) => {
+      if (response.status === 404 && submitOptions.onNotFound) {
+        submitOptions.onNotFound();
+        return Promise.resolve();
+      }
+
       const contentType = response.headers.get("Content-Type");
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error("Response is not JSON");
       }
 
-      return response.json().then((data) => ({
-        response,
-        data,
-      }));
-    })
-    .then(({ response, data }) => {
-      if (!response.ok) {
-        // eslint-disable-next-line no-throw-literal
-        throw { responseData: data };
-      }
+      return response.json().then((data) => {
+        if (!response.ok) {
+          // eslint-disable-next-line no-throw-literal
+          throw { responseData: data };
+        }
 
-      submitOptions.onSuccess(data);
+        submitOptions.onSuccess(data);
+      });
     })
     .catch((error) => {
       const messages = [];
@@ -431,19 +452,36 @@ function submitFetch(submitOptions) {
         console.error(e);
       }
 
+      let { errorIntro, errorOutro } = submitOptions;
+
+      if (!messageStr) {
+        errorIntro = `<p>An unexpected error occurred.</p>`;
+        errorOutro = `
+          <p class="mb-0">
+            Please try again or <a href="${escapeHtml(
+              options.issuesUrl,
+            )}">file an issue</a> for assistance.
+          </p>
+        `;
+      }
+
       alertModalBodyEl.innerHTML = `
-        ${submitOptions.errorIntro}
+        ${errorIntro}
         ${messageStr}
-        ${submitOptions.errorOutro}
+        ${errorOutro}
       `;
       alertModal.show();
     })
-    .finally(enableSubmitButton.bind(null, submitButtonEl));
+    .finally(() => {
+      if (submitOptions.submitButtonEl) {
+        enableSubmitButton(submitOptions.submitButtonEl);
+      }
+    });
 }
 
 function apiKeyRegistrationFetch() {
   const formData = {
-    ...serialize(formEl, { hash: true }),
+    ...serialize(signupFormEl, { hash: true }),
     options: {
       example_api_url: options.exampleApiUrl,
       contact_url: options.contactUrl,
@@ -479,9 +517,7 @@ function apiKeyRegistrationFetch() {
           <p>Your API key for <strong>${escapeHtml(
             user.email,
           )}</strong> has been emailed to you. You can use your API key to begin making web service requests immediately.</p>
-          <p>If you don't receive your API Key via email within a few minutes, please <a href="${escapeHtml(
-            data.options.contact_url,
-          )}">contact us</a>.</p>
+          <p>If you don't receive your API Key via email within a few minutes, please check your junk mail.</p>
         `;
       } else {
         confirmationTemplate += `
@@ -518,10 +554,11 @@ function apiKeyRegistrationFetch() {
         )}">file an issue</a> for assistance.
       </p>
     `,
+    submitButtonEl: signupSubmitButtonEl,
   });
 }
 
-function requestDeactivationFetch(formEl) {
+function requestDeactivationFetch(formEl, submitButtonEl) {
   const formData = {
     ...serialize(formEl, { hash: true }),
     options: {
@@ -532,21 +569,22 @@ function requestDeactivationFetch(formEl) {
   return submitFetch({
     url: `${options.apiUrlRoot}/v1/users/request-deactivation.json`,
     data: formData,
-    onSuccess: () => {
-      let confirmationTemplate = `
-        <p>Instructions for deactivating your API key have been emailed to <strong>${escapeHtml(formData.user.email)}</strong>.;
+    onSuccess: (data) => {
+      formModalBodyEl.innerHTML = `
+        <p>Instructions for deactivating your API key have been emailed to <strong>${escapeHtml(data.user.email)}</strong>. You must complete the emailed steps before your key will be deactivated.</p>
 
-        <p>If you don't receive instructions via e-mail within a few minutes, please check your junk mail.
+        <p>If you don't receive instructions via e-mail within a few minutes, please check your junk mail.</p>
       `;
-
-      formModalBodyEl.innerHTML = confirmationTemplate;
+      formModalFooterEl.hidden = false;
     },
-    errorIntro: '',
-    errorOutro: 'Please resolve the errors and try again.',
+    errorIntro: "",
+    errorOutro:
+      '<p class="mb-0">Please resolve the validation errors and try again.</p>',
+    submitButtonEl,
   });
 }
 
-function confirmDeactivationFetch(formEl) {
+function confirmDeactivationFetch(formEl, submitButtonEl) {
   const formData = {
     ...serialize(formEl, { hash: true }),
     options: {
@@ -557,21 +595,19 @@ function confirmDeactivationFetch(formEl) {
   return submitFetch({
     url: `${options.apiUrlRoot}/v1/users/confirm-deactivation.json`,
     data: formData,
-    onSuccess: () => {
-      let confirmationTemplate = `
-        <p>Instructions for deactivating your API key have been emailed to <strong>${escapeHtml(formData.user.email)}</strong>.;
-
-        <p>If you don't receive instructions via e-mail within a few minutes, please check your junk mail.
+    onSuccess: (data) => {
+      formModalBodyEl.innerHTML = `
+        <p>Your API key ending in <code>${escapeHtml(data.user.api_key_suffix)}</code> is <strong>now deactivated</strong>.</p>
       `;
-
-      formModalBodyEl.innerHTML = confirmationTemplate;
+      formModalFooterEl.hidden = false;
     },
-    errorIntro: '',
-    errorOutro: 'Please resolve the errors and try again.',
+    errorIntro: "",
+    errorOutro: "",
+    submitButtonEl,
   });
 }
 
-function recaptchaCallback() {
+function recaptchaCallback(submitButtonEl) {
   if (recaptchaV2Enabled) {
     recaptchaV2Response = window.grecaptcha.getResponse(recaptchaV2WidgetId);
 
@@ -607,7 +643,7 @@ window.apiUmbrellaRecaptchaLoadCallback =
         sitekey: options.recaptchaV2SiteKey,
         size: "invisible",
         isolated: true,
-        callback: recaptchaCallback,
+        callback: recaptchaCallback.bind(null, signupSubmitButtonEl),
         "error-callback": () => {
           // TODO: Make error fatal (rather than disabling), once we want to
           // start enforcing recaptcha use.
@@ -623,7 +659,7 @@ window.apiUmbrellaRecaptchaLoadCallback =
         sitekey: options.recaptchaV3SiteKey,
         size: "invisible",
         isolated: true,
-        callback: recaptchaCallback,
+        callback: recaptchaCallback.bind(null, signupSubmitButtonEl),
         "error-callback": () => {
           // TODO: Make error fatal (rather than disabling), once we want to
           // start enforcing recaptcha use.
@@ -644,7 +680,13 @@ if (recaptchaV2Enabled || recaptchaV3Enabled) {
   });
 }
 
-function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
+function handleSubmit(
+  event,
+  formEl,
+  submitButtonEl,
+  formHasRecaptcha,
+  submitAction,
+) {
   event.preventDefault();
   disableSubmitButton(submitButtonEl);
 
@@ -666,7 +708,7 @@ function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
     recaptchaV3Enabled = false;
   }
 
-  if (recaptchaV2Enabled || recaptchaV3Enabled) {
+  if (formHasRecaptcha && (recaptchaV2Enabled || recaptchaV3Enabled)) {
     try {
       if (recaptchaV2Enabled) {
         // Re-enable the submit button after a period of time in case the user
@@ -677,7 +719,11 @@ function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
         //
         // https://stackoverflow.com/a/44984658
         // https://stackoverflow.com/a/47949586
-        recaptchaV2SubmitButtonTimeout = setTimeout(enableSubmitButton, 3000, submitButtonEl);
+        recaptchaV2SubmitButtonTimeout = setTimeout(
+          enableSubmitButton,
+          3000,
+          submitButtonEl,
+        );
 
         recaptchaV2Response = null;
         window.grecaptcha
@@ -691,14 +737,14 @@ function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
             // TODO: Remove once we start enforcing recaptcha, in which case we
             // won't need to submit if `error-callback` was called.
             if (!recaptchaV2Enabled) {
-              recaptchaCallback();
+              recaptchaCallback(submitButtonEl);
             }
           })
           .catch((e) => {
             // eslint-disable-next-line no-console
             console.error("recaptcha v2 execute catch: ", e);
             recaptchaV2Enabled = false;
-            recaptchaCallback();
+            recaptchaCallback(submitButtonEl);
           });
       }
 
@@ -715,14 +761,14 @@ function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
             // TODO: Remove once we start enforcing recaptcha, in which case we
             // won't need to submit if `error-callback` was called.
             if (!recaptchaV3Enabled) {
-              recaptchaCallback();
+              recaptchaCallback(submitButtonEl);
             }
           })
           .catch((e) => {
             // eslint-disable-next-line no-console
             console.error("recaptcha v3 execute catch: ", e);
             recaptchaV3Enabled = false;
-            recaptchaCallback();
+            recaptchaCallback(submitButtonEl);
           });
       }
     } catch (e) {
@@ -739,71 +785,93 @@ function handleSubmit(event, formEl, formHasRecaptcha, submitAction) {
   }
 
   return undefined;
-};
+}
 
-formEl.addEventListener("submit", (event) => {
-  handleSubmit(event, formEl, true, apiKeyRegistrationFetch);
+signupFormEl.addEventListener("submit", (event) => {
+  handleSubmit(
+    event,
+    signupFormEl,
+    signupSubmitButtonEl,
+    true,
+    apiKeyRegistrationFetch,
+  );
 });
 
-router.add('/deactivate-api-key', ({ params, query }) => {
-  formModalEl.querySelector('h1').innerHTML = 'Deactivate an API Key';
+router.add("/deactivate-api-key", () => {
+  formModalEl.querySelector("h1").innerHTML = "Deactivate an API Key";
   formModalBodyEl.innerHTML = requestDeactivationFormTemplate;
+  formModalFooterEl.hidden = true;
   formModal.show();
 
   const formEl = formModalBodyEl.querySelector("form");
   const submitButtonEl = formEl.querySelector("button[type=submit]");
 
   formEl.addEventListener("submit", (event) => {
-    handleSubmit(event, formEl, false, requestDeactivationFetch.bind(null, formEl));
+    handleSubmit(
+      event,
+      formEl,
+      submitButtonEl,
+      false,
+      requestDeactivationFetch.bind(null, formEl, submitButtonEl),
+    );
   });
-})
+});
 
-router.add('/confirm-deactivation', ({ params, query }) => {
-  formModalEl.querySelector('h1').innerHTML = 'Deactivate an API Key';
-  formModalBodyEl.innerHTML = '<p>Loading...</p>';
+router.add("/confirm-deactivation", ({ query }) => {
+  formModalEl.querySelector("h1").innerHTML = "Deactivate an API Key";
+  formModalBodyEl.innerHTML = "<p>Loading...</p>";
+  formModalFooterEl.hidden = true;
   formModal.show();
 
-  const url = new URL(`${options.apiUrlRoot}/v1/users/confirm-deactivation.json`);
-  url.search = new URLSearchParams({ token: query.token }).toString();
   submitFetch({
-    url: url,
+    url: `${options.apiUrlRoot}/v1/users/confirm-deactivation.json?${new URLSearchParams({ token: query.token }).toString()}`,
     onSuccess: (data) => {
       formModalBodyEl.innerHTML = `
-        <p><strong>The API key is still active.</strong> To complete the deactivation process, review the details below and confirm your request.</p>
+        <p>To complete the deactivation process, review the details below and confirm your request.</p>
 
         <ul>
           <li><strong>API Key:</strong> <code>...${escapeHtml(data.user.api_key_suffix)}</code></li>
           <li><strong>Key Created:</strong> ${escapeHtml(data.user.created_at)}</li>
         </ul>
 
-        <p>Are you sure you want to deactivate this key? Once deactivated, requests using this API key will fail.</p>
+        <p>Are you sure you want to deactivate this key? Once deactivated, requests using this API key will fail. Until you confirm, the API key will remain active.</p>
 
         <form id="api_umbrella_confirm_deactivation_form" novalidate>
           <input type="hidden" name="user[deactivation_token]" value="${escapeHtml(query.token)}" />
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-lg btn-primary" data-loading-text="Loading...">Deactivate this API key</button>
+            <button type="submit" class="btn btn-lg btn-primary">Deactivate this API key</button>
           </div>
         </form>
       `;
+      formModalFooterEl.hidden = true;
 
       const formEl = formModalBodyEl.querySelector("form");
       const submitButtonEl = formEl.querySelector("button[type=submit]");
 
       formEl.addEventListener("submit", (event) => {
-        handleSubmit(event, formEl, false, confirmDeactivationFetch.bind(null, formEl));
+        handleSubmit(
+          event,
+          formEl,
+          submitButtonEl,
+          false,
+          confirmDeactivationFetch.bind(null, formEl, submitButtonEl),
+        );
       });
     },
-    errorIntro: '',
-    errorOutro: 'Please resolve the errors and try again.',
+    onNotFound: () => {
+      formModalBodyEl.innerHTML = `<p>This deactivation link could not be found or has expired. You may <a href="#/deactivate-api-key">begin API key deactivation</a> again.</p>`;
+      formModalFooterEl.hidden = false;
+    },
+    errorIntro: "",
+    errorOutro: "",
   });
-})
+});
 
-
-router.add('*', () => {
+router.add("*", () => {
   if (formModal.shown) {
     formModal.hide();
   }
-})
+});
 
-router.run()
+router.run();

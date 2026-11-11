@@ -505,6 +505,9 @@ function _M.cors_preflight(self)
 end
 
 function _M.request_deactivation(self)
+  -- Wildcard CORS header to allow the deactivation form to be embedded anywhere.
+  self.res.headers["Access-Control-Allow-Origin"] = "*"
+
   local options = deepcopy(self.params["options"]) or {}
   options["submitted_from_url"] = known_domains.sanitized_url(options["submitted_from_url"])
 
@@ -558,6 +561,13 @@ return function(app)
 
   app:match("/api-umbrella/v1/users/confirm-deactivation(.:format)", respond_to({
     before = capture_errors_json_full(wrapped_json_params(function(self)
+      if self.req.cmd_mth == "OPTIONS" then
+        return
+      end
+
+      -- Wildcard CORS header to allow the deactivation form to be embedded anywhere.
+      self.res.headers["Access-Control-Allow-Origin"] = "*"
+
       local token = self.params["token"]
       if not token and self.params["user"] and self.params["user"]["deactivation_token"] then
         token = self.params["user"]["deactivation_token"]

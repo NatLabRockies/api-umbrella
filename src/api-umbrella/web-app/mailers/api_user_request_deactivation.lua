@@ -16,7 +16,7 @@ end
 
 return function(api_user, url, host)
   local data = {
-    instruction = string.format(t("We received a request to deactivate your API key. To confirm you'd like to deactivate your API key (ending in \"%s\"), visit the link below and confirm your request:"), api_user.api_key_suffix),
+    instruction = string.format(t("We received a request to deactivate your API key ending in \"%s\". To confirm you'd like to deactivate your API key, visit the link below and confirm your request:"), api_user.api_key_suffix),
     url = url,
     instruction_2 = t("Your API key is still active and will not be deactivated until you follow the link above and complete the final confirmation step."),
   }

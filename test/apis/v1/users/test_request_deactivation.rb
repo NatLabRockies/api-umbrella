@@ -27,8 +27,9 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
     data = MultiJson.load(response.body)
     assert_equal({
       "user" => {
-        "deactivation_sent_at" => api_user.deactivation_sent_at.iso8601,
+        "deactivation_sent_at" => api_user.deactivation_sent_at.utc.iso8601,
         "api_key_suffix" => api_user.api_key_suffix,
+        "email" => api_user.email,
       },
     }, data)
     assert_equal(6, data.fetch("user").fetch("api_key_suffix").length)
@@ -38,7 +39,7 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
     message = messages.fetch("messages").first
 
     assert_equal("", message.fetch("HTML"))
-    assert_match("To confirm you'd like to deactivate your API key (ending in \"#{api_user.api_key_suffix}\")", message.fetch("Text"))
+    assert_match("deactivate your API key ending in \"#{api_user.api_key_suffix}\".", message.fetch("Text"))
     refute_match(api_user.deactivation_token_hash, message.fetch("Text"))
 
     url_matcher = %r{^https://localhost:9081/signup/#/confirm-deactivation\?token=(\w+)$}
@@ -102,6 +103,13 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
     assert_nil(api_user.deactivation_sent_at)
 
     assert_equal(0, sent_emails.fetch("total"))
+  end
+
+  def test_matches_email_case_insensitively
+    api_user = FactoryBot.create(:api_user)
+
+    response = make_request(user: { api_key: api_user.api_key, email: api_user.email.swapcase })
+    assert_response_code(201, response)
   end
 
   def test_invalid_api_key_format
@@ -330,9 +338,9 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
     if options.present?
       data.merge!(options: options)
     end
-    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users/request-deactivation.json", http_options.deep_merge(non_admin_auth).deep_merge({
+    Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users/request-deactivation.json", http_options.deep_merge(non_admin_auth).deep_merge({
       headers: { "Content-Type" => "application/json" }.merge(headers),
-      body: MultiJson.dump(data)
+      body: MultiJson.dump(data),
     }))
   end
 end

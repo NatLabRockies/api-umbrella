@@ -209,6 +209,7 @@ ApiUser = model_ext.new_class("api_users", {
     local data = {
       api_key_suffix = json_null_default(self.api_key_suffix),
       deactivation_sent_at = json_null_default(time.postgres_to_iso8601(self.deactivation_sent_at)),
+      email = json_null_default(self.email),
     }
 
     return data

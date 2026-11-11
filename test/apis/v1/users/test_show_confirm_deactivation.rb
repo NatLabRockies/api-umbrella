@@ -3,13 +3,10 @@ require_relative "../../../test_helper"
 class Test::Apis::V1::Users::TestShowConfirmDeactivation < Minitest::Test
   include ApiUmbrellaTestHelpers::AdminAuth
   include ApiUmbrellaTestHelpers::Setup
-  include ApiUmbrellaTestHelpers::SentEmails
 
   def setup
     super
     setup_server
-
-    clear_all_test_emails
   end
 
   def test_valid_show
@@ -24,7 +21,7 @@ class Test::Apis::V1::Users::TestShowConfirmDeactivation < Minitest::Test
     assert_equal({
       "user" => {
         "api_key_suffix" => api_user.api_key_suffix,
-        "created_at" => api_user.created_at.iso8601,
+        "created_at" => api_user.created_at.utc.iso8601,
       },
     }, data)
     assert_equal(6, data.fetch("user").fetch("api_key_suffix").length)
@@ -57,6 +54,18 @@ class Test::Apis::V1::Users::TestShowConfirmDeactivation < Minitest::Test
     assert_response_code(404, response)
   end
 
+  def test_wildcard_cors
+    api_user = FactoryBot.create(:api_user, deactivation_token: SecureRandom.alphanumeric(30), deactivation_sent_at: Time.now)
+
+    response = make_request(token: api_user.deactivation_token)
+    assert_response_code(200, response)
+    assert_equal("*", response.headers["Access-Control-Allow-Origin"])
+
+    response = make_request(token: "foo")
+    assert_response_code(404, response)
+    assert_equal("*", response.headers["Access-Control-Allow-Origin"])
+  end
+
   private
 
   def non_admin_auth
@@ -68,8 +77,8 @@ class Test::Apis::V1::Users::TestShowConfirmDeactivation < Minitest::Test
   end
 
   def make_request(attributes)
-    response = Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/users/confirm-deactivation.json", http_options.deep_merge(non_admin_auth).deep_merge({
-      params: attributes
+    Typhoeus.get("https://127.0.0.1:9081/api-umbrella/v1/users/confirm-deactivation.json", http_options.deep_merge(non_admin_auth).deep_merge({
+      params: attributes,
     }))
   end
 end

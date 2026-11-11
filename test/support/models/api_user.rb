@@ -2,7 +2,7 @@ class ApiUser < ApplicationRecord
   has_one :settings, :class_name => "ApiUserSettings"
   has_and_belongs_to_many :roles, -> { order(:id) }, :class_name => "ApiRole", :join_table => "api_users_roles"
   attr_accessor :terms_and_conditions
-  attr_accessor :deactivation_token
+  attr_reader :deactivation_token
 
   def id=(id)
     prev_id = self[:id]

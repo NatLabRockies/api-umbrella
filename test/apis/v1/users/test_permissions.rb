@@ -490,7 +490,6 @@ class Test::Apis::V1::Users::TestPermissions < Minitest::Test
 
     assert_response_code(200, response)
     data = MultiJson.load(response.body)
-    data = MultiJson.load(response.body)
     assert(data.fetch("user").fetch("api_key_suffix"))
   end
 

@@ -79,14 +79,11 @@ function _M.authorized_deliver(_, data, options)
   local url = url_build(parsed)
 
   local ok, err = api_user_request_deactivation_mailer(api_user, url, parsed["host"])
-  -- if not ok then
-  --   ngx.log(ngx.ERR, "mail error: ", err)
-  --   -- message_level = "danger"
-  --   -- message = t("An unexpected error occurred when sending the email.")
-  --   return false
-  -- else
-  --   return true
-  -- end
+  if not ok then
+    ngx.log(ngx.ERR, "mail error: ", err)
+    add_error(errors, "email", t("Email"), t("An unexpected error occurred when sending the email."))
+    return coroutine.yield("error", errors)
+  end
 
   return api_user
 end
