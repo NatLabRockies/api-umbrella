@@ -279,7 +279,7 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmailSanitizedLinks < Minitest::Te
       :contact_url => "https://#{host}/contact-us",
     })
 
-    assert_equal(["noreply@localhost"], message.fetch("headers").fetch("From"))
+    assert_equal(["noreply@127.0.0.1"], message.fetch("headers").fetch("From"))
     refute_match(host, message.fetch("Text"))
     refute_match(host, message.fetch("HTML"))
     assert_match("please contact us.", message.fetch("Text"))
