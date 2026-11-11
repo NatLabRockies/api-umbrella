@@ -116,14 +116,36 @@ class Test::AdminUi::Login::TestExternalProviders < Minitest::Capybara::Test
     ].sort, uri.query_values.keys.sort)
     assert_equal("test_fake_id", uri.query_values.fetch("client_id"))
     assert_equal("select_account", uri.query_values.fetch("prompt"))
-    # Ensure the host used to access the site is part of the redirect URI (and
-    # this doesn't get lost with some internal hostname, like 127.0.0.1 being
-    # used instead).
-    assert_equal("https://foobar.example.com:9081/admins/auth/google_oauth2/callback", uri.query_values.fetch("redirect_uri"))
+    # Previously, we'd use the hostname being sent in, but as part of making
+    # that stricter, we only use the `web.default_host` config, so first verify
+    # that a hostname being sent in via header is not used.
+    assert_equal("https://127.0.0.1:9081/admins/auth/google_oauth2/callback", uri.query_values.fetch("redirect_uri"))
     assert_equal("code", uri.query_values.fetch("response_type"))
     assert_equal("openid email", uri.query_values.fetch("scope"))
     assert_kind_of(String, uri.query_values.fetch("state"))
     assert_kind_of(String, uri.query_values.fetch("nonce"))
+  end
+
+  def test_external_auth_redirect_default_host
+    # Verify that the `web.default_host` is used since the Host header is no
+    # longer used.
+    override_config({
+      web: {
+        default_host: "foo.example.com",
+        admin: {
+          auth_strategies: {
+            enabled: [
+              "google",
+            ],
+          },
+        },
+      },
+    }) do
+      response = Typhoeus.post("https://127.0.0.1:9081/admins/auth/google_oauth2", keyless_http_options.deep_merge(csrf_session))
+      assert_response_code(302, response)
+      uri = Addressable::URI.parse(response.headers["Location"])
+      assert_equal("https://foo.example.com:9081/admins/auth/google_oauth2/callback", uri.query_values.fetch("redirect_uri"))
+    end
   end
 
   [
