@@ -58,6 +58,8 @@ class Test::Processes::TestTrafficserver < Minitest::Test
       # triggered an empty crash log file generation (even though there was no
       # actual crash).
       log_paths.reject! { |path| File.basename(path).start_with?("crash-") }
+      # FIXME: Temporarily debugging intermittent CI failures.
+      puts `set -x; ls -lah #{$config["log_dir"]}/trafficserver; cat #{$config["log_dir"]}/trafficserver/access.log`
       assert_equal([], log_paths)
     end
   end
