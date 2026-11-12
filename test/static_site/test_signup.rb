@@ -14,7 +14,7 @@ class Test::StaticSite::TestSignup < Minitest::Capybara::Test
 
   def test_submission
     visit "/signup/"
-    assert_text("API Key Signup")
+    assert_text("API Key Sign Up")
 
     # Because these elements are inside the shadow DOM, testing is a bit harder
     # with Capybara, so we can't rely on the normal `fill_in` usage currently,
@@ -41,7 +41,7 @@ class Test::StaticSite::TestSignup < Minitest::Capybara::Test
       assert_equal("I have read and agree to the terms and conditions.", terms_label.text)
 
       submit_button = find("button[type=submit]")
-      assert_equal("Signup", submit_button.text)
+      assert_equal("Sign up", submit_button.text)
       submit_button.click
 
       assert_text("Your API key for foo@example.com is:")

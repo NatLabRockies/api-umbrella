@@ -99,7 +99,6 @@ local function uuid()
   end
 end
 
-
 local validators = validation.validators
 local validators_metatable = getmetatable(validators)
 

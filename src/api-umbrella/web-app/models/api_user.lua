@@ -1,6 +1,7 @@
 local ApiRole = require "api-umbrella.web-app.models.api_role"
 local ApiUserSettings = require "api-umbrella.web-app.models.api_user_settings"
 local api_key_prefixer = require("api-umbrella.utils.api_key_prefixer").prefix
+local api_key_suffixer = require("api-umbrella.utils.api_key_suffixer").suffix
 local api_user_policy = require "api-umbrella.web-app.policies.api_user_policy"
 local array_includes = require "api-umbrella.utils.array_includes"
 local cjson = require "cjson"
@@ -9,6 +10,7 @@ local db = require "lapis.db"
 local encryptor = require "api-umbrella.utils.encryptor"
 local hmac = require "api-umbrella.utils.hmac"
 local is_array = require "api-umbrella.utils.is_array"
+local is_empty = require "api-umbrella.utils.is_empty"
 local is_hash = require "api-umbrella.utils.is_hash"
 local json_array_fields = require "api-umbrella.web-app.utils.json_array_fields"
 local json_encode = require "api-umbrella.utils.json_encode"
@@ -74,7 +76,7 @@ ApiUser = model_ext.new_class("api_users", {
   api_key_preview = function(self)
     local preview
     if self.api_key_prefix then
-      preview = string.sub(self.api_key_prefix, 1, 6) .. "..."
+      preview = string.sub(self.api_key_prefix, 1, 4) .. "..." .. string.sub(self.api_key_suffix, -4)
     end
 
     return preview
@@ -203,6 +205,25 @@ ApiUser = model_ext.new_class("api_users", {
     return data
   end,
 
+  request_deactivation_json = function(self)
+    local data = {
+      api_key_suffix = json_null_default(self.api_key_suffix),
+      deactivation_sent_at = json_null_default(time.postgres_to_iso8601(self.deactivation_sent_at)),
+      email = json_null_default(self.email),
+    }
+
+    return data
+  end,
+
+  confirm_deactivation_json = function(self)
+    local data = {
+      api_key_suffix = json_null_default(self.api_key_suffix),
+      created_at = json_null_default(time.postgres_to_iso8601(self.created_at)),
+    }
+
+    return data
+  end,
+
   csv_headers = function()
     local headers = {
       t("E-mail"),
@@ -244,6 +265,39 @@ ApiUser = model_ext.new_class("api_users", {
   settings_delete = function(self)
     return model_ext.has_one_delete(self, ApiUserSettings, "api_user_id")
   end,
+
+  set_deactivation_token = function(self)
+    local token = random_token(30, true)
+    local token_hash = hmac(token)
+    model_ext.transaction_update("api_users", {
+      deactivation_token_hash = token_hash,
+      deactivation_sent_at = db.raw("now() AT TIME ZONE 'UTC'"),
+    }, { id = assert(self.id) })
+    self:refresh()
+
+    return token
+  end,
+
+  is_deactivation_expired = function(self)
+    local expired = true
+    if self.deactivation_sent_at then
+      local expires_at = ngx.now() - 6 * 60 * 60
+      if time.postgres_to_timestamp(self.deactivation_sent_at) > expires_at then
+        expired = false
+      end
+    end
+
+    return expired
+  end,
+
+  deactivate = function(self)
+    model_ext.transaction_update("api_users", {
+      disabled_at = db.raw("now() AT TIME ZONE 'UTC'"),
+      deactivation_token_hash = db_null,
+      deactivation_sent_at = db_null,
+    }, { id = assert(self.id) })
+    self:refresh()
+  end,
 }, {
   authorize = function(data, action)
     if action == "create" then
@@ -260,6 +314,11 @@ ApiUser = model_ext.new_class("api_users", {
     values["api_key_encrypted"] = encrypted
     values["api_key_encrypted_iv"] = iv
     values["api_key_prefix"] = api_key_prefixer(api_key)
+    values["api_key_suffix"] = api_key_suffixer(api_key)
+
+    if type(values["email"]) == "string" then
+      values["email"] = string.lower(values["email"])
+    end
   end,
 
   before_validate = function(_, values)
@@ -433,5 +492,14 @@ ApiUser = model_ext.new_class("api_users", {
     })
   end,
 })
+
+ApiUser.find_by_deactivation_token = function(_, token)
+  if is_empty(token) then
+    return nil
+  end
+
+  local token_hash = hmac(token)
+  return ApiUser:find({ deactivation_token_hash = token_hash })
+end
 
 return ApiUser

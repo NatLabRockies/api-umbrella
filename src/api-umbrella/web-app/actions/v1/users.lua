@@ -1,4 +1,5 @@
 local ApiUser = require "api-umbrella.web-app.models.api_user"
+local ApiUserRequestDeactivation = require "api-umbrella.web-app.models.api_user_request_deactivation"
 local api_key_prefixer = require "api-umbrella.utils.api_key_prefixer"
 local api_user_admin_notification_mailer = require "api-umbrella.web-app.mailers.api_user_admin_notification"
 local api_user_policy = require "api-umbrella.web-app.policies.api_user_policy"
@@ -22,6 +23,7 @@ local json_decode = require("cjson.safe").decode
 local json_encode = require "api-umbrella.utils.json_encode"
 local json_response = require "api-umbrella.web-app.utils.json_response"
 local known_domains = require "api-umbrella.web-app.utils.known_domains"
+local nillify_json_nulls = require "api-umbrella.utils.nillify_json_nulls"
 local parse_post_for_pseudo_ie_cors = require "api-umbrella.web-app.utils.parse_post_for_pseudo_ie_cors"
 local require_admin = require "api-umbrella.web-app.utils.require_admin"
 local respond_to = require "api-umbrella.web-app.utils.respond_to"
@@ -479,6 +481,19 @@ function _M.api_user_params(self)
   return params
 end
 
+function _M.request_deactivation_params(self)
+  local params = {}
+  if self.params and type(self.params["user"]) == "table" then
+    local input = self.params["user"]
+    params = nillify_json_nulls({
+      api_key = input["api_key"],
+      email = input["email"],
+    })
+  end
+
+  return params
+end
+
 function _M.cors_preflight(self)
   -- Wildcard CORS header to allow the signup form to be embedded anywhere.
   self.res.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Api-Key"
@@ -489,17 +504,90 @@ function _M.cors_preflight(self)
   return { status = 204, layout = false }
 end
 
+function _M.request_deactivation(self)
+  -- Wildcard CORS header to allow the deactivation form to be embedded anywhere.
+  self.res.headers["Access-Control-Allow-Origin"] = "*"
+
+  local options = deepcopy(self.params["options"]) or {}
+  options["submitted_from_url"] = known_domains.sanitized_url(options["submitted_from_url"])
+
+  local api_user = ApiUserRequestDeactivation:authorized_deliver(_M.request_deactivation_params(self), options)
+  local response = {
+    user = api_user:request_deactivation_json(),
+  }
+
+  self.res.status = 201
+  return json_response(self, response)
+end
+
+function _M.show_confirm_deactivation(self)
+  api_user_policy.authorize_create(ngx.ctx.current_admin, self.api_user:attributes())
+
+  local response = {
+    user = self.api_user:confirm_deactivation_json(),
+  }
+
+  return json_response(self, response)
+end
+
+function _M.confirm_deactivation(self)
+  api_user_policy.authorize_create(ngx.ctx.current_admin, self.api_user:attributes())
+
+  self.api_user:deactivate()
+
+  local response = {
+    user = self.api_user:confirm_deactivation_json(),
+  }
+
+  self.res.status = 200
+  return json_response(self, response)
+end
+
 return function(app)
-  app:match("/api-umbrella/v1/users/:id(.:format)", respond_to({
-    before = require_admin(function(self)
-      local ok = validation_ext.string.uuid(self.params["id"])
-      if ok then
-        self.api_user = ApiUser:find(self.params["id"])
+  local function find_api_user(self)
+    local ok = validation_ext.string.uuid(self.params["id"])
+    if ok then
+      self.api_user = ApiUser:find(self.params["id"])
+    end
+    if not self.api_user then
+      return self.app.handle_404(self)
+    end
+  end
+
+  app:match("/api-umbrella/v1/users/request-deactivation(.:format)", respond_to({
+    POST = capture_errors_json_full(parse_post_for_pseudo_ie_cors(wrapped_json_params(_M.request_deactivation, "user"))),
+    OPTIONS = capture_errors_json_full(_M.cors_preflight),
+  }))
+
+  app:match("/api-umbrella/v1/users/confirm-deactivation(.:format)", respond_to({
+    before = capture_errors_json_full(wrapped_json_params(function(self)
+      if self.req.cmd_mth == "OPTIONS" then
+        return
       end
+
+      -- Wildcard CORS header to allow the deactivation form to be embedded anywhere.
+      self.res.headers["Access-Control-Allow-Origin"] = "*"
+
+      local token = self.params["token"]
+      if not token and self.params["user"] and self.params["user"]["deactivation_token"] then
+        token = self.params["user"]["deactivation_token"]
+      end
+      self.api_user = ApiUser:find_by_deactivation_token(token)
       if not self.api_user then
         return self.app.handle_404(self)
       end
-    end),
+
+      if self.api_user:is_deactivation_expired() then
+        return self.app.handle_404(self)
+      end
+    end, "user")),
+    GET = capture_errors_json_full(_M.show_confirm_deactivation),
+    POST = capture_errors_json_full(parse_post_for_pseudo_ie_cors(wrapped_json_params(_M.confirm_deactivation, "user"))),
+    OPTIONS = capture_errors_json_full(_M.cors_preflight),
+  }))
+
+  app:match("/api-umbrella/v1/users/:id(.:format)", respond_to({
+    before = require_admin(find_api_user),
     GET = capture_errors_json_full(_M.show),
     POST = csrf_validate_token_or_admin_token_filter(capture_errors_json_full(wrapped_json_params(_M.update, "user"))),
     PUT = csrf_validate_token_or_admin_token_filter(capture_errors_json_full(wrapped_json_params(_M.update, "user"))),

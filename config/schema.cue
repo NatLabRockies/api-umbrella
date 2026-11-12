@@ -386,10 +386,11 @@ import "path"
     analytics_v0_summary_analytics_timeout: uint | *2400 // 40 minutes
     max_body_size: string | *"1m"
     allowed_signup_embed_urls_regex?: string
+    #scheme: "http" | "https"
     default_host?: string
+    default_scheme: #scheme | *"https"
     send_notify_email?: bool
     admin_notify_email?: string
-    #scheme: "http" | "https"
     recaptcha_scheme: #scheme | *"https"
     recaptcha_host: string | *"www.google.com"
     recaptcha_port: uint16 | *443
@@ -506,7 +507,6 @@ import "path"
         aws_region?: string
         aws_service: string | *"aps"
       }
-
     }
   }
 

@@ -1,6 +1,7 @@
 local db = require("lapis.db")
 local json_encode = require "api-umbrella.utils.json_encode"
 local path_join = require "api-umbrella.utils.path_join"
+local pg_utils = require "api-umbrella.utils.pg_utils"
 local readfile = require("pl.utils").readfile
 
 local grants_sql_path = path_join(os.getenv("API_UMBRELLA_SRC_ROOT"), "db/grants.sql")
@@ -146,7 +147,6 @@ return {
       END;
       $$ LANGUAGE plpgsql;
     ]])
-
 
     db.query([[
       CREATE OR REPLACE FUNCTION next_api_backend_sort_order()
@@ -1611,5 +1611,52 @@ return {
 
     db.query(grants_sql)
     db.query("COMMIT")
+  end,
+
+  [1793458036] = function()
+    db.query("BEGIN")
+
+    db.query("ALTER TABLE api_users ADD COLUMN api_key_suffix varchar(6), ADD COLUMN deactivation_token_hash varchar(64), ADD COLUMN deactivation_sent_at timestamp with time zone")
+
+    db.query("CREATE UNIQUE INDEX api_users_deactivation_token_hash_idx ON api_umbrella.api_users USING btree (deactivation_token_hash)")
+
+    db.query(grants_sql)
+    db.query("COMMIT")
+  end,
+
+  [1793458037] = function()
+    local decrypt = require("api-umbrella.utils.encryptor").decrypt
+    local escape_literal = pg_utils.escape_literal
+    local string_sub = string.sub
+
+    db.query("SET SESSION audit.application_user_id = ?", "00000000-0000-0000-0000-000000000000")
+    db.query("SET SESSION audit.application_user_name = ?", "migrations")
+
+    db.query("CREATE TEMPORARY TABLE pg_temp.suffixes (id uuid NOT NULL PRIMARY KEY, api_key_suffix varchar(6) NOT NULL)")
+
+    for _ = 1, 3 do
+      db.query("UPDATE api_users SET email = lower(email) WHERE email != lower(email)")
+
+      local _, cursor_err = pg_utils.cursor("SELECT id, api_key_encrypted, api_key_encrypted_iv, api_key_prefix FROM api_users WHERE api_key_suffix IS NULL ORDER BY created_at", nil, 1000, nil, function(results)
+        local suffixes = {}
+        for _, row in ipairs(results) do
+          if row["api_key_encrypted"] and row["api_key_encrypted_iv"] then
+            local decrypted = decrypt(row["api_key_encrypted"], row["api_key_encrypted_iv"], row["id"])
+            local suffix = string_sub(decrypted, -6)
+            table.insert(suffixes, "(" .. escape_literal(row["id"]) .. ", " .. escape_literal(suffix) .. ")")
+          end
+        end
+
+        db.query("INSERT INTO pg_temp.suffixes (id, api_key_suffix) VALUES " .. table.concat(suffixes, ", "))
+        db.query("UPDATE api_users AS u SET api_key_suffix = s.api_key_suffix FROM pg_temp.suffixes AS s WHERE u.api_key_suffix IS NULL AND u.id = s.id")
+        db.query("TRUNCATE TABLE pg_temp.suffixes")
+      end)
+
+      if cursor_err then
+        error(cursor_err)
+      end
+    end
+
+    db.query("ALTER TABLE api_users ALTER COLUMN api_key_suffix SET NOT NULL")
   end,
 }

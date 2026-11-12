@@ -105,7 +105,7 @@ class Test::Proxy::TestNginxBans < Minitest::Test
     }) do
       response = Typhoeus.get("https://127.0.0.1:9081/signup/", http_options)
       assert_response_code(200, response)
-      assert_match("API Key Signup", response.body)
+      assert_match("API Key Sign Up", response.body)
 
       response = Typhoeus.get("https://127.0.0.1:9081/signup/", http_options.deep_merge({
         :headers => {

@@ -8,7 +8,6 @@ local validation_ext = require "api-umbrella.web-app.utils.validation_ext"
 
 local _M = {}
 
-
 local function validate(values)
   local errors = {}
   validate_field(errors, values, "name", t("Name"), {

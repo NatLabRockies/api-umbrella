@@ -50,7 +50,7 @@ class Test::AdminUi::TestRoles < Minitest::Capybara::Test
     page.execute_script("window.PNotifyRemoveAll()")
     refute_text("Successfully saved the user")
 
-    user = ApiUser.find_by!(:email => "#{unique_test_id}@example.com")
+    user = ApiUser.find_by!(:email => "#{unique_test_id}@example.com".downcase)
     assert_equal(["test-new-role"], user.roles)
 
     click_link("Add New API User")
@@ -74,7 +74,7 @@ class Test::AdminUi::TestRoles < Minitest::Capybara::Test
     assert_text("Successfully saved the user")
     page.execute_script("window.PNotifyRemoveAll()")
 
-    user = ApiUser.find_by!(:email => "#{unique_test_id}@example.com")
+    user = ApiUser.find_by!(:email => "#{unique_test_id}@example.com".downcase)
     assert_equal(["test-new-user-role"], user.roles)
 
     visit "/admin/#/apis/new"

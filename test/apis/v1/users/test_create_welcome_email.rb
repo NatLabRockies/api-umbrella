@@ -179,9 +179,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_equal([user.email], message.fetch("headers").fetch("To"))
 
     # Greeting
-    assert_match("Hi,</p>", message.fetch("HTML"))
-    assert_match("Hi,", message.fetch("Text"))
-
     assert_match("Your API key for <strong>#{user.email}</strong> is:</p>", message.fetch("HTML"))
     assert_match("Your API key for #{user.email} is:", message.fetch("Text"))
 
@@ -191,10 +188,10 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     assert_match(user.api_key, message.fetch("Text"))
 
     # Subject
-    assert_equal("Your API key", message.fetch("Subject"))
+    assert_equal("Your 127.0.0.1 API key", message.fetch("Subject"))
 
     # From
-    assert_equal(["noreply@localhost"], message.fetch("headers").fetch("From"))
+    assert_equal(["127.0.0.1 API Keys <noreply@127.0.0.1>"], message.fetch("headers").fetch("From"))
 
     # Example API URL
     refute_match("Here's an example", message.fetch("HTML"))
@@ -263,10 +260,10 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
       assert_match(user.api_key, message.fetch("Text"))
 
       # Subject
-      assert_equal("Your API key", message.fetch("Subject"))
+      assert_equal("Your 127.0.0.1 API key", message.fetch("Subject"))
 
       # From
-      assert_equal(["test@example.com"], message.fetch("headers").fetch("From"))
+      assert_equal(["127.0.0.1 API Keys <test@example.com>"], message.fetch("headers").fetch("From"))
 
       # URL Example
       refute_match("Here's an example", message.fetch("HTML"))
@@ -298,9 +295,6 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
     message = messages.fetch("messages").first
 
     # Greeting
-    assert_match("Hi,</p>", message.fetch("HTML"))
-    assert_match("Hi,", message.fetch("Text"))
-
     assert_match("Your API key for <strong>foo&amp;bar@example.com</strong> is:</p>", message.fetch("HTML"))
     assert_match("Your API key for foo&bar@example.com is:", message.fetch("Text"))
 
@@ -337,6 +331,61 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmail < Minitest::Test
 
       assert_equal([unique_test_id], message.fetch("headers").fetch("X-Foo"))
     end
+  end
+
+  def test_uses_origin_host_if_allowed
+    prepend_website_backends([
+      {
+        :frontend_host => unique_test_hostname,
+        :backend_protocol => "http",
+        :server_host => "127.0.0.1",
+        :server_port => 9443,
+      },
+    ]) do
+      response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users.json", http_options.deep_merge(non_admin_key_creator_api_key).deep_merge({
+        :headers => {
+          "Content-Type" => "application/x-www-form-urlencoded",
+          "Origin" => "https://#{unique_test_hostname}",
+        },
+        :body => {
+          :user => FactoryBot.attributes_for(:api_user),
+          :options => { :send_welcome_email => true },
+        },
+      }))
+      assert_response_code(201, response)
+
+      messages = sent_email_contents
+      assert_equal(1, messages.fetch("total"))
+      message = messages.fetch("messages").first
+
+      assert_equal("Your #{unique_test_hostname} API key", message.fetch("Subject"))
+      assert_equal(["#{unique_test_hostname} API Keys <noreply@127.0.0.1>"], message.fetch("headers").fetch("From"))
+      assert_match("confirm the creation of an API key at #{unique_test_hostname}.", message.fetch("HTML"))
+      assert_match("confirm the creation of an API key at #{unique_test_hostname}.", message.fetch("Text"))
+    end
+  end
+
+  def test_uses_default_host_if_origin_host_is_disallowed
+    response = Typhoeus.post("https://127.0.0.1:9081/api-umbrella/v1/users.json", http_options.deep_merge(non_admin_key_creator_api_key).deep_merge({
+      :headers => {
+        "Content-Type" => "application/x-www-form-urlencoded",
+        "Origin" => "https://#{unique_test_hostname}",
+      },
+      :body => {
+        :user => FactoryBot.attributes_for(:api_user),
+        :options => { :send_welcome_email => true },
+      },
+    }))
+    assert_response_code(201, response)
+
+    messages = sent_email_contents
+    assert_equal(1, messages.fetch("total"))
+    message = messages.fetch("messages").first
+
+    assert_equal("Your 127.0.0.1 API key", message.fetch("Subject"))
+    assert_equal(["127.0.0.1 API Keys <noreply@127.0.0.1>"], message.fetch("headers").fetch("From"))
+    assert_match("confirm the creation of an API key at 127.0.0.1.", message.fetch("HTML"))
+    assert_match("confirm the creation of an API key at 127.0.0.1.", message.fetch("Text"))
   end
 
   private

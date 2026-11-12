@@ -38,6 +38,7 @@ require "api-umbrella.utils.active_config_store.fetch_published_config_for_setti
 require "api-umbrella.utils.active_config_store.polling_set_active_config"
 require "api-umbrella.utils.active_config_store.set_envoy_config"
 require "api-umbrella.utils.api_key_prefixer"
+require "api-umbrella.utils.api_key_suffixer"
 require "api-umbrella.utils.append_array"
 require "api-umbrella.utils.compressed_json"
 require "api-umbrella.utils.deep_merge_overwrite_arrays"

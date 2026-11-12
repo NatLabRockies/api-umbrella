@@ -42,7 +42,7 @@ class Test::Apis::V1::Contact::TestEmail < Minitest::Test
 
     assert_equal(["default-test-contact-email@example.com"], message.fetch("headers").fetch("To"))
     assert_equal("API Umbrella Contact Message from foo@example.com", message.fetch("Subject"))
-    assert_equal(["noreply@localhost"], message.fetch("headers").fetch("From"))
+    assert_equal(["noreply@127.0.0.1"], message.fetch("headers").fetch("From"))
     assert_equal(["foo@example.com"], message.fetch("headers").fetch("Reply-To"))
     assert_match("Name: Foo\nEmail: foo@example.com\nAPI: Example API\nSubject: Support\n\n-------------------------------------\n\nMessage body\n\n-------------------------------------", message.fetch("Text"))
     assert_equal("", message.fetch("HTML"))

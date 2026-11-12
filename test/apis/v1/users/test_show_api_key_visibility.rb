@@ -112,7 +112,7 @@ class Test::Apis::V1::Users::TestShowApiKeyVisibility < Minitest::Test
     data = MultiJson.load(response.body)
     assert_equal(user.api_key, data["user"]["api_key"])
     assert_equal(user.created_at.utc.iso8601, data["user"]["api_key_hides_at"])
-    assert_equal("#{user.api_key[0, 6]}...", data["user"]["api_key_preview"])
+    assert_equal("#{user.api_key[0, 4]}...#{user.api_key[-4..]}", data["user"]["api_key_preview"])
   end
 
   def refute_api_key_visible(user, admin)
@@ -122,7 +122,7 @@ class Test::Apis::V1::Users::TestShowApiKeyVisibility < Minitest::Test
     data = MultiJson.load(response.body)
     refute_includes(data["user"].keys, "api_key")
     refute_includes(data["user"].keys, "api_key_hides_at")
-    assert_equal("#{user.api_key[0, 6]}...", data["user"]["api_key_preview"])
+    assert_equal("#{user.api_key[0, 4]}...#{user.api_key[-4..]}", data["user"]["api_key_preview"])
     refute_match(user.api_key, response.body)
   end
 end
