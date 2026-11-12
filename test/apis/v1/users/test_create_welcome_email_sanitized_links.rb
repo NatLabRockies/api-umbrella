@@ -185,7 +185,7 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmailSanitizedLinks < Minitest::Te
         :email_from_address => "bar@test.example.com",
         :contact_url => "https://github.com/NREL/api-umbrella/issues",
       })
-      assert_equal(["bar@test.example.com"], message.fetch("headers").fetch("From"))
+      assert_equal(["127.0.0.1 API Keys <bar@test.example.com>"], message.fetch("headers").fetch("From"))
       assert_match("https://github.com/NREL/api-umbrella/issues", message.fetch("Text"))
 
       message = create_user({
@@ -255,7 +255,7 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmailSanitizedLinks < Minitest::Te
       :contact_url => "https://#{host}/contact-us",
     })
 
-    assert_equal(["test@#{host}"], message.fetch("headers").fetch("From"))
+    assert_equal(["#{$config.fetch("web").fetch("default_host")} API Keys <test@#{host}>"], message.fetch("headers").fetch("From"))
     refute_match("https://#{host}/api.json?test=1", message.fetch("Text"))
     assert_match("please contact us ( https://#{host}/contact-us ).", message.fetch("Text"))
 
@@ -279,7 +279,7 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmailSanitizedLinks < Minitest::Te
       :contact_url => "https://#{host}/contact-us",
     })
 
-    assert_equal(["noreply@127.0.0.1"], message.fetch("headers").fetch("From"))
+    assert_equal(["127.0.0.1 API Keys <noreply@127.0.0.1>"], message.fetch("headers").fetch("From"))
     refute_match(host, message.fetch("Text"))
     refute_match(host, message.fetch("HTML"))
     assert_match("please contact us.", message.fetch("Text"))
@@ -304,7 +304,7 @@ class Test::Apis::V1::Users::TestCreateWelcomeEmailSanitizedLinks < Minitest::Te
       :contact_url => "https://#{host}/contact-us",
     })
 
-    assert_equal(["test@#{host}"], message.fetch("headers").fetch("From"))
+    assert_equal(["127.0.0.1 API Keys <test@#{host}>"], message.fetch("headers").fetch("From"))
     refute_match("api.json", message.fetch("Text"))
     assert_match("please contact us ( https://#{host}/contact-us ).", message.fetch("Text"))
 

@@ -28,7 +28,7 @@ return function(api_user, url, host)
 
   local ok, send_err = mailer:send({
     headers = config["web"]["mailer"]["headers"],
-    from = host .. " Keys <noreply@" .. config["web"]["default_host"] .. ">",
+    from = host .. " API Keys <noreply@" .. config["web"]["default_host"] .. ">",
     to = { api_user.email },
     subject = string.format(t("Confirm %s API key deactivation request"), host),
     text = template_text(data),

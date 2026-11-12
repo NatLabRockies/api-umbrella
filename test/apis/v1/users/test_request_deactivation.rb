@@ -54,7 +54,7 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
     assert_equal("Confirm 127.0.0.1 API key deactivation request", message.fetch("Subject"))
     assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
-    assert_equal("127.0.0.1 Keys", message.fetch("From").fetch("Name"))
+    assert_equal("127.0.0.1 API Keys", message.fetch("From").fetch("Name"))
   end
 
   def test_api_key_not_found
@@ -289,7 +289,7 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
       assert_equal("Confirm #{unique_test_hostname} API key deactivation request", message.fetch("Subject"))
       assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
-      assert_equal("#{unique_test_hostname} Keys", message.fetch("From").fetch("Name"))
+      assert_equal("#{unique_test_hostname} API Keys", message.fetch("From").fetch("Name"))
     end
   end
 
@@ -305,7 +305,7 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
     assert_equal("Confirm 127.0.0.1 API key deactivation request", message.fetch("Subject"))
     assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
-    assert_equal("127.0.0.1 Keys", message.fetch("From").fetch("Name"))
+    assert_equal("127.0.0.1 API Keys", message.fetch("From").fetch("Name"))
   end
 
   def test_default_url_does_not_use_header_hosts
@@ -320,7 +320,7 @@ class Test::Apis::V1::Users::TestRequestDeactivation < Minitest::Test
 
     assert_equal("Confirm 127.0.0.1 API key deactivation request", message.fetch("Subject"))
     assert_equal("noreply@127.0.0.1", message.fetch("From").fetch("Address"))
-    assert_equal("127.0.0.1 Keys", message.fetch("From").fetch("Name"))
+    assert_equal("127.0.0.1 API Keys", message.fetch("From").fetch("Name"))
   end
 
   private
