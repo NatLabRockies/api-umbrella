@@ -35,6 +35,7 @@ class ApiScope extends Model.extend(Validations) {
   static urlRoot = '/api-umbrella/v1/api_scopes';
   static singlePayloadKey = 'api_scope';
   static arrayPayloadKey = 'data';
+  static duplicateExclude = ['pathPrefix'];
 
   @attr()
   name;

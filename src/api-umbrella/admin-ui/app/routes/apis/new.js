@@ -1,15 +1,19 @@
-import { inject as service } from '@ember/service';
-import { clearStoreCache } from 'api-umbrella-admin-ui/utils/uncached-model';
+import duplicableNewRoute from 'api-umbrella-admin-ui/utils/duplicable-new-route';
 
 import Form from './form';
 
-export default class NewRoute extends Form {
-  @service store;
+export default class NewRoute extends duplicableNewRoute(Form) {
+  duplicateModelName = 'api';
 
-  model() {
-    clearStoreCache(this.store);
-    return this.fetchModels(this.store.createRecord('api', {
-      frontendHost: location.hostname,
-    }));
+  newRecordAttrs() {
+    return { frontendHost: location.hostname };
+  }
+
+  wrapModel(record) {
+    return this.fetchModels(record);
+  }
+
+  modelFromResolved(resolved) {
+    return resolved && resolved.record;
   }
 }

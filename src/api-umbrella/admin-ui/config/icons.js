@@ -7,6 +7,7 @@ module.exports = function() {
       'calendar',
       'caret-down',
       'cog',
+      'copy',
       'lock',
       'map-marker-alt',
       'pencil-alt',

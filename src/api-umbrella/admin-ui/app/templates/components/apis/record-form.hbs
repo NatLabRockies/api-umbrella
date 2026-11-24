@@ -151,6 +151,7 @@
     </div>
     {{#if this.model.id}}
       <div class="form-extra-actions">
+        <LinkTo @route="apis.new" @query={{hash duplicate_id=this.model.id}} class="duplicate-action"><FaIcon @icon="copy" />Duplicate API</LinkTo>
         <a href="#" class="remove-action" {{action "delete"}}><FaIcon @icon="times" />Delete API</a>
       </div>
     {{/if}}

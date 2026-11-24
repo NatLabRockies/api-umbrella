@@ -13,6 +13,7 @@ class Admin extends Model.extend(Validations) {
   static urlRoot = '/api-umbrella/v1/admins';
   static singlePayloadKey = 'admin';
   static arrayPayloadKey = 'data';
+  static duplicateExclude = ['username', 'email'];
 
   @attr()
   username;
