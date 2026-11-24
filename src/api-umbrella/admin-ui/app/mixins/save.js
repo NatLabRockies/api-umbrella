@@ -71,16 +71,17 @@ export default Mixin.create({
   destroyRecord(options) {
     bootbox.confirm(options.prompt, (result) => {
       if(result) {
-        this.model.destroyRecord().then(() => {
-          success({
-            title: 'Deleted',
-            text: (isFunction(options.message)) ? options.message(this.model) : options.message,
-            textTrusted: true,
+        const message = (isFunction(options.message)) ? options.message(this.model) : options.message;
+        this.router.transitionTo(options.transitionToRoute).then(() => {
+          this.model.destroyRecord().then(() => {
+            success({
+              title: 'Deleted',
+              text: message,
+              textTrusted: true,
+            });
+          }, function(response) {
+            bootbox.alert('Unexpected error deleting record: ' + response.responseText);
           });
-
-          this.router.transitionTo(options.transitionToRoute);
-        }, function(response) {
-          bootbox.alert('Unexpected error deleting record: ' + response.responseText);
         });
       }
     });
