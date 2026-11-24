@@ -172,7 +172,7 @@ function _M.drilldown(self)
   search:aggregate_by_drilldown(self.params["prefix"], drilldown_size)
 
   if self.params["format"] ~= "csv" then
-    search:aggregate_by_drilldown_over_time()
+    search:aggregate_by_drilldown_over_time(self.params["hits_over_time_max_buckets"])
   end
 
   local raw_results = search:fetch_results()

@@ -358,6 +358,14 @@ paths:
           required: false
           type: string
           description: A raw elasticsearch query string.
+        - name: hits_over_time_max_buckets
+          in: query
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+          description: The maximum number of top results to include in the hits_over_time chart data. Defaults to 10.
       responses:
         200:
           description: Successful response
