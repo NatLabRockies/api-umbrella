@@ -14,8 +14,8 @@ elif [ "$TARGETARCH" == "arm64" ]; then
 fi
 
 task_working_dir
-download "https://github.com/sass/dart-sass/releases/download/${dart_sass_version}/dart-sass-${dart_sass_version}-linux-${TARGETARCH}.tar.gz" "sha256" "$dart_sass_hash"
-extract_download "dart-sass-${dart_sass_version}-linux-${TARGETARCH}.tar.gz"
+download "https://github.com/sass/dart-sass/releases/download/${dart_sass_version}/dart-sass-${dart_sass_version}-linux-${download_arch}.tar.gz" "sha256" "$dart_sass_hash"
+extract_download "dart-sass-${dart_sass_version}-linux-${download_arch}.tar.gz"
 
 mkdir -p "$DEV_INSTALL_PREFIX"
 rsync -a --itemize-changes "dart-sass/" "$DEV_INSTALL_PREFIX/bin/"
