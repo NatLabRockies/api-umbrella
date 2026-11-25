@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -e -u -x
+source ./tasks/helpers.sh
+
+dart_sass_version="1.108.2"
+dart_sass_hash="32d2eb5b83cbc180fce9657ff3c57401a9006c59eccfe0bfdde0aa755a66d42f"
+
+download_arch="$TARGETARCH"
+if [ "$TARGETARCH" == "amd64" ]; then
+  download_arch="x64"
+elif [ "$TARGETARCH" == "arm64" ]; then
+  dart_sass_hash="1c7a587c81467e8f7551d71e5d62845b53270033c5cc3d36aa8fa07330a5d2a9"
+fi
+
+task_working_dir
+download "https://github.com/sass/dart-sass/releases/download/${dart_sass_version}/dart-sass-${dart_sass_version}-linux-${TARGETARCH}.tar.gz" "sha256" "$dart_sass_hash"
+extract_download "dart-sass-${dart_sass_version}-linux-${TARGETARCH}.tar.gz"
+
+mkdir -p "$DEV_INSTALL_PREFIX"
+rsync -a --itemize-changes "dart-sass/" "$DEV_INSTALL_PREFIX/bin/"
+
+stamp
