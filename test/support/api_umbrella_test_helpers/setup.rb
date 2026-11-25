@@ -493,30 +493,15 @@ module ApiUmbrellaTestHelpers
       @unique_test_ip_addr ||= next_unique_ip_addr
     end
 
-    # Typheous/Ethon doesn't currently support sending empty HTTP headers by
-    # simply setting the value to an empty string:
+    # Setting an empty header requires this special semicolon for curl. Since
+    # this is somewhat non-obvious, and this has changed over the years with
+    # Ethon, we'll keep this wrapper to make this rarer usage explicit.
+    #
+    # See:
     # https://github.com/typhoeus/ethon/pull/132
-    #
-    # This provides a workaround by using a fake extra header (see
-    # https://curl.haxx.se/mail/lib-2010-08/0174.html).
-    #
-    # If the Ethon pull request gets merged in, we can perhaps remove this, but
-    # we may still need it if we want our test suite to run on CentOS 6 (where
-    # curl is at v7.19, lacking the official support for sending empty values).
+    # https://github.com/typhoeus/ethon/pull/225
     def empty_http_header_options(header)
-      @empty_http_header_counter ||= 0
-      @empty_http_header_counter += 1
-      {
-        :headers => {
-          # First set the header to null to prevent Typheous from adding some
-          # default headers back in (like Content-Type).
-          header => nil,
-
-          # Next, add a fake header, and in the content of the header add line
-          # breaks and the real header without a value.
-          "X-Empty-Http-Header-Curl-Workaround#{@empty_http_header_counter}" => "ignore\r\n#{header}:",
-        },
-      }
+      { headers: { "#{header};" => "" } }
     end
   end
 end
