@@ -19,6 +19,10 @@ class Outdated < Thor
       :git => "https://github.com/cue-lang/cue.git",
       :github_release => "cue-lang/cue",
     },
+    "dart_sass" => {
+      :git => "https://github.com/sass/dart-sass.git",
+      :github_release => "sass/dart-sass",
+    },
     "envoy" => {
       :git => "https://github.com/envoyproxy/envoy.git",
       :github_release => "envoyproxy/envoy",
@@ -40,7 +44,6 @@ class Outdated < Thor
     "hugo" => {
       :git => "https://github.com/gohugoio/hugo.git",
       :github_release => "gohugoio/hugo",
-      :filename_matcher => /hugo_extended_\d.*\.tar\.gz/,
     },
     "lrexlib_pcre2" => {
       :luarock => "lrexlib-pcre2",
@@ -52,9 +55,6 @@ class Outdated < Thor
     "lua_resty_logger_socket" => {
       :git => "https://github.com/cloudflare/lua-resty-logger-socket.git",
       :git_ref => "master",
-    },
-    "lua_resty_openssl_aux_module" => {
-      :git => "https://github.com/fffonion/lua-resty-openssl-aux-module.git",
     },
     "luarocks" => {
       :git => "https://github.com/keplerproject/luarocks.git",

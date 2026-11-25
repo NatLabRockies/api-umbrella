@@ -36,7 +36,7 @@ return function(cache, callback)
   local new_active_config_value = callback(last_fetched_version)
   if new_active_config_value then
     local key = "active_config"
-    local namespaced_key = cache.name .. key
+    local namespaced_key = cache.ns_prefix .. key
 
     local previous_active_config_value, previous_get_err = active_config_dict:get(namespaced_key)
     if previous_get_err then

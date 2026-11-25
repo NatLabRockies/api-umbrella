@@ -12,8 +12,8 @@ importers:
         specifier: ^8.1.5
         version: 8.1.5
       bootstrap:
-        specifier: ^5.3.8
-        version: 5.3.8(@popperjs/core@2.11.8)
+        specifier: ^5.3.9
+        version: 5.3.9(@popperjs/core@2.11.8)
       escape-html:
         specifier: ^1.0.3
         version: 1.0.3
@@ -46,16 +46,16 @@ importers:
         specifier: ^2.32.0
         version: 2.32.0(eslint@8.57.1(supports-color@7.2.0))(supports-color@7.2.0)
       prettier:
-        specifier: ^3.9.10
-        version: 3.9.10
+        specifier: ^3.10.1
+        version: 3.10.1
       prettier-plugin-go-template:
         specifier: ^0.0.15
-        version: 0.0.15(prettier@3.9.10)
+        version: 0.0.15(prettier@3.10.1)
 
 packages:
 
-  '@babel/runtime@7.29.10':
-    resolution: {integrity: sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==}
+  '@babel/runtime@7.29.14':
+    resolution: {integrity: sha512-Y5tqevQaUAZhhj82BpYMNC1ssvLQTVAfwKdm8iy8qwmhvC2/CpcAu8OC+QEtjM7pMk7knx83u1Qj8gzkicyelw==}
     engines: {node: '>=6.9.0'}
 
   '@eslint-community/eslint-utils@4.10.1':
@@ -64,8 +64,8 @@ packages:
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
 
-  '@eslint-community/regexpp@4.12.2':
-    resolution: {integrity: sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew==}
+  '@eslint-community/regexpp@4.12.3':
+    resolution: {integrity: sha512-R76UKbvsqI68DJJVTVyqFKqU98CN4+B+acxNfEA2IFarSzP0SjtKf/3+fFiXzTyv5Fj3PxLkGHe2wnVWWMxobQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint/eslintrc@2.1.4':
@@ -175,13 +175,13 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  bootstrap@5.3.8:
-    resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
+  bootstrap@5.3.9:
+    resolution: {integrity: sha512-20cU0rcfw8WdxtVbmfU+xT2EjvVTw9Ror/h1Qvd7DXCujRg8OO9mdBCsmTHdJFf3BuadmBNJtgIuUXsBqSkk/w==}
     peerDependencies:
       '@popperjs/core': ^2.11.8
 
-  brace-expansion@1.1.21:
-    resolution: {integrity: sha512-9zeA+KLZNNzglF2TPKRQEDyx6Yby7daAkuy8MiPzpXPsYDWi/DRM8jmwUDxokQjYqBpv5DgPiwD4h4ZZSy1Ujw==}
+  brace-expansion@1.1.22:
+    resolution: {integrity: sha512-CKLDTuSsN0+r1ThM0WkzzBI7dnPI6xEGfa/JnVYIK9JNBA1N1NyPwXVHor//NKD/y3sDxp764sZdLhFK7pH8XQ==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -559,8 +559,8 @@ packages:
     resolution: {integrity: sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==}
     engines: {node: '>= 0.4'}
 
-  is-core-module@2.17.0:
-    resolution: {integrity: sha512-J/vG0zBCbIKOQFfufSwyXdMrsohyJIUNkrnmo6WZGzoM7tr/lsbfW5b2BvisL6zsyMzK9UxV9L6c7AoFbyXHOA==}
+  is-core-module@2.18.0:
+    resolution: {integrity: sha512-qyax9fgaKOEC4qK8WZn7Q4IcoZC9RC1O1fFxRcRTq/oMMkWT/uXpqpXa12kzWR409zAt1drYN9N9BO26UmBCmw==}
     engines: {node: '>= 0.4'}
 
   is-data-view@1.0.2:
@@ -780,8 +780,8 @@ packages:
     peerDependencies:
       prettier: ^3.0.0
 
-  prettier@3.9.10:
-    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
+  prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -836,8 +836,8 @@ packages:
     resolution: {integrity: sha512-x/+Cz4YrimQxQccJf5mKEbIa1NzeCRNI5Ecl/ekmlYaampdNLPalVyIcCZNNH3MvmqBugV5TMYZXv0ljslUlaw==}
     engines: {node: '>= 0.4'}
 
-  semver@6.3.1:
-    resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
+  semver@6.3.2:
+    resolution: {integrity: sha512-GYrCADwpu6yV5OAvchkQ27Z5wwMxWAEMg5NNWjyHh/5DboFFqbdbvYNIvZouQpxXyeMPoTOh0vdPYKlf0ZswdQ==}
     hasBin: true
 
   set-function-length@1.2.2:
@@ -990,14 +990,14 @@ packages:
 
 snapshots:
 
-  '@babel/runtime@7.29.10': {}
+  '@babel/runtime@7.29.14': {}
 
   '@eslint-community/eslint-utils@4.10.1(eslint@8.57.1(supports-color@7.2.0))':
     dependencies:
       eslint: 8.57.1(supports-color@7.2.0)
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/regexpp@4.12.2': {}
+  '@eslint-community/regexpp@4.12.3': {}
 
   '@eslint/eslintrc@2.1.4(supports-color@7.2.0)':
     dependencies:
@@ -1130,11 +1130,11 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  bootstrap@5.3.8(@popperjs/core@2.11.8):
+  bootstrap@5.3.9(@popperjs/core@2.11.8):
     dependencies:
       '@popperjs/core': 2.11.8
 
-  brace-expansion@1.1.21:
+  brace-expansion@1.1.22:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
@@ -1340,7 +1340,7 @@ snapshots:
       eslint-plugin-import: 2.32.0(eslint@8.57.1(supports-color@7.2.0))(supports-color@7.2.0)
       object.assign: 4.1.7
       object.entries: 1.1.9
-      semver: 6.3.1
+      semver: 6.3.2
 
   eslint-config-prettier@9.1.2(eslint@8.57.1(supports-color@7.2.0)):
     dependencies:
@@ -1349,7 +1349,7 @@ snapshots:
   eslint-import-resolver-node@0.3.10(supports-color@7.2.0):
     dependencies:
       debug: 3.2.7(supports-color@7.2.0)
-      is-core-module: 2.17.0
+      is-core-module: 2.18.0
       resolve: 2.0.0-next.7
     transitivePeerDependencies:
       - supports-color
@@ -1376,13 +1376,13 @@ snapshots:
       eslint-import-resolver-node: 0.3.10(supports-color@7.2.0)
       eslint-module-utils: 2.14.0(eslint-import-resolver-node@0.3.10(supports-color@7.2.0))(eslint@8.57.1(supports-color@7.2.0))(supports-color@7.2.0)
       hasown: 2.0.4
-      is-core-module: 2.17.0
+      is-core-module: 2.18.0
       is-glob: 4.0.3
       minimatch: 3.1.5
       object.fromentries: 2.0.8
       object.groupby: 1.0.3
       object.values: 1.2.1
-      semver: 6.3.1
+      semver: 6.3.2
       string.prototype.trimend: 1.0.10
       tsconfig-paths: 3.15.0
     transitivePeerDependencies:
@@ -1400,7 +1400,7 @@ snapshots:
   eslint@8.57.1(supports-color@7.2.0):
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@8.57.1(supports-color@7.2.0))
-      '@eslint-community/regexpp': 4.12.2
+      '@eslint-community/regexpp': 4.12.3
       '@eslint/eslintrc': 2.1.4(supports-color@7.2.0)
       '@eslint/js': 8.57.1
       '@humanwhocodes/config-array': 0.13.0(supports-color@7.2.0)
@@ -1591,7 +1591,7 @@ snapshots:
 
   history@5.3.0:
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.14
 
   ignore@5.3.2: {}
 
@@ -1640,7 +1640,7 @@ snapshots:
 
   is-callable@1.2.7: {}
 
-  is-core-module@2.17.0:
+  is-core-module@2.18.0:
     dependencies:
       hasown: 2.0.4
 
@@ -1764,7 +1764,7 @@ snapshots:
 
   minimatch@3.1.5:
     dependencies:
-      brace-expansion: 1.1.21
+      brace-expansion: 1.1.22
 
   minimist@1.2.8: {}
 
@@ -1777,7 +1777,7 @@ snapshots:
       array.prototype.flatmap: 1.3.3
       es-errors: 1.3.0
       object.entries: 1.1.9
-      semver: 6.3.1
+      semver: 6.3.2
 
   object-inspect@1.13.4: {}
 
@@ -1863,12 +1863,12 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-go-template@0.0.15(prettier@3.9.10):
+  prettier-plugin-go-template@0.0.15(prettier@3.10.1):
     dependencies:
-      prettier: 3.9.10
+      prettier: 3.10.1
       ulid: 2.4.0
 
-  prettier@3.9.10: {}
+  prettier@3.10.1: {}
 
   promise-polyfill@8.3.0: {}
 
@@ -1901,7 +1901,7 @@ snapshots:
   resolve@2.0.0-next.7:
     dependencies:
       es-errors: 1.3.0
-      is-core-module: 2.17.0
+      is-core-module: 2.18.0
       node-exports-info: 1.6.2
       object-keys: 1.1.1
       path-parse: 1.0.7
@@ -1936,7 +1936,7 @@ snapshots:
       es-errors: 1.3.0
       is-regex: 1.2.1
 
-  semver@6.3.1: {}
+  semver@6.3.2: {}
 
   set-function-length@1.2.2:
     dependencies:

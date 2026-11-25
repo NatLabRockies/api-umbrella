@@ -25,7 +25,7 @@ gem "rubocop-minitest", "~> 0.41.0", :require => false
 gem "childprocess"
 
 # Making HTTP requests
-gem "typhoeus", "~> 1.6.0"
+gem "typhoeus", "~> 1.7.1"
 
 # JSON parsing
 gem "multi_json", "~> 1.21"

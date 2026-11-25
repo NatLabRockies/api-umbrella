@@ -116,7 +116,18 @@ tasks:
       - task: deps:perp
       - task: deps:trafficserver
 
+  build-deps:dart-sass:
+    cmds:
+      - ./tasks/build-deps/dart-sass
+    sources:
+      - ./tasks/build-deps/dart-sass
+      - ./tasks/helpers.sh
+    generates:
+      - ./build/work/stamp/build-deps/dart-sass
+
   build-deps:hugo:
+    deps:
+      - build-deps:dart-sass
     cmds:
       - ./tasks/build-deps/hugo
     sources:

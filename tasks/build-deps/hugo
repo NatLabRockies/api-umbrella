@@ -3,15 +3,15 @@
 set -e -u -x
 source ./tasks/helpers.sh
 
-hugo_version="0.168.0"
-hugo_hash="787f100057328824f38c6ad7c87ff10d6451ae0a7bc39cedaad0dd2bcde17e53"
+hugo_version="0.170.1"
+hugo_hash="841a5462853aefc9942e4de1e8a5d75584b6a5181941e6ad3f1d745190e03cd8"
 if [ "$TARGETARCH" == "arm64" ]; then
-  hugo_hash="b975ba150a464f57115bdf6cbf6638224906461fdcf863821ec983f8602a442c"
+  hugo_hash="6f57f13bc47c000c0d36c7f5a446d6c06f7956d8e102cc2a13735e0c0225b2d2"
 fi
 
 task_working_dir
-download "https://github.com/gohugoio/hugo/releases/download/v${hugo_version}/hugo_extended_${hugo_version}_linux-${TARGETARCH}.tar.gz" "sha256" "$hugo_hash"
-extract_download "hugo_extended_${hugo_version}_linux-${TARGETARCH}.tar.gz"
+download "https://github.com/gohugoio/hugo/releases/download/v${hugo_version}/hugo_${hugo_version}_linux-${TARGETARCH}.tar.gz" "sha256" "$hugo_hash"
+extract_download "hugo_${hugo_version}_linux-${TARGETARCH}.tar.gz"
 
 install -D -m 755 "hugo" "$DEV_INSTALL_PREFIX/bin/hugo"
 

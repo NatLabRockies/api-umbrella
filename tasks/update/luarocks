@@ -6,11 +6,12 @@ source ./tasks/helpers/lua.sh
 
 cd "$SOURCE_DIR/src"
 
-rm -rf "$APP_VENDOR_LUA_DIR"
+rm -rf "$APP_VENDOR_LUA_DIR" "./luarocks.lock"
 
-extra_args=(
-  "--only-deps"
-  "--pin"
-)
+extra_args=("--only-deps")
 
 luarocks_install "./api-umbrella-git-1.rockspec" "git-1" "${extra_args[@]}"
+
+extra_args+=("--pin")
+luarocks_install "./api-umbrella-git-1.rockspec" "git-1" "${extra_args[@]}"
+cat ./luarocks.lock
