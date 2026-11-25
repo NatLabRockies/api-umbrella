@@ -29,6 +29,9 @@ class Test::Processes::TestTrafficserver < Minitest::Test
     assert_includes(log_filenames, "diags.log")
     FileUtils.rm_f(log_paths)
 
+    # FIXME: Temporarily debugging intermittent CI failures.
+    puts `set -x; ls -lah #{$config["log_dir"]}/trafficserver; cat #{$config["log_dir"]}/trafficserver/access.log`
+
     # Check stdout/stderr based logging.
     override_config({
       "log" => {
@@ -60,6 +63,10 @@ class Test::Processes::TestTrafficserver < Minitest::Test
       log_paths.reject! { |path| File.basename(path).start_with?("crash-") }
       # FIXME: Temporarily debugging intermittent CI failures.
       puts `set -x; ls -lah #{$config["log_dir"]}/trafficserver; cat #{$config["log_dir"]}/trafficserver/access.log`
+      if log_paths != []
+        sleep 10
+        puts `set -x; ls -lah #{$config["log_dir"]}/trafficserver; cat #{$config["log_dir"]}/trafficserver/access.log`
+      end
       assert_equal([], log_paths)
     end
   end
